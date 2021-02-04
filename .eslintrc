@@ -10,6 +10,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "ignorePatterns": [
+    ".cache/**",
     "dist/**",
     "node_modules/**"
   ]
