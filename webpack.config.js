@@ -1,3 +1,6 @@
+/* eslint-env node */
+/* eslint-disable @typescript-eslint/no-var-requires */
+
 const webpackConfig = require('webpack-typescript-boilerplate');
 
 module.exports = webpackConfig({
