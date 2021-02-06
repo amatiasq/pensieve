@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+
 import { Gist } from '../contracts/Gist';
 import { getFiles } from '../contracts/Gist-methods';
 import { GistDetails } from '../contracts/GistDetails';
-import { GistFile } from '../contracts/GistFile';
 import { GistFileDetails } from '../contracts/GistFileDetails';
-import { UserName } from '../contracts/type-aliases';
+import { GistId, UserName } from '../contracts/type-aliases';
 import { getGist, getGistsByUser } from '../services/api';
 
 export function NotesList() {
@@ -40,22 +40,21 @@ function GistCard({ gist }: { gist: Gist }) {
   }
 
   return (
-    <>
-      <div className="card">
-        {getFiles(details).map(x => (
-          <GistFileCard key={x.filename} {...x} />
-        ))}
-      </div>
-      <footer className="card-footer">
-        <Link className="card-footer-item" to={gist.id}>
-          Edit
-        </Link>
-      </footer>
-    </>
+    <div className="card">
+      {getFiles(details).map(x => (
+        <GistFileCard key={x.filename} gistId={gist.id} file={x} />
+      ))}
+    </div>
   );
 }
 
-function GistFileCard(file: GistFileDetails) {
+function GistFileCard({
+  gistId,
+  file,
+}: {
+  gistId: GistId;
+  file: GistFileDetails;
+}) {
   return (
     <>
       <div className="card-header">
@@ -66,6 +65,11 @@ function GistFileCard(file: GistFileDetails) {
           <pre>{file.content}</pre>
         </div>
       </div>
+      <footer className="card-footer">
+        <Link className="card-footer-item" to={`/${gistId}/${file.filename}`}>
+          Edit
+        </Link>
+      </footer>
     </>
   );
 }
