@@ -1,7 +1,8 @@
 {
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build --public-url /np src/index.html",
+    "build": "parcel build src/index.html",
+    "build-ci": "parcel build --public-url /np src/index.html",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
