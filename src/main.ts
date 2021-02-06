@@ -1,6 +1,9 @@
-console.log('Works,  no?');
+import { renderApp } from './App';
 
-document.write('Hi there!');
+const container = document.getElementById('app-container');
 
-// This is required to interpret this as a module I guess
-export const x = 1;
+if (!container) {
+  throw new Error('Missing container element');
+}
+
+renderApp(container);
