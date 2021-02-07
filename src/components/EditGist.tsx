@@ -54,7 +54,7 @@ function GistEditor({
     <div className="editor">
       <nav className="tabs">
         <Link to="/">
-          <button>&lt;</button>
+          <button>◀️</button>
         </Link>
         {getFiles(gist).map(x => (
           <button
@@ -73,7 +73,10 @@ function GistEditor({
         theme="vs-dark"
         defaultLanguage={file.language.toLowerCase()}
         value={value}
-        options={{ minimap: { enabled: lines > 100 } }}
+        options={{
+          minimap: { enabled: lines > 100 },
+          contextmenu: false,
+        }}
         onChange={setValue}
       />
     </div>

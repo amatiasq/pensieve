@@ -30,10 +30,16 @@ export function GistList() {
 }
 
 function GistItem({ gist }: { gist: Gist }) {
+  const date = gist.created_at.split('T')[0];
+  const title = gist.description ? `${date} - ${gist.description}` : date;
+  const files = getFiles(gist);
+  const extraClasses = files.length === 1 ? 'one-file':  '';
+
   return (
-    <li key={gist.id} className="gist-item">
+    <li className={`gist-item ${extraClasses}`}>
+      <h4>{title}</h4>
       <ol className="file-list">
-        {getFiles(gist).map(file => <GistFileItem key={file.filename} gist={gist} file={file} />)}
+        {files.map(file => <GistFileItem key={file.filename} gist={gist} file={file} />)}
       </ol>
     </li>
   );
@@ -41,11 +47,11 @@ function GistItem({ gist }: { gist: Gist }) {
 
 function GistFileItem({ gist, file }: { gist: Gist, file: GistFile }) {
   return (
-    <Link to={`/${gist.id}/${file.filename}`}>
-      <li key={file.filename} className="file-item">
-        {file.filename}
+      <li className="file-item">
+        <Link to={`/${gist.id}/${file.filename}`}>
+          {file.filename}
+        </Link>
       </li>
-      </Link>
     );
   }
 }
