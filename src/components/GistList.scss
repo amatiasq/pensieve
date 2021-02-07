@@ -1,14 +1,40 @@
 .gist-list {
   flex: 1;
   display: block;
+  background-color: #212122;
   margin: 0;
   padding: 0;
   overflow-y: auto;
   list-style: none;
+  padding-top: 8px;
+
+  --padding: 16px;
+  --files-padding: 8px;
+  --row-height: 28px;
 }
 
-.gist-item + .gist-item {
-  border-top: 2px solid #252526;
+.gist-item {
+  display: flex;
+  flex-direction: column;
+
+  &.one-file {
+    flex-direction: row;
+
+    .file-item {
+      padding-left: var(--files-padding);
+      padding-right: var(--files-padding);
+    }
+
+    > h4 {
+      padding-right: var(--files-padding);
+    }
+  }
+
+  > h4 {
+    height: var(--row-height);
+    line-height: var(--row-height);
+    padding-left: var(--padding);
+  }
 }
 
 .file-list {
@@ -16,10 +42,17 @@
 }
 
 .file-item {
-  padding: 16px;
+  height: var(--row-height);
+  line-height: var(--row-height);
+  padding-left: calc(var(--padding) + var(--files-padding));
 
-  & + .file-item {
-    padding-top: 0;
-    padding-bottom: 8px;
+  a {
+    display: block;
+    color: #939395;
+    text-decoration: none;
+  }
+
+  &:hover {
+    background-color: #252829;
   }
 }
