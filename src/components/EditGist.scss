@@ -1,0 +1,28 @@
+.editor {
+  flex: 1;
+}
+
+.tabs {
+  margin-bottom: 0;
+  background-color: #252526;
+
+  button {
+    appearance: none;
+    border: none;
+    background: #2d2d2d;
+    padding: 8px;
+    margin-right: 1px;
+
+    &:focus {
+      outline: none;
+    }
+
+    &.active {
+      background-color: #1c1c1c;
+    }
+  }
+}
+
+.spacer {
+  flex: 1;
+}

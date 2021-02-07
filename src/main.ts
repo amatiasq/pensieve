@@ -1,4 +1,4 @@
-import { renderApp } from './App';
+import { renderApp } from './components/App';
 
 const container = document.getElementById('app-container');
 
