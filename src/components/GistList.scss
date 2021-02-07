@@ -1,0 +1,25 @@
+.gist-list {
+  flex: 1;
+  display: block;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.gist-item + .gist-item {
+  border-top: 2px solid #252526;
+}
+
+.file-list {
+  list-style: none;
+}
+
+.file-item {
+  padding: 16px;
+
+  & + .file-item {
+    padding-top: 0;
+    padding-bottom: 8px;
+  }
+}
