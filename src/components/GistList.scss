@@ -9,7 +9,6 @@
 
   --padding: 16px;
   --files-padding: 8px;
-  --row-height: 28px;
 }
 
 .gist-item {
@@ -42,8 +41,8 @@
   }
 
   > h4 {
-    height: var(--row-height);
-    line-height: var(--row-height);
+    height: var(--gist-item-height);
+    line-height: var(--gist-item-height);
     padding-left: var(--padding);
   }
 }
@@ -53,8 +52,8 @@
 }
 
 .file-item {
-  height: var(--row-height);
-  line-height: var(--row-height);
+  height: var(--gist-item-height);
+  line-height: var(--gist-item-height);
   padding-left: calc(var(--padding) + var(--files-padding));
 
   a {
