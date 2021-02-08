@@ -131,10 +131,15 @@ table {
 html,
 body,
 #app-container {
+  color: white;
   display: flex;
   flex: 1;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 html {
   height: 100%;
+  background-color: black;
 }

@@ -1,0 +1,8 @@
+.resizer {
+  width: 3px;
+  cursor: ew-resize;
+}
+
+.resizer:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
