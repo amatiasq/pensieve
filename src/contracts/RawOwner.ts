@@ -1,6 +1,6 @@
 import { ValidURL } from './type-aliases';
 
-export interface Owner {
+export interface RawOwner {
   login: string;
   id: number;
   node_id: string;

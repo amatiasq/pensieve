@@ -4,9 +4,9 @@ import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 
-import { EditGist } from './EditGist';
-import { GistList } from './GistList';
 import { useGithubAuth } from '../hooks/useGithubAuth';
+import { GistList } from './GistList/GistList';
+import { EditGist } from './EditGist/EditGist';
 
 function App() {
   if (!useGithubAuth()) {

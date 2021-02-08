@@ -20,18 +20,11 @@ export function Resizer(props: ResizerProps) {
   };
 
   const dragMove = (event: React.DragEvent<HTMLDivElement>) => {
-    console.log(
-      'MOVE',
-      event.clientX - initialPosition,
-      event.clientX,
-      initialPosition,
-    );
     isDragging && setDelta([delta[1], event.clientX - initialPosition]);
   };
 
-  const dragEnd = (event: React.DragEvent<HTMLDivElement>) => {
+  const dragEnd = () => {
     const pos = initialPosition + delta[0];
-    console.log('END', pos, initialPosition, delta[0]);
     setIsDragging(false);
     setInitialPosition(pos);
     props.onChange(pos);
