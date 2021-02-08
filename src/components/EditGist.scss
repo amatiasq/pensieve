@@ -12,11 +12,11 @@
     background: #2d2d2d;
     color: #8b8b8b;
     vertical-align: middle;
-    height: 42px;
-    line-height: 42px;
-    font-size: 1.1rem;
     margin-right: 1px;
     padding: 0 24px;
+    height: var(--tabs-height);
+    line-height: var(--tabs-height);
+    font-size: var(--tabs-font-size);
 
     &:focus {
       outline: none;
