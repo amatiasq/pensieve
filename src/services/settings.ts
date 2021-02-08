@@ -1,6 +1,6 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 
-interface Settings {
+export interface Settings {
   sidebarWidth: number;
 }
 

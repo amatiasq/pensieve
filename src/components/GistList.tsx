@@ -4,15 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Gist } from '../contracts/Gist';
-import { getFiles } from '../contracts/Gist-methods';
+import { getFiles, getGistDate } from '../contracts/Gist-methods';
 import { GistFile } from '../contracts/GistFile';
 import { UserName } from '../contracts/type-aliases';
 import { getGistsByUser } from '../services/api';
-import { getSetting, setSetting } from '../services/settings';
 import { Resizer } from './Resizer';
+import { useSetting } from '../hooks/useSetting';
 
 export function GistList() {
-  const [size, setSize] = useState(getSetting('sidebarWidth'));
+  const [size, setSize] = useSetting('sidebarWidth');
   const [gists, setGists] = useState<Gist[]>([]);
 
   useEffect(() => {
@@ -30,39 +30,39 @@ export function GistList() {
           <GistItem key={gist.id} gist={gist}></GistItem>
         ))}
       </ul>
-      <Resizer size={size} onChange={onSidebarWidthChange} />
+      <Resizer size={size} onChange={setSize} />
     </aside>
   );
-
-  function onSidebarWidthChange(width: number) {
-    setSize(width);
-    setSetting('sidebarWidth', width)
-  }
 }
 
 function GistItem({ gist }: { gist: Gist }) {
-  const date = gist.created_at.split('T')[0];
+  const date = getGistDate(gist);
   const title = gist.description ? `${date} - ${gist.description}` : date;
   const files = getFiles(gist);
-  const extraClasses = files.length === 1 ? 'one-file':  '';
+  const extraClasses = files.length === 1 ? 'one-file' : '';
 
   return (
     <li className={`gist-item ${extraClasses}`}>
       <h4>{title}</h4>
       <ol className="file-list">
-        {files.map(file => <GistFileItem key={file.filename} gist={gist} file={file} />)}
+        {files.map(file => (
+          <GistFileItem key={file.filename} gist={gist} file={file} />
+        ))}
       </ol>
     </li>
   );
 }
 
-function GistFileItem({ gist, file }: { gist: Gist, file: GistFile }) {
+function GistFileItem({ gist, file }: { gist: Gist; file: GistFile }) {
+  const { filename } = file;
+  const date = getGistDate(gist);
+  const name = filename.startsWith(date)
+    ? filename.substr(date.length).trim()
+    : filename;
+
   return (
-      <li className="file-item">
-        <Link to={`/${gist.id}/${file.filename}`}>
-          {file.filename}
-        </Link>
-      </li>
-    );
-  }
+    <li className="file-item">
+      <Link to={`/${gist.id}/${file.filename}`}>{name}</Link>
+    </li>
+  );
 }

@@ -50,20 +50,22 @@ function GistEditor({
 
   const lines = value.split('\n').length;
 
+  console.log({ files: getFiles(gist) });
+
   return (
     <div className="editor">
       <nav className="tabs">
         <Link to="/">
-          <button>◀️</button>
+          <button className="back-button">◀️</button>
         </Link>
         {getFiles(gist).map(x => (
-          <button
+          <FileTab
             key={x.filename}
-            className={x === file ? 'active' : ''}
-            onClick={() => setFile(x)}
-          >
-            {x.filename}
-          </button>
+            file={x}
+            isActive={x === file}
+            onSelect={setFile}
+            onRename={name => console.log(name)}
+          />
         ))}
         <div className="spacer" draggable="true"></div>
       </nav>
@@ -83,4 +85,60 @@ function GistEditor({
       />
     </div>
   );
+}
+
+function FileTab({
+  file,
+  isActive,
+  onSelect,
+  onRename,
+}: {
+  file: GistFileDetails;
+  isActive: boolean;
+  onSelect(file: GistFileDetails): void;
+  onRename(name: string): void;
+}) {
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [name, setName] = useState(file.filename);
+
+  return (
+    <button
+      className={isActive ? 'active' : ''}
+      onClick={() => onSelect(file)}
+      onDoubleClick={() => setIsRenaming(true)}
+    >
+      <input
+        type="text"
+        className="rename-field"
+        style={{ width: file.filename.length + 'ch' }}
+        value={name}
+        readOnly={!isRenaming}
+        autoFocus
+        onChange={x => setName(x.target.value)}
+        onKeyDown={onKeyDown}
+        onBlur={rename}
+      />
+    </button>
+  );
+
+  function rename() {
+    if (name !== file.filename) {
+      // TODO: this should go to the server
+      file.filename = name;
+      onRename(name);
+    }
+
+    setIsRenaming(false);
+  }
+
+  function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter') {
+      rename();
+    }
+
+    if (event.key === 'Escape') {
+      setName(file.filename);
+      setIsRenaming(false);
+    }
+  }
 }
