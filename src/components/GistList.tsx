@@ -1,25 +1,20 @@
 import './GistList.scss';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { Gist } from '../contracts/Gist';
 import { getFiles, getGistDate } from '../contracts/Gist-methods';
 import { GistFile } from '../contracts/GistFile';
-import { UserName } from '../contracts/type-aliases';
-import { getGistsByUser } from '../services/api';
-import { Resizer } from './Resizer';
 import { useSetting } from '../hooks/useSetting';
+import { Resizer } from './Resizer';
+import { useGithubApi } from '../hooks/useGithubApi';
 
 export function GistList() {
   const [size, setSize] = useSetting('sidebarWidth');
-  const [gists, setGists] = useState<Gist[]>([]);
+  const gists = useGithubApi<Gist[]>('/gists');
 
-  useEffect(() => {
-    getGistsByUser('amatiasq' as UserName).then(setGists);
-  }, []);
-
-  if (!gists.length) {
+  if (!gists || !gists.length) {
     return <p>Loading...</p>;
   }
 

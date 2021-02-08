@@ -1,22 +1,35 @@
-import { GistId, UserName } from './../contracts/type-aliases';
-import { Gist } from '../contracts/Gist';
-import { GistDetails } from '../contracts/GistDetails';
+export type RequestBody = Record<string, any> | string | null;
 
-const GH_USER = 'amatiasq';
-const GH_TOKEN = '472722b21a619ff5965bf1a68c55d704f567e557';
+type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
+export type RequestOptions = Omit<FetchOptions, 'body'> & {
+  body?: RequestBody;
+};
 
-const API_ROOT = `https://api.github.com`;
-const url = (path: string) => `${API_ROOT}${path}`;
+function request<T>(url: string, extras: RequestOptions = {}) {
+  const body =
+    'body' in extras && typeof extras.body !== 'string'
+      ? JSON.stringify(extras.body)
+      : extras.body;
 
-const request = <T>(path: string, extras?: any) =>
-  fetch(url(path), { ...(extras || {}) }).then(x => x.json() as Promise<T>);
+  const options = {
+    ...extras,
+    body,
+  } as FetchOptions;
 
-const GET = <T>(path: string, options?: any) => request<T>(path, options);
-const POST = <T>(path: string, body: string) => request<T>(path, { body });
+  return fetch(url, options).then(x => x.json() as Promise<T>);
+}
 
-export const createGist = (content: string) => POST('/gists', content);
-export const getGist = (id: GistId) => GET<GistDetails>(`/gists/${id}`);
-export const getGistsByUser = (user: UserName) =>
-  GET<Gist[]>(`/users/${user}/gists`, {
-    headers: { Authorization: `Basic ${btoa(`${GH_USER}:${GH_TOKEN}`)}` },
-  });
+export const GET = <T>(url: string, options: RequestOptions = {}) =>
+  request<T>(url, options);
+
+export const POST = <T>(
+  url: string,
+  body: RequestBody = null,
+  options: RequestOptions = {},
+) => request<T>(url, { method: 'POST', body, ...options });
+
+export const PATCH = <T>(
+  url: string,
+  body: RequestBody = null,
+  options: RequestOptions = {},
+) => request<T>(url, { method: 'PATCH', body, ...options });

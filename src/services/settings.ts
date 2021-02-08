@@ -1,16 +1,20 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 
 export interface Settings {
+  username: string;
+  accessToken: string;
   sidebarWidth: number;
 }
 
-const settings = new ClientStorage<Settings>('np.sidebar-size', {
+const settings = new ClientStorage<Settings>('np.settings', {
   default: {
+    username: '',
+    accessToken: '',
     sidebarWidth: 400,
   },
 });
 
-export function getSetting(key: keyof Settings) {
+export function getSetting<Key extends keyof Settings>(key: Key) {
   return get()[key];
 }
 
