@@ -63,7 +63,7 @@ export class GistRepository {
       return (this.getById(id) as Gist).fetch();
     }
 
-    return fetchGist(id).then(x => this.saveToCache(new Gist(x)));
+    return fetchGist(id).then(x => this.addToPool(new Gist(x)));
   }
 
   private hasCached(id: GistId) {
@@ -76,7 +76,7 @@ export class GistRepository {
       return existing ? existing.setData(x) : new Gist(x);
     });
 
-    wrapped.forEach(this.saveToCache);
+    wrapped.forEach(this.addToPool);
 
     this.list.push(...wrapped);
     this.saveToStorage();
@@ -84,7 +84,16 @@ export class GistRepository {
     return [...this.list];
   }
 
-  private readonly saveToCache = (gist: Gist) => {
+  private readonly addToPool = (gist: Gist) => {
+    const { saveToStorage } = this;
+    const original = gist.setData;
+
+    gist.setData = function (raw) {
+      const result = original.call(this, raw);
+      saveToStorage();
+      return result;
+    };
+
     this.pool.set(gist.id, gist);
     return gist;
   };

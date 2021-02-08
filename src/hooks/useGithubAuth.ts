@@ -63,8 +63,10 @@ function getCodeFromParams() {
     );
   }
 
-  requestState.clear();
-  history.pushState({}, '', redirect_uri);
+  if (code) {
+    requestState.clear();
+    history.pushState({}, '', redirect_uri);
+  }
 
   return { code, state };
 }
