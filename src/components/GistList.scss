@@ -1,11 +1,22 @@
+aside {
+  display: flex;
+  background-color: #212122;
+
+  transition: width 0.5s ease-in-out;
+}
+
 .gist-list {
   display: block;
-  background-color: #212122;
+  flex: 1;
   margin: 0;
   padding: 0;
   overflow-y: auto;
   list-style: none;
   padding-top: 8px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   --padding: 16px;
   --files-padding: 8px;
@@ -14,6 +25,7 @@
 .gist-item {
   display: flex;
   flex-direction: column;
+  scroll-snap-align: start end;
 
   &.one-file {
     flex-direction: row;

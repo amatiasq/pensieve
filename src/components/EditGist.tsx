@@ -65,7 +65,7 @@ function GistEditor({
             {x.filename}
           </button>
         ))}
-        <div className="spacer"></div>
+        <div className="spacer" draggable="true"></div>
       </nav>
 
       <Editor
@@ -77,6 +77,7 @@ function GistEditor({
           minimap: { enabled: lines > 100 },
           contextmenu: false,
           wordWrap: 'on',
+          renderLineHighlight: 'none',
         }}
         onChange={setValue}
       />

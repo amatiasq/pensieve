@@ -4,8 +4,8 @@ import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 
-import { GistList } from './GistList';
 import { EditGist } from './EditGist';
+import { GistList } from './GistList';
 
 function App() {
   return (

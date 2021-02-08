@@ -8,11 +8,11 @@
   --tabs-height: 42px;
   --tabs-font-size: 1em;
 
-  .gist-list {
+  > aside {
     width: 400px;
   }
 
-  .editor {
+  > main {
     flex: 1;
   }
 }
