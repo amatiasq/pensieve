@@ -1,0 +1,13 @@
+.app {
+  display: flex;
+  flex: 1;
+  font-family: Arial, Helvetica, sans-serif;
+
+  .gist-list {
+    width: 300px;
+  }
+
+  .editor {
+    flex: 1;
+  }
+}

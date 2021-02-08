@@ -1,5 +1,4 @@
 .gist-list {
-  flex: 1;
   display: block;
   background-color: #212122;
   margin: 0;
@@ -19,10 +18,22 @@
 
   &.one-file {
     flex-direction: row;
+    white-space: nowrap;
+
+    .file-list {
+      flex: 1;
+      flex-shrink: 1;
+      overflow: hidden;
+    }
 
     .file-item {
       padding-left: var(--files-padding);
       padding-right: var(--files-padding);
+
+      a {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
 
     > h4 {

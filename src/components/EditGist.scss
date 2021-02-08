@@ -10,8 +10,13 @@
     appearance: none;
     border: none;
     background: #2d2d2d;
-    padding: 8px;
+    color: #8b8b8b;
+    vertical-align: middle;
+    height: 42px;
+    line-height: 42px;
+    font-size: 1.1rem;
     margin-right: 1px;
+    padding: 0 24px;
 
     &:focus {
       outline: none;
@@ -19,6 +24,7 @@
 
     &.active {
       background-color: #1c1c1c;
+      color: #ffffff;
     }
   }
 }

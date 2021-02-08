@@ -1,4 +1,4 @@
-import './App.css';
+import './App.scss';
 
 import React from 'react';
 import { render } from 'react-dom';
@@ -10,7 +10,8 @@ import { EditGist } from './EditGist';
 function App() {
   return (
     <div className="app">
-      <Route path="/" component={GistList} exact />
+      <GistList />
+      <Route path="/" component={() => <div></div>} exact />
       <Route path="/:gistId/:filename" component={EditGist}></Route>
     </div>
   );
