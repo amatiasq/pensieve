@@ -22,7 +22,7 @@ export function GistList() {
 
   return (
     <ul className="gist-list">
-      {gists.slice(0, 5).map(gist => (
+      {gists.map(gist => (
         <GistItem key={gist.id} gist={gist}></GistItem>
       ))}
     </ul>
