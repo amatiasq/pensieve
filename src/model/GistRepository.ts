@@ -16,36 +16,29 @@ export class GistRepository {
   });
 
   private readonly pool = new Map<string, Gist>();
-  private readonly ordered: Gist[] = [];
-  private page = 1;
+  private readonly list: Gist[] = [];
+  private page = 0;
 
   private get store() {
     return this.storage.get() as StoredGists;
   }
 
   get all() {
-    const { order } = this.store;
-
-    if (!this.ordered.length && order) {
-      const fromStorage = order
-        .map(id => this.getById(id))
-        .filter(Boolean) as Gist[];
-
-      this.ordered.push(...fromStorage);
-    }
-
-    return this.ordered;
+    return this.list;
   }
 
-  fetchAll() {
-    this.ordered.length = 0;
-    this.page = 1;
-    return fetchGists().then(x => this.addEntries(x));
+  getListFromCache() {
+    return this.store.order.map(x => this.getById(x)).filter(Boolean) as Gist[];
   }
 
   fetchMore() {
     this.page++;
     return fetchGists(this.page).then(x => this.addEntries(x));
+  }
+
+  reset() {
+    this.list.length = 0;
+    this.page = 0;
   }
 
   getById(id: GistId) {
@@ -66,11 +59,15 @@ export class GistRepository {
   }
 
   fetchById(id: GistId) {
-    if (this.pool.has(id)) {
+    if (this.hasCached(id)) {
       return (this.getById(id) as Gist).fetch();
     }
 
     return fetchGist(id).then(x => this.saveToCache(new Gist(x)));
+  }
+
+  private hasCached(id: GistId) {
+    return this.pool.has(id) || id in this.store.data;
   }
 
   private addEntries(list: RawGist[]) {
@@ -81,10 +78,10 @@ export class GistRepository {
 
     wrapped.forEach(this.saveToCache);
 
-    this.ordered.push(...wrapped);
+    this.list.push(...wrapped);
     this.saveToStorage();
 
-    return [...this.ordered];
+    return [...this.list];
   }
 
   private readonly saveToCache = (gist: Gist) => {
@@ -98,7 +95,7 @@ export class GistRepository {
       gist.toJSON(),
     ]);
 
-    const order = this.ordered.map(x => x.id);
+    const order = this.list.map(x => x.id);
     const data = Object.fromEntries(raw);
 
     const stored = this.storage.get() || { data: [] };
