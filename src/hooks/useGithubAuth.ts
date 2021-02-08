@@ -64,7 +64,7 @@ function getCodeFromParams() {
   }
 
   requestState.clear();
-  history.pushState({}, '', location.origin);
+  history.pushState({}, '', redirect_uri);
 
   return { code, state };
 }
