@@ -76,6 +76,7 @@ function GistEditor({
         options={{
           minimap: { enabled: lines > 100 },
           contextmenu: false,
+          wordWrap: 'on',
         }}
         onChange={setValue}
       />
