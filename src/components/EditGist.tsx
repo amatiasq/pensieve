@@ -7,25 +7,24 @@ import Editor from '@monaco-editor/react';
 
 import { getFiles } from '../contracts/Gist-methods';
 import { GistDetails } from '../contracts/GistDetails';
+import { GistFile } from '../contracts/GistFile';
 import { GistFileDetails } from '../contracts/GistFileDetails';
-import { GistId } from '../contracts/type-aliases';
-import { getGist } from '../services/api';
+import { useGithubApi } from '../hooks/useGithubApi';
+import { useScheduler } from '../hooks/useScheduler';
+import { updateGist } from '../services/github_api';
+
+const DELAY = 5;
 
 export function EditGist() {
   const { gistId, filename } = useParams() as { [key: string]: string };
+  const gist = useGithubApi<GistDetails>(`/gists/${gistId}`);
+  const file = gist ? gist.files[filename] : null;
 
-  const [details, setDetails] = useState<GistDetails>();
-  const file = details ? details.files[filename] : null;
-
-  useEffect(() => {
-    getGist(gistId as GistId).then(setDetails);
-  }, [gistId]);
-
-  if (!details || !file) {
+  if (!gist || !file) {
     return <p>Loading...</p>;
   }
 
-  return <GistEditor gist={details} defaultFile={file} />;
+  return <GistEditor gist={gist} defaultFile={file} />;
 }
 
 function GistEditor({
@@ -35,8 +34,15 @@ function GistEditor({
   gist: GistDetails;
   defaultFile: GistFileDetails;
 }) {
+  const [isSaved, setIsSaved] = useState(true);
   const [file, setFile] = useState<GistFileDetails>(defaultFile);
-  const [value, setValue] = useState<string>();
+  const [value, setValue] = useState<string | null>(null);
+
+  const scheduler = useScheduler(DELAY * 1000, () => {
+    if (isSaved) return;
+    saveFile(file, value);
+    setIsSaved(true);
+  });
 
   useEffect(() => {
     if (file) {
@@ -46,11 +52,18 @@ function GistEditor({
     setValue(file.content);
   }, [file]);
 
-  if (!value) return <p>Loading...</p>;
+  useEffect(() => {
+    window.addEventListener('keydown', event => {
+      if (event.metaKey && event.key === 's') {
+        event.preventDefault();
+        scheduler.run();
+      }
+    });
+  }, []);
+
+  if (value == null) return <p>Loading...</p>;
 
   const lines = value.split('\n').length;
-
-  console.log({ files: getFiles(gist) });
 
   return (
     <div className="editor">
@@ -63,11 +76,12 @@ function GistEditor({
             key={x.filename}
             file={x}
             isActive={x === file}
-            onSelect={setFile}
-            onRename={name => console.log(name)}
+            onSelect={onFileChange}
+            onRename={name => renameFile(x, name)}
           />
         ))}
         <div className="spacer" draggable="true"></div>
+        <span>{isSaved ? 'Saved' : `Waiting ${DELAY}s...`}</span>
       </nav>
 
       <Editor
@@ -81,10 +95,44 @@ function GistEditor({
           wordWrap: 'on',
           renderLineHighlight: 'none',
         }}
-        onChange={setValue}
+        onChange={onChange}
       />
     </div>
   );
+
+  function onFileChange(newFile: GistFileDetails) {
+    if (!isSaved && value != null) {
+      saveFile(file, value);
+      scheduler.stop();
+    }
+
+    setFile(newFile);
+  }
+
+  function onChange(value?: string) {
+    setIsSaved(false);
+    setValue(value || '');
+    scheduler.restart();
+  }
+
+  function renameFile(file: GistFile, filename: string) {
+    return updateGist(gist.id, {
+      files: { [file.filename]: { filename } },
+    }).then(() => (file.filename = filename));
+  }
+
+  function saveFile(file: GistFileDetails, value: string | null) {
+    const content = value || "Don't leave this empty";
+
+    if (file.content === content) {
+      console.log('NOTHING TO SAVE');
+      return;
+    }
+
+    return updateGist(gist.id, {
+      files: { [file.filename]: { content } },
+    }).then(() => (file.content = content));
+  }
 }
 
 function FileTab({
@@ -123,8 +171,6 @@ function FileTab({
 
   function rename() {
     if (name !== file.filename) {
-      // TODO: this should go to the server
-      file.filename = name;
       onRename(name);
     }
 

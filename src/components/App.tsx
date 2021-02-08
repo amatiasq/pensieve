@@ -6,8 +6,13 @@ import { BrowserRouter, Route } from 'react-router-dom';
 
 import { EditGist } from './EditGist';
 import { GistList } from './GistList';
+import { useGithubAuth } from '../hooks/useGithubAuth';
 
 function App() {
+  if (!useGithubAuth()) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <div className="app">
       <GistList />
