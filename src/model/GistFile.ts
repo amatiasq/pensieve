@@ -37,6 +37,10 @@ export class GistFile {
     return this.raw.content;
   }
 
+  get isContentLoaded() {
+    return 'content' in this.raw;
+  }
+
   constructor(
     private readonly gist: Gist,
     private raw: RawGistFile | RawGistFileDetails,

@@ -28,6 +28,10 @@ export class Gist {
     return this.raw.created_at.split('T')[0];
   }
 
+  get hasContent() {
+    return this._files.every(x => x.isContentLoaded);
+  }
+
   constructor(private raw: RawGist | RawGistDetails) {
     this.setData(raw);
   }
@@ -50,7 +54,6 @@ export class Gist {
     });
 
     old.filter(x => !this._files.includes(x)).map(x => x.dispose());
-
     return this;
   }
 
