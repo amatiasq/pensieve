@@ -1,8 +1,54 @@
-import { RawGist, RawGistDetails } from '../contracts/RawGist';
-import { fetchGist } from '../services/github_api';
+import { ClientStorage } from '@amatiasq/client-storage';
+
+import { RawGist } from '../contracts/RawGist';
+import { GistId } from '../contracts/type-aliases';
+import { notifyGistChanged } from '../services/cache-invalidation';
+import {
+  addGileToGist,
+  createGist,
+  fetchGist,
+  removeFileFromGist,
+  removeGist,
+  renameGistFile,
+  setFileContent,
+} from '../services/github_api';
+import { mergeGist } from '../util/mergeGist';
 import { GistFile } from './GistFile';
 
+type Storage = Partial<Record<GistId, RawGist>>;
+
+const storage = new ClientStorage<Storage>('np.gists', {
+  version: 2,
+  default: {},
+});
+
+function getFromStorage(id: GistId) {
+  const stored = storage.get() as Storage;
+  return id in stored ? new Gist(stored[id] as RawGist) : null;
+}
+
+function saveToStorage(raw: RawGist) {
+  const stored = storage.get() as Storage;
+  const existing = raw.id in stored ? stored[raw.id] : null;
+  const newEntry = existing ? mergeGist(existing, raw) : raw;
+
+  storage.set({
+    ...stored,
+    [raw.id]: compress(newEntry),
+  });
+
+  return raw;
+}
+
 export class Gist {
+  static create() {
+    return createGist().then(wrap);
+  }
+
+  static getById(id: GistId) {
+    return getFromStorage(id);
+  }
+
   private _files: GistFile[] = [];
 
   get id() {
@@ -10,6 +56,9 @@ export class Gist {
   }
   get url() {
     return this.raw.url;
+  }
+  get htmlUrl() {
+    return this.raw.html_url;
   }
   get isPublic() {
     return this.raw.public;
@@ -32,32 +81,70 @@ export class Gist {
     return this._files.every(x => x.isContentLoaded);
   }
 
-  constructor(private raw: RawGist | RawGistDetails) {
-    this.setData(raw);
+  constructor(private readonly raw: RawGist) {
+    saveToStorage(raw);
+    this._files = Object.values(raw.files).map(x => new GistFile(this, x));
   }
 
-  getFile(name: string) {
+  getFileByName(name: string) {
     return this._files.find(x => x.name === name);
   }
 
-  fetch() {
-    return fetchGist(this.id).then(x => this.setData(x));
+  reload() {
+    return fetchGist(this.id).then(wrap);
   }
 
-  setData(raw: RawGist | RawGistDetails) {
-    this.raw = raw;
-    const old = this._files;
+  addFile(name: string, content = 'Empty!') {
+    return addGileToGist(this.id, name, content).then(wrap);
+  }
 
-    this._files = Object.values(raw.files).map(file => {
-      const existing = old.find(x => x.name === file.filename);
-      return existing ? existing.setData(file) : new GistFile(this, file);
-    });
+  removeFile(file: GistFile): Promise<null | Gist> {
+    this.ensureFileIsMine(file);
 
-    old.filter(x => !this._files.includes(x)).map(x => x.dispose());
-    return this;
+    return this.files.length === 1
+      ? removeGist(this.id).then(() => null)
+      : removeFileFromGist(this.id, file.name).then(wrap);
+  }
+
+  renameFile(file: GistFile, newName: string) {
+    this.ensureFileIsMine(file);
+    return renameGistFile(this.id, file.name, newName).then(wrap);
+  }
+
+  setFileContent(file: GistFile, content: string) {
+    this.ensureFileIsMine(file);
+    return setFileContent(this.id, file.name, content).then(wrap);
   }
 
   toJSON() {
     return this.raw;
   }
+
+  private ensureFileIsMine(file: GistFile) {
+    if (!(file.name in this.raw.files)) {
+      throw new Error(`File ${file.name} doesn't belong to ${this.id}`);
+    }
+  }
+}
+
+function wrap(raw: RawGist) {
+  return new Gist(raw);
+}
+
+function compress<T extends RawGist>({
+  description,
+  files,
+  id,
+  public: p,
+  created_at,
+  html_url,
+}: T) {
+  return {
+    description,
+    files,
+    id,
+    public: p,
+    created_at,
+    html_url,
+  } as T;
 }

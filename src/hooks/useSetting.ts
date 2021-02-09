@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 import { getSetting, setSetting, Settings } from '../services/settings';
 
 export function useSetting<

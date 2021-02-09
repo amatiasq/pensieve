@@ -1,8 +1,10 @@
-import { RawGistFile, RawGistFileDetails } from './RawGistFile';
+import { RawGistFileDetails, RawGistFileItem } from './RawGistFile';
 import { RawOwner } from './RawOwner';
 import { GistId, SerializedDate, ValidURL } from './type-aliases';
 
-export interface RawGist {
+export type RawGist = RawGistItem | RawGistDetails;
+
+export interface RawGistItem {
   url: ValidURL;
   forks_url: ValidURL;
   commits_url: ValidURL;
@@ -11,7 +13,7 @@ export interface RawGist {
   git_pull_url: ValidURL;
   git_push_url: ValidURL;
   html_url: ValidURL;
-  files: { [key: string]: RawGistFile };
+  files: { [key: string]: RawGistFileItem };
   public: boolean;
   created_at: SerializedDate;
   updated_at: SerializedDate;
@@ -23,7 +25,7 @@ export interface RawGist {
   truncated: boolean;
 }
 
-export interface RawGistDetails extends RawGist {
+export interface RawGistDetails extends RawGistItem {
   files: { [key: string]: RawGistFileDetails };
   forks: any[];
   history: History[];

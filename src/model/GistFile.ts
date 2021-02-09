@@ -1,5 +1,4 @@
-import { RawGistFileDetails, RawGistFile } from '../contracts/RawGistFile';
-import { updateGist } from '../services/github_api';
+import { RawGistFileDetails, RawGistFileItem } from '../contracts/RawGistFile';
 import { Gist } from './Gist';
 
 export class GistFile {
@@ -41,58 +40,51 @@ export class GistFile {
     return 'content' in this.raw;
   }
 
+  get path() {
+    return `/${this.gist.id}/${this.name}`;
+  }
+
+  get isOnlyFile() {
+    return this.gist.files.length === 1;
+  }
+
   constructor(
     private readonly gist: Gist,
-    private raw: RawGistFile | RawGistFileDetails,
+    private raw: RawGistFileItem | RawGistFileDetails,
   ) {}
 
-  setData(raw: RawGistFile | RawGistFileDetails) {
-    this.checkNotDisposed();
-    this.raw = raw;
+  setData(raw: RawGistFileItem | RawGistFileDetails) {
+    this.raw = { ...this.raw, ...raw };
     return this;
   }
 
   rename(newName: string) {
-    this.checkNotDisposed();
-
     if (this.name === newName) {
       console.log(`File name is already "${newName}"`);
       return Promise.reject(`File name is already "${newName}"`);
     }
 
-    return updateGist(this.gist.id, {
-      files: {
-        [this.name]: { filename: newName },
-      },
-    }).then(() => this.update());
+    return this.gist
+      .renameFile(this, newName)
+      .then(x => x.getFileByName(newName) as GistFile);
   }
 
   setContent(content: string) {
-    this.checkNotDisposed();
-
     if (this.content === content) {
       console.log(`File content is already "${content}"`);
       return Promise.reject(`File content is already "${content}"`);
     }
 
-    return updateGist(this.gist.id, {
-      files: {
-        [this.name]: { content },
-      },
-    }).then(() => this.update());
+    return this.gist
+      .setFileContent(this, content)
+      .then(x => x.getFileByName(this.name));
   }
 
-  dispose() {
-    this.isDisposed = true;
+  remove() {
+    return this.gist.removeFile(this);
   }
 
-  private update() {
-    this.gist.fetch();
-  }
-
-  private checkNotDisposed() {
-    if (this.isDisposed) {
-      throw new Error(`File ${this.name} is already disposed`);
-    }
+  toJSON() {
+    return this.raw;
   }
 }

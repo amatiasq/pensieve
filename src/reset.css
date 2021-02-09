@@ -143,3 +143,16 @@ html {
   height: 100%;
   background-color: black;
 }
+
+button,
+input[type='text'] {
+  appearance: none;
+  background: transparent;
+  outline: none;
+  border: none;
+  color: inherit;
+}
+
+.fas {
+  color: inherit;
+}

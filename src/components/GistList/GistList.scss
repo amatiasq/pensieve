@@ -12,13 +12,31 @@ aside {
 .gist-list {
   display: block;
   flex: 1;
+  flex-shrink: 1;
   margin: 0;
   padding: 0;
   list-style: none;
   padding-top: 8px;
+  width: 1px;
 
   --padding: 16px;
   --files-padding: 8px;
+}
+
+.filter {
+  display: flex;
+  padding-left: var(--padding);
+  padding-right: var(--padding);
+
+  input {
+    flex: 1;
+    height: var(--gist-item-height);
+    line-height: var(--gist-item-height);
+  }
+
+  .clear {
+    background-color: transparent;
+  }
 }
 
 .gist-item {
@@ -76,4 +94,8 @@ aside {
   &:hover {
     background-color: #252829;
   }
+}
+
+.add-gist  {
+  cursor: pointer;
 }

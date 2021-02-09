@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+
 import { GistFile } from '../../model/GistFile';
+import { InputField } from './InputField';
 
 export function FileTab({
   file,
@@ -10,47 +13,49 @@ export function FileTab({
   file: GistFile;
   isActive: boolean;
   onSelect(file: GistFile): void;
-  onRename(name: string): void;
+  onRename(name: string): Promise<GistFile>;
 }) {
+  const history = useHistory();
   const [isRenaming, setIsRenaming] = useState(false);
-  const [name, setName] = useState(file.name);
+  const classNames = `file-tab ${isActive ? 'active' : ''}`;
 
   return (
-    <button
-      className={isActive ? 'active' : ''}
+    <div
+      className={classNames}
       onClick={() => onSelect(file)}
       onDoubleClick={() => setIsRenaming(true)}
     >
-      <input
-        type="text"
-        className="rename-field"
-        style={{ width: file.name.length + 'ch' }}
-        value={name}
-        readOnly={!isRenaming}
-        autoFocus
-        onChange={x => setName(x.target.value)}
-        onKeyDown={onKeyDown}
-        onBlur={rename}
+      <InputField
+        className="tab-name"
+        value={file.name}
+        editable={isRenaming}
+        onSubmit={rename}
+        onAbort={() => setIsRenaming(false)}
       />
-    </button>
+
+      <button className="remove" onClick={remove}>
+        <i className="fas fa-times"></i>
+      </button>
+    </div>
   );
 
-  function rename() {
+  function rename(name: string) {
     if (name !== file.name) {
-      onRename(name);
+      onRename(name).then(file => history.push(file.path));
     }
 
     setIsRenaming(false);
   }
 
-  function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter') {
-      rename();
-    }
+  function remove() {
+    const message = file.isOnlyFile
+      ? 'Permanently delete THE GIST?'
+      : `Permanently remove ${file.name}?`;
 
-    if (event.key === 'Escape') {
-      setName(file.name);
-      setIsRenaming(false);
+    if (confirm(message)) {
+      return file
+        .remove()
+        .then(gist => history.push(gist == null ? '/' : gist.files[0].path));
     }
   }
 }
