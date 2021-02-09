@@ -1,22 +1,45 @@
+import './FileTab.scss';
+
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { GistFile } from '../../model/GistFile';
+import { Action } from '../Action';
 import { InputField } from './InputField';
 
-export function FileTab({
-  file,
-  isActive,
-  onSelect,
-  onRename,
-}: {
+interface ExistingFileProps {
   file: GistFile;
   isActive: boolean;
   onSelect(file: GistFile): void;
   onRename(name: string): Promise<GistFile>;
-}) {
+}
+
+interface CreateFileProps {
+  onSubmit(name: string): void;
+  onAbort(): void;
+}
+
+type FileTabProps = ExistingFileProps | CreateFileProps;
+
+export function FileTab(props: FileTabProps) {
   const history = useHistory();
   const [isRenaming, setIsRenaming] = useState(false);
+
+  if (isCreateFile(props)) {
+    return (
+      <div className="file-tab active">
+        <InputField
+          className="tab-name"
+          value="type a file name.md"
+          editable={true}
+          onSubmit={props.onSubmit}
+          onAbort={props.onAbort}
+        />
+      </div>
+    );
+  }
+
+  const { file, isActive, onSelect, onRename } = props;
   const classNames = `file-tab ${isActive ? 'active' : ''}`;
 
   return (
@@ -33,9 +56,7 @@ export function FileTab({
         onAbort={() => setIsRenaming(false)}
       />
 
-      <button className="remove" onClick={remove}>
-        <i className="fas fa-times"></i>
-      </button>
+      <Action name="remove" icon="times" onClick={remove} />
     </div>
   );
 
@@ -58,4 +79,8 @@ export function FileTab({
         .then(gist => history.push(gist == null ? '/' : gist.files[0].path));
     }
   }
+}
+
+function isCreateFile(props: FileTabProps): props is CreateFileProps {
+  return !('file' in props);
 }

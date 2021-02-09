@@ -38,7 +38,7 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
 
   useEffect(() => {
     if (file) {
-      document.title = `${gist.date} ${file.name} | Gists`;
+      document.title = `${file.name} | Gists`;
     }
 
     setValue(file.content);

@@ -1,18 +1,19 @@
 import React, { createRef, useState } from 'react';
+
 import { useScheduler } from '../../hooks/useScheduler';
 import StringComparer from '../../util/StringComparer';
+import { Action } from '../Action';
 
 export function FilterBox({
   onChange,
 }: {
   onChange: (comparer: StringComparer | null) => void;
 }) {
+  const ref = createRef<HTMLInputElement>();
   const [term, setTerm] = useState('');
   const scheduler = useScheduler(50, () =>
     onChange(term ? new StringComparer(term) : null),
   );
-
-  const ref = createRef<HTMLInputElement>();
 
   return (
     <>
@@ -25,9 +26,7 @@ export function FilterBox({
       />
 
       {term ? (
-        <button className="clear" onClick={() => process('')}>
-          <i className="fas fa-times"></i>
-        </button>
+        <Action name="clear" icon="times" onClick={() => process('')} />
       ) : null}
     </>
   );

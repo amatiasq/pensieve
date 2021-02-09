@@ -2,25 +2,19 @@ aside {
   display: flex;
   background-color: #212122;
   transition: width 0.5s ease-in-out;
+}
+
+.gist-list {
+  flex: 1;
   overflow-y: auto;
+  padding-top: 8px;
+
+  --padding: 16px;
+  --files-padding: 8px;
 
   &::-webkit-scrollbar {
     display: none;
   }
-}
-
-.gist-list {
-  display: block;
-  flex: 1;
-  flex-shrink: 1;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  padding-top: 8px;
-  width: 1px;
-
-  --padding: 16px;
-  --files-padding: 8px;
 }
 
 .filter {
@@ -33,69 +27,4 @@ aside {
     height: var(--gist-item-height);
     line-height: var(--gist-item-height);
   }
-
-  .clear {
-    background-color: transparent;
-  }
-}
-
-.gist-item {
-  display: flex;
-  flex-direction: column;
-  scroll-snap-align: start end;
-
-  &.one-file {
-    flex-direction: row;
-    white-space: nowrap;
-
-    .file-list {
-      flex: 1;
-      flex-shrink: 1;
-      overflow: hidden;
-    }
-
-    .file-item {
-      padding-left: var(--files-padding);
-      padding-right: var(--files-padding);
-
-      a {
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-    }
-
-    > h4 {
-      padding-right: var(--files-padding);
-    }
-  }
-
-  > h4 {
-    height: var(--gist-item-height);
-    line-height: var(--gist-item-height);
-    padding-left: var(--padding);
-  }
-}
-
-.file-list {
-  list-style: none;
-}
-
-.file-item {
-  height: var(--gist-item-height);
-  line-height: var(--gist-item-height);
-  padding-left: calc(var(--padding) + var(--files-padding));
-
-  a {
-    display: block;
-    color: #939395;
-    text-decoration: none;
-  }
-
-  &:hover {
-    background-color: #252829;
-  }
-}
-
-.add-gist  {
-  cursor: pointer;
 }
