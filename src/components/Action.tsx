@@ -29,7 +29,8 @@ export type ActionProps =
 export function Action(props: ActionProps) {
   const { name, icon } = props;
   const cn = `action ${name || ''}`;
-  const iconEl = <i className={`action--icon fas fa-${icon}`}></i>;
+  const fa = icon === 'github' ? 'fab' : 'fas';
+  const iconEl = <i className={`action--icon ${fa} fa-${icon}`}></i>;
 
   if (isButtonAction(props)) {
     return (

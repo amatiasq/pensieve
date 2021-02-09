@@ -1,5 +1,3 @@
-import './EditGist.scss';
-
 import React, { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 
@@ -38,7 +36,8 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
 
   useEffect(() => {
     if (file) {
-      document.title = `${file.name} | Gists`;
+      // eslint-disable-next-line no-irregular-whitespace
+      document.title = `${file.name}  ✏️  Gists`;
     }
 
     setValue(file.content);
@@ -56,10 +55,10 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
   if (value == null) return <p>Loading...</p>;
 
   return (
-    <div className="editor">
+    <main className="editor">
       <EditorTabs gist={gist} active={file} onChange={onFileChange} />
       <ContentEditor file={file} value={value} onChange={onChange} />
-    </div>
+    </main>
   );
 
   function onFileChange(newFile: GistFile) {

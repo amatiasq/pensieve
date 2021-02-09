@@ -48,7 +48,7 @@ export function EditorTabs({
 
       <Action
         name="gh-link"
-        icon="github fab"
+        icon="github"
         target="_blank"
         href={gist.htmlUrl}
       />

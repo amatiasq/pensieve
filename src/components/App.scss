@@ -1,3 +1,5 @@
+@import '../util/fit-parent.scss';
+
 .app {
   display: flex;
   flex: 1;
@@ -13,10 +15,17 @@
   }
 
   > main {
-    flex: 1;
+    @include fit-parent();
   }
 }
 
-.spacer {
-  flex: 1;
+@media (max-width: 850px) {
+  .app.page-home > main,
+  .app.page-gist > aside {
+    display: none;
+  }
+
+  .app.page-home > aside {
+    width: 100% !important;
+  }
 }

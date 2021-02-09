@@ -1,7 +1,4 @@
-@mixin fit-parent() {
-  flex: 1 1;
-  width: 1px;
-}
+@import '../../util/fit-parent.scss';
 
 .gist-item {
   display: flex;
