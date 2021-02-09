@@ -13,7 +13,6 @@ export function Resizer(props: ResizerProps) {
   const [delta, setDelta] = useState([0, 0]);
 
   const dragStart = (event: React.DragEvent<HTMLDivElement>) => {
-    console.log('START');
     setIsDragging(true);
     setInitialPosition(event.clientX);
     setDelta([0, 0]);

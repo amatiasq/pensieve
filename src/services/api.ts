@@ -1,6 +1,7 @@
 export type RequestBody = Record<string, any> | string | null;
 
 type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
+
 export type RequestOptions = Omit<FetchOptions, 'body'> & {
   body?: RequestBody;
 };
@@ -16,7 +17,11 @@ function request<T>(url: string, extras: RequestOptions = {}) {
     body,
   } as FetchOptions;
 
-  return fetch(url, options).then(x => x.json() as Promise<T>);
+  return fetch(url, options).then(x => {
+    return isJsonResponse(x)
+      ? (x.json() as Promise<T>)
+      : ((x.text() as unknown) as Promise<T>);
+  });
 }
 
 export const GET = <T>(url: string, options: RequestOptions = {}) =>
@@ -33,3 +38,11 @@ export const PATCH = <T>(
   body: RequestBody = null,
   options: RequestOptions = {},
 ) => request<T>(url, { method: 'PATCH', body, ...options });
+
+export const DELETE = <T>(url: string, options: RequestOptions = {}) =>
+  request<T>(url, { method: 'DELETE', ...options });
+
+function isJsonResponse(response: Response) {
+  const type = response.headers.get('content-type');
+  return type ? type.toLowerCase().includes('application/json') : false;
+}

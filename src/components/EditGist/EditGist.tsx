@@ -11,12 +11,12 @@ import { GistFile } from '../../model/GistFile';
 import { ContentEditor } from './ContentEditor';
 import { EditorTabs } from './EditorTabs';
 
-const DELAY = 5;
+const DELAY = 2;
 
 export function EditGist() {
   const { gistId, filename } = useParams() as { [key: string]: string };
   const gist = useGist(gistId as GistId);
-  const file = gist ? gist.getFile(filename) || gist.files[0] : null;
+  const file = gist ? gist.getFileByName(filename) || gist.files[0] : null;
 
   if (!gist || !file || !file.content) {
     return <p>Loading...</p>;
@@ -57,7 +57,7 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
 
   return (
     <div className="editor">
-      <EditorTabs files={gist.files} active={file} onChange={onFileChange} />
+      <EditorTabs gist={gist} active={file} onChange={onFileChange} />
       <ContentEditor file={file} value={value} onChange={onChange} />
     </div>
   );

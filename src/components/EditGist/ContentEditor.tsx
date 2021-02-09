@@ -20,12 +20,13 @@ export function ContentEditor({
   onChange: (newValue: string | undefined) => void;
 }) {
   const lines = value.split('\n').length;
+  const language = file.language || 'Markdown';
 
   return (
     <Editor
       height="100vh"
       theme="vs-dark"
-      defaultLanguage={file.language.toLowerCase()}
+      defaultLanguage={language.toLowerCase()}
       value={value}
       options={{
         ...DEFAULT_OPTIONS,

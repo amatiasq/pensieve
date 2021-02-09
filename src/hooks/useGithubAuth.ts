@@ -31,7 +31,6 @@ export function useGithubAuth() {
       const { access_token } = parseParams(`/?${x.result}`);
       auth.set(access_token);
       setToken(access_token);
-      console.log(access_token);
     });
     return false;
   }

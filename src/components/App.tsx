@@ -5,8 +5,8 @@ import { render } from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 import { useGithubAuth } from '../hooks/useGithubAuth';
-import { GistList } from './GistList/GistList';
 import { EditGist } from './EditGist/EditGist';
+import { GistList } from './GistList/GistList';
 
 function App() {
   if (!useGithubAuth()) {
