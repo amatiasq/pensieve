@@ -1,15 +1,16 @@
 import './GistList.scss';
 
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { useGists } from '../../hooks/useGists';
 import { useSetting } from '../../hooks/useSetting';
-import { Resizer } from '../Resizer';
-import { GistItem } from './GistItem';
-import StringComparer from '../../util/StringComparer';
-import { FilterBox } from './FilterBox';
 import { Gist } from '../../model/Gist';
-import { useHistory } from 'react-router-dom';
+import StringComparer from '../../util/StringComparer';
+import { Action } from '../Action';
+import { Resizer } from '../Resizer';
+import { FilterBox } from './FilterBox';
+import { GistItem } from './GistItem';
 
 export function GistList() {
   const history = useHistory();
@@ -35,13 +36,11 @@ export function GistList() {
   );
 
   return (
-    <aside style={{ width: size }} onScroll={onScroll}>
-      <ul className="gist-list">
+    <aside style={{ width: size }}>
+      <ul className="gist-list" onScroll={onScroll}>
         <li className="filter">
           <FilterBox onChange={setFilter} />
-          <button className="add-gist" onClick={addGist}>
-            <i className="fas fa-plus"></i>
-          </button>
+          <Action name="add-gist" icon="plus" onClick={addGist} />
         </li>
 
         {content}

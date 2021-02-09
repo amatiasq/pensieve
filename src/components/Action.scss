@@ -1,0 +1,21 @@
+.action {
+  cursor: pointer;
+  opacity: 0.8;
+  transform: scale(1);
+  transform-origin: center center;
+  transition: opacity 0.1s, transform 0.1s;
+
+  &:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transition-duration: 0.1s;
+    transform: scale(0.8);
+  }
+
+  &--icon {
+    color: white;
+  }
+}

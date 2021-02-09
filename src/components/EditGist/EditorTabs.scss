@@ -1,0 +1,21 @@
+.tabs {
+  display: flex;
+  color: #8b8b8b;
+  background-color: #252526;
+
+  vertical-align: middle;
+  height: var(--tabs-height);
+  line-height: var(--tabs-height);
+
+  --tab-padding-h: 12px;
+  --tab-padding-v: 16px;
+
+  .action {
+    padding: 0 20px;
+  }
+}
+
+.external-link {
+  cursor: pointer;
+  font-size: 1.5em;
+}

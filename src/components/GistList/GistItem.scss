@@ -1,0 +1,58 @@
+@mixin fit-parent() {
+  flex: 1 1;
+  width: 1px;
+}
+
+.gist-item {
+  display: flex;
+  flex-direction: column;
+  line-height: var(--gist-item-height);
+  color: #939395;
+
+  &--title {
+    height: var(--gist-item-height);
+    padding-left: var(--padding);
+    color: #c7c7c7;
+  }
+
+  &--file-item {
+    height: var(--gist-item-height);
+    padding-left: calc(var(--padding) + var(--files-padding));
+    border-radius: 3px;
+
+    &:hover {
+      background-color: #252829;
+    }
+  }
+
+  &--link {
+    display: block;
+    color: #939395;
+    text-decoration: none;
+  }
+
+  &.one-file {
+    flex-direction: row;
+    white-space: nowrap;
+  }
+
+  &.one-file &--title {
+    padding-right: calc(var(--files-padding) / 2);
+  }
+
+  &.one-file &--file-list {
+    @include fit-parent();
+    display: flex;
+  }
+
+  &.one-file &--file-item {
+    @include fit-parent();
+    padding-left: calc(var(--files-padding) / 2);
+    padding-right: var(--files-padding);
+  }
+
+  &.one-file &--link {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

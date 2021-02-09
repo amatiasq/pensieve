@@ -1,10 +1,12 @@
+import './EditorTabs.scss';
+
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
+import { Action } from '../Action';
 import { FileTab } from './FileTab';
-import { InputField } from './InputField';
 
 export function EditorTabs({
   gist,
@@ -20,11 +22,7 @@ export function EditorTabs({
 
   return (
     <nav className="tabs">
-      <Link to="/">
-        <button className="back-button">
-          <i className="fas fa-chevron-left"></i>
-        </button>
-      </Link>
+      <Action name="back-button" icon="chevron-left" navigate="/" />
 
       {gist.files.map(file => (
         <FileTab
@@ -37,36 +35,33 @@ export function EditorTabs({
       ))}
 
       {newFileName == null ? (
-        <button
-          className="new-file"
+        <Action
+          name="new-file"
+          icon="plus"
           onClick={() => setNewFileName('Filename.md')}
-        >
-          <i className="fas fa-plus"></i>
-        </button>
+        />
       ) : (
-        <button className="active">
-          <InputField
-            className="tab-name"
-            value="type a file name.md"
-            editable={true}
-            onSubmit={addFile}
-            onAbort={() => setNewFileName(null)}
-          />
-        </button>
+        <FileTab onSubmit={addFile} onAbort={() => setNewFileName(null)} />
       )}
 
-      <span className="spacer"></span>
+      <div className="spacer"></div>
 
-      <a className="external-link" target="_blank" href={gist.htmlUrl}>
-        <i className="fab fa-github"></i>
-      </a>
+      <Action
+        name="gh-link"
+        icon="github fab"
+        target="_blank"
+        href={gist.htmlUrl}
+      />
     </nav>
   );
 
   function addFile(name: string) {
     setNewFileName(null);
-    gist
-      .addFile(name)
-      .then(x => history.push((x.getFileByName(name) as GistFile).path));
+
+    return gist.addFile(name).then(x => {
+      const file = x.getFileByName(name) as GistFile;
+      history.push(file.path);
+      return file;
+    });
   }
 }
