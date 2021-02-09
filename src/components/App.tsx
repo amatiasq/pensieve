@@ -10,13 +10,11 @@ import { GistList } from './GistList/GistList';
 
 function App() {
   const location = useLocation();
-  console.log({ location });
+  const page = getPageFromPath(location.pathname);
 
   if (!useGithubAuth()) {
     return <p>Loading...</p>;
   }
-
-  const page = getPageFromPath(location.pathname);
 
   return (
     <div className={`app page-${page}`}>
