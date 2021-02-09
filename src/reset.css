@@ -153,6 +153,11 @@ input[type='text'] {
   color: inherit;
 }
 
-.fas {
+.fas,
+.fab {
   color: inherit;
+}
+
+.spacer {
+  flex: 1;
 }
