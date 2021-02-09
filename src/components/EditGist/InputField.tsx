@@ -1,6 +1,7 @@
 import React, { createRef, useEffect, useState } from 'react';
 
 import { escapeHtml } from '../../util/escapeHtml';
+import { selectElementContents } from '../../util/selectElementContents';
 
 export function InputField({
   className,
@@ -20,8 +21,16 @@ export function InputField({
   const ref = createRef<HTMLSpanElement>();
 
   useEffect(() => {
-    if (editable) {
-      ref.current?.focus();
+    const el = ref.current;
+
+    if (editable && el) {
+      el.focus();
+      selectElementContents(el);
+
+      // HACK: selection doesn't work on newly created elements
+      setTimeout(() => {
+        selectElementContents(el);
+      }, 10);
     }
   }, [editable]);
 
