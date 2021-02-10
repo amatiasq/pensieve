@@ -17,8 +17,7 @@ import { GistFile } from './GistFile';
 
 type Storage = Partial<Record<GistId, RawGist>>;
 
-const storage = new ClientStorage<Storage>('np.gists', {
-  version: 2,
+const storage = new ClientStorage<Storage>('gists.cache', {
   default: {},
 });
 

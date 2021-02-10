@@ -8,6 +8,7 @@ const DEFAULT_OPTIONS = {
   contextmenu: false,
   wordWrap: 'on',
   renderLineHighlight: 'none',
+  rulers: [80, 120] as number[],
 } as const;
 
 export function ContentEditor({

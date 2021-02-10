@@ -7,12 +7,21 @@ const https = require('https');
 const encode = encodeURIComponent;
 const decode = decodeURIComponent;
 
+const {
+  PORT,
+  CLIENT_ID_PROD,
+  CLIENT_SECRET_PROD,
+  CLIENT_ID_DEV,
+  CLIENT_SECRET_DEV,
+} = process.env;
+
 const server = http.createServer(async (req, res) => {
   const { code, redirect_uri, state } = parseParams(req.url);
+  const isDev = redirect_uri.startsWith('http://localhost');
 
   const url = withParams(`https://github.com/login/oauth/access_token`, {
-    client_id: '120875b87556e8c052e4',
-    client_secret: '0e3f256f00f01cd73aade385da59c4e36a9eca50',
+    client_id: isDev ? CLIENT_ID_DEV : CLIENT_ID_PROD,
+    client_secret: isDev ? CLIENT_SECRET_DEV : CLIENT_SECRET_PROD,
     redirect_uri,
     state,
     code,
@@ -26,10 +35,12 @@ const server = http.createServer(async (req, res) => {
     'Content-Type': 'application/json',
   });
 
+  console.log(`Login request from ${redirect_uri}`);
   res.end(JSON.stringify({ result }));
 });
 
-server.listen(60175);
+server.listen(PORT);
+console.log(`Listening at ${PORT}`);
 
 function request(url) {
   return new Promise((resolve, reject) => {

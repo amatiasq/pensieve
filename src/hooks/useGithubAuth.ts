@@ -6,15 +6,17 @@ import { POST } from '../services/api';
 import { parseParams, withParams } from '../services/url';
 
 const isLocalHost = location.hostname === 'localhost';
+const CLIENT_ID = isLocalHost ? '3e0c6862be8f7272c3d4' : '120875b87556e8c052e4';
+
 const redirect_uri = isLocalHost
   ? location.origin
-  : 'https://amatiasq.github.io/np';
+  : 'https://gist.amatiasq.com/';
 
 const AUTH_ROOT = 'https://github.com/login/oauth';
-const AUTH_PROXY = 'https://api.amatiasq.com/np-auth';
+const AUTH_ENDPOINT = 'https://gist.amatiasq.com/auth';
 
-const requestState = new ClientStorage<string>('np.gh-state');
-const auth = new ClientStorage<string>('np.gh-token');
+const requestState = new ClientStorage<string>('gists.gh-state');
+const auth = new ClientStorage<string>('gists.gh-token');
 
 export const getGithubHeaders = () => ({
   Authorization: `token ${auth.get()}`,
@@ -44,7 +46,7 @@ export function useGithubAuth() {
 }
 
 function requestAccessToken(code: string, state: string) {
-  const url = withParams(AUTH_PROXY, {
+  const url = withParams(AUTH_ENDPOINT, {
     redirect_uri,
     state,
     code,
@@ -74,7 +76,7 @@ function requestAccess() {
   const state = Math.random().toString().substr(2);
 
   const url = withParams(`${AUTH_ROOT}/authorize`, {
-    client_id: '120875b87556e8c052e4',
+    client_id: CLIENT_ID,
     scope: 'gist',
     redirect_uri,
     state,
