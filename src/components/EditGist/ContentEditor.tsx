@@ -9,6 +9,7 @@ import { isMobile } from '../../util/isMobile';
 
 const DEFAULT_OPTIONS = {
   contextmenu: false,
+  tabSize: 2,
   wordWrap: 'on',
   renderLineHighlight: 'none',
   rulers: [80, 120] as number[],
