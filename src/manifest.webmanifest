@@ -1,0 +1,31 @@
+{
+  "short_name": "Better Gists",
+  "name": "UI improvements over Github Gists",
+  "description": "Simple app to take notes",
+  "display": "standalone",
+  "background_color": "#1c1c1c",
+  "theme_color": "#1c1c1c",
+  "start_url": "https://gist.amatiasq.com/",
+  "scope": "https://gist.amatiasq.com/",
+  "icons": [
+    { "src": "../assets/Matrix-16.png", "type": "image/png", "sizes": "16x16" },
+    { "src": "../assets/Matrix-24.png", "type": "image/png", "sizes": "24x24" },
+    { "src": "../assets/Matrix-32.png", "type": "image/png", "sizes": "32x32" },
+    { "src": "../assets/Matrix-64.png", "type": "image/png", "sizes": "64x64" },
+    {
+      "src": "../assets/Matrix-128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "../assets/Matrix-256.png",
+      "type": "image/png",
+      "sizes": "256x256"
+    },
+    {
+      "src": "../assets/Matrix-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

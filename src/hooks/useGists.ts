@@ -11,8 +11,7 @@ import {
 } from '../services/cache-invalidation';
 import { fetchGists } from '../services/github_api';
 
-const storage = new ClientStorage<GistId[]>('np.gist-order', {
-  version: 2,
+const storage = new ClientStorage<GistId[]>('gists.order', {
   default: [],
 });
 
