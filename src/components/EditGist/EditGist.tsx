@@ -41,7 +41,7 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
     }
 
     setValue(file.content);
-  }, [file]);
+  }, [file.name]);
 
   useEffect(() => {
     window.addEventListener('keydown', event => {
