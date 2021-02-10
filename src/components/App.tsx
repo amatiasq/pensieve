@@ -36,6 +36,6 @@ export function renderApp(container: HTMLElement): void {
 
 function getPageFromPath(path: string) {
   if (path === '/') return 'home';
-  if (path.split('/').length === 3) return 'gist';
-  throw new Error(`Unknown page "${path}"`);
+  const [start] = path.split('/');
+  return start;
 }
