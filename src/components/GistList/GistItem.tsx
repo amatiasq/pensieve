@@ -16,7 +16,7 @@ export function GistItem({ gist }: { gist: Gist }) {
       <ol className="gist-item--file-list">
         {files.map(({ name }) => (
           <li key={name} className="gist-item--file-item">
-            <Link className="gist-item--link" to={`/${gist.id}/${name}`}>
+            <Link className="gist-item--link" to={`/gist/${gist.id}/${name}`}>
               {print(name)}
             </Link>
           </li>

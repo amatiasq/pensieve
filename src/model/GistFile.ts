@@ -41,7 +41,7 @@ export class GistFile {
   }
 
   get path() {
-    return `/${this.gist.id}/${this.name}`;
+    return `/gist/${this.gist.id}/${this.name}`;
   }
 
   get isOnlyFile() {

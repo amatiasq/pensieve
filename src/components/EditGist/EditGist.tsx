@@ -67,7 +67,7 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
       scheduler.stop();
     }
 
-    history.push(`/${gist.id}/${newFile.name}`);
+    history.push(`/gist/${gist.id}/${newFile.name}`);
   }
 
   function onChange(value?: string) {
