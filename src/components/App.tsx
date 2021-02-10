@@ -20,7 +20,7 @@ function App() {
     <div className={`app page-${page}`}>
       <GistList />
       <Route path="/" component={() => <div></div>} exact />
-      <Route path="/:gistId/:filename" component={EditGist}></Route>
+      <Route path="/gist/:gistId/:filename" component={EditGist}></Route>
     </div>
   );
 }
