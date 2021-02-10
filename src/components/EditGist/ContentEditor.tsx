@@ -1,8 +1,11 @@
+import './ContentEditor.scss';
+
 import React from 'react';
 
 import Editor from '@monaco-editor/react';
 
 import { GistFile } from '../../model/GistFile';
+import { isMobile } from '../../util/isMobile';
 
 const DEFAULT_OPTIONS = {
   contextmenu: false,
@@ -22,6 +25,16 @@ export function ContentEditor({
 }) {
   const lines = value.split('\n').length;
   const language = file.language || 'Markdown';
+
+  if (isMobile) {
+    return (
+      <textarea
+        className="mobile-fallback"
+        defaultValue={value}
+        onChange={e => onChange(e.target.value)}
+      ></textarea>
+    );
+  }
 
   return (
     <Editor

@@ -36,6 +36,6 @@ export function renderApp(container: HTMLElement): void {
 
 function getPageFromPath(path: string) {
   if (path === '/') return 'home';
-  const [start] = path.split('/');
+  const [_, start] = path.split('/');
   return start;
 }
