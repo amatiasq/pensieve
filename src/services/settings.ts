@@ -2,10 +2,12 @@ import { ClientStorage } from '@amatiasq/client-storage';
 
 export interface Settings {
   sidebarWidth: number;
+  autosave: number | null;
 }
 
 const settings = new ClientStorage<Settings>('gists.settings', {
   default: {
+    autosave: 5,
     sidebarWidth: 400,
   },
 });

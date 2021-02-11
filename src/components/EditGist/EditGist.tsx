@@ -4,12 +4,12 @@ import { useHistory, useParams } from 'react-router-dom';
 import { GistId } from '../../contracts/type-aliases';
 import { useGist } from '../../hooks/useGist';
 import { useScheduler } from '../../hooks/useScheduler';
+import { useSetting } from '../../hooks/useSetting';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
+import { setFileContent } from '../../services/github_api';
 import { ContentEditor } from './ContentEditor';
 import { EditorTabs } from './EditorTabs';
-
-const DELAY = 2;
 
 export function EditGist() {
   const { gistId, filename } = useParams() as { [key: string]: string };
@@ -25,10 +25,15 @@ export function EditGist() {
 
 function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
   const history = useHistory();
+  const autosave = useSetting('autosave')[0] || 0;
   const [isSaved, setIsSaved] = useState(true);
   const [value, setValue] = useState<string>(file.content);
 
-  const scheduler = useScheduler(DELAY * 1000, () => {
+  const scheduler = useScheduler(autosave * 1000, () => {
+    if (autosave === 0) {
+      return;
+    }
+
     if (!isSaved && file.content !== value) {
       saveFile(file, value);
     }
@@ -42,6 +47,10 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
 
     setValue(file.content);
   }, [file.name]);
+
+  useEffect(() => {
+    if (isSaved) setValue(file.content);
+  }, [file.content]);
 
   useEffect(() => {
     window.addEventListener('keydown', event => {
