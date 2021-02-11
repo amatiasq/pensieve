@@ -1,8 +1,8 @@
-import { RawGist } from './../contracts/RawGist';
 import { useEffect, useState } from 'react';
 
 import { ClientStorage } from '@amatiasq/client-storage';
 
+import { RawGist } from '../contracts/RawGist';
 import { GistId } from '../contracts/type-aliases';
 import { Gist } from '../model/Gist';
 import {
@@ -10,6 +10,7 @@ import {
   onGistListchanged,
 } from '../services/cache-invalidation';
 import { fetchGists } from '../services/github_api';
+import { setTopGists } from '../services/settings';
 
 const storage = new ClientStorage<GistId[]>('gists.order', {
   default: [],
@@ -43,11 +44,13 @@ export function useGists(loadMore: boolean) {
   useEffect(() => onGistListchanged(() => fetch(1, [])));
 
   // If we have data then return it, otherwise return what's in local Storage
-  return cache.length
+  const result = cache.length
     ? cache
     : (getStored()
         .map(x => Gist.getById(x))
         .filter(Boolean) as Gist[]);
+
+  return setTopGists(result);
 
   function updateSingleGist(raw: RawGist) {
     const index = cache.findIndex(x => x.id === raw.id);

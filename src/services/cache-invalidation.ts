@@ -19,7 +19,12 @@ export function notifyGistChanged(raw: RawGistDetails) {
 }
 
 export function notifyGistListChanged() {
-  postMessage({ type: GIST_CREATED } as GistListChangedEvent, location.origin);
+  setTimeout(() => {
+    postMessage(
+      { type: GIST_CREATED } as GistListChangedEvent,
+      location.origin,
+    );
+  }, 10);
 }
 
 export function onGistChanged(listener: (raw: RawGistDetails) => void) {
