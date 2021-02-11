@@ -6,11 +6,13 @@ import { onGistChanged } from '../services/cache-invalidation';
 import { fetchGist } from '../services/github_api';
 import { onPageVisibilityChange as onVisibility } from '../util/page-visibility';
 import { Stopwatch } from '../util/Stopwatch';
+import { useSetting } from './useSetting';
 
 export function useGist(id: GistId) {
+  const [reloadAfter] = useSetting('reloadIfAwayForSeconds');
   const stored = Gist.getById(id);
 
-  const stopwatch = new Stopwatch();
+  const away = new Stopwatch();
   const [cache, setCache] = useState<Gist | null>(
     stored?.hasContent ? stored : null,
   );
@@ -28,17 +30,19 @@ export function useGist(id: GistId) {
   useEffect(() => {
     const unsubscribe = onVisibility(isVisible => {
       if (!isVisible) {
-        stopwatch.start();
+        away.start();
         return;
       }
 
-      if (stopwatch.stop('seconds') > 5) {
-        return cache?.reload().then(updated => {
+      if (reloadAfter && away.seconds > reloadAfter) {
+        cache?.reload().then(updated => {
           if (!updated.isIdentical(cache)) {
             setCache(updated);
           }
         });
       }
+
+      away.stop();
     });
 
     return () => {

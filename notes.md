@@ -1,6 +1,26 @@
 - Gist API Doc: https://docs.github.com/en/rest/reference/gists
 - Monaco React Doc: https://github.com/suren-atoyan/monaco-react
 
+## Features
+
+- Create & remove gists and files from them
+- Open gist link
+- Autosave every 5 seconds (configurable)
+- Full history visible through Github's page (follow link)
+- Auto refresh if await for more than 5 seconds (configurable)
+- Installable
+- Mobile support (editor is very simplified)
+- Search filters by name (by cached content in future)
+- Powerful editor on desktop
+  - It's VS Code's Monaco Editor
+  - Handles multi-selection
+  - Find
+  - Highlight
+  - Syntax
+  - ...
+
+## Log
+
 ###  [2021-02-10](https://gist.github.com/amatiasq/73a3b78622533205eac1ac6cfbee231e)
 
 ~~PRIORIZE THIS LIST~~
@@ -18,16 +38,18 @@
 - ~~Update language on filename change (should be happening already)~~
   - ~~**cambiar `defaultLanguage` a `language`**~~
 
+- ~~Revisar `language` en JS snippet~~
+
 - Markdown: ~ ~ ~~should strike text~~ ~ ~
 
-- Revisar `language` en JS snippet
-  - ???
+- Button "DOWNLOAD ALL"
 
 - save settings to gist file
   - cache to local storage
   - should be hidden from list
   - should be destroyed and re-create when in position 20+
   - asume missing if there is one on first fetch
+  - settings button opens settings gist
 
 - Favourite gists
   - ~~to local storage, gist to always be requested and listed first~~
