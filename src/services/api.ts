@@ -18,6 +18,10 @@ function request<T>(url: string, extras: RequestOptions = {}) {
   } as FetchOptions;
 
   return fetch(url, options).then(x => {
+    if (x.status === 404) {
+      throw new Error('Not found');
+    }
+
     return isJsonResponse(x)
       ? (x.json() as Promise<T>)
       : ((x.text() as unknown) as Promise<T>);

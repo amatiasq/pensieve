@@ -122,6 +122,10 @@ export class Gist {
     return true;
   }
 
+  hasFile(name: string) {
+    return name in this.raw.files;
+  }
+
   getFileByName(name: string) {
     return this._files.find(x => x.name === name);
   }

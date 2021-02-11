@@ -36,12 +36,13 @@ export const setFileContent = (id: GistId, filename: string, content: string) =>
 export const renameGistFile = (id: GistId, oldName: string, newName: string) =>
   updateGist(id, { files: { [oldName]: { filename: newName } } });
 
-export function createGist() {
+export function createGist(body: UpdateGistRequest = {}) {
   return POST<RawGistDetails>(
     url(`/gists`),
     {
       public: false,
       files: { 'New gist.md': { content: 'DO STUFF' } },
+      ...body,
     },
     withAuth(),
   ).finally(notifyGistListChanged);
