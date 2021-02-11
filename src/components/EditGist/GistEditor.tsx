@@ -1,29 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import './GistEditor.scss';
 
-import { GistId } from '../../contracts/type-aliases';
-import { useGist } from '../../hooks/useGist';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+
 import { useScheduler } from '../../hooks/useScheduler';
 import { useSetting } from '../../hooks/useSetting';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
-import { setFileContent } from '../../services/github_api';
 import { ContentEditor } from './ContentEditor';
 import { EditorTabs } from './EditorTabs';
 
-export function EditGist() {
-  const { gistId, filename } = useParams() as { [key: string]: string };
-  const gist = useGist(gistId as GistId);
-  const file = gist ? gist.getFileByName(filename) || gist.files[0] : null;
-
-  if (!gist || !file || !file.content) {
-    return <p>Loading...</p>;
-  }
-
-  return <GistEditor gist={gist} file={file} />;
-}
-
-function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
+export function GistEditor({
+  gist,
+  file,
+  readonly,
+}: {
+  gist: Gist;
+  file: GistFile;
+  readonly?: boolean;
+}) {
   const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
   const [isSaved, setIsSaved] = useState(true);
@@ -64,9 +59,19 @@ function GistEditor({ gist, file }: { gist: Gist; file: GistFile }) {
   if (value == null) return <p>Loading...</p>;
 
   return (
-    <main className="editor">
-      <EditorTabs gist={gist} active={file} onChange={onFileChange} />
-      <ContentEditor file={file} value={value} onChange={onChange} />
+    <main className={`gist-editor ${readonly ? 'readonly' : ''}`}>
+      <EditorTabs
+        gist={gist}
+        active={file}
+        readonly={readonly}
+        onChange={onFileChange}
+      />
+      <ContentEditor
+        file={file}
+        value={value}
+        readonly={readonly}
+        onChange={onChange}
+      />
     </main>
   );
 

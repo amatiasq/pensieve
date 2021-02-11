@@ -12,10 +12,12 @@ import { FileTab } from './FileTab';
 export function EditorTabs({
   gist,
   active,
+  readonly,
   onChange,
 }: {
   gist: Gist;
   active: GistFile;
+  readonly?: boolean;
   onChange: (file: GistFile) => void;
 }) {
   const settings = getSettingsGist();
@@ -25,9 +27,10 @@ export function EditorTabs({
   return (
     <nav className="editor-tabs">
       <Action
-        name="editor-tabs--back-button"
+        name="editor-tabs--back"
         icon="chevron-left"
         navigate="/"
+        square
       />
 
       {gist.files.map(file => (
@@ -35,6 +38,7 @@ export function EditorTabs({
           key={file.name}
           file={file}
           isActive={file === active}
+          readonly={readonly}
           onSelect={onChange}
           onRename={name => file.rename(name)}
         />
@@ -53,9 +57,26 @@ export function EditorTabs({
       <div className="spacer"></div>
 
       <div className="editor-tabs--actions">
+        {/* <Action
+          name="editor-tabs--fav"
+          icon={gist.isStarred ? 'star' : 'far star'}
+          onClick={gist.toggleStar()}
+        /> */}
+
         <Action
-          name="editor-tabs--gh-link"
-          icon="github"
+          name="editor-tabs--commments"
+          icon="comment-alt"
+          target="_blank"
+          href={gist.commentsUrl}
+        >
+          <span className="editor-tabs--comment-count">
+            {gist.commentCount}
+          </span>
+        </Action>
+
+        <Action
+          name="editor-tabs--github"
+          icon="fab github"
           target="_blank"
           href={gist.htmlUrl}
         />

@@ -1,50 +1,45 @@
+import { emitter } from '@amatiasq/emitter';
 import { RawGistDetails } from '../contracts/RawGist';
 
 export const GIST_CHANGED = 'GIST_CHANGED' as const;
-export const GIST_CREATED = 'GIST_CREATED' as const;
+export const LIST_CHANGED = 'LIST_CHANGED' as const;
 
 interface GistChangedEvent {
   type: typeof GIST_CHANGED;
-  raw: RawGistDetails;
+  data: RawGistDetails;
 }
 
 interface GistListChangedEvent {
-  type: typeof GIST_CREATED;
+  type: typeof LIST_CHANGED;
+  data?: never;
 }
 
 type CacheEvent = GistChangedEvent | GistListChangedEvent;
 
-export function notifyGistChanged(raw: RawGistDetails) {
-  postMessage({ type: GIST_CHANGED, raw } as GistChangedEvent, location.origin);
-}
+const emitters = {
+  [GIST_CHANGED]: emitter<RawGistDetails>(),
+  [LIST_CHANGED]: emitter<void>(),
+} as const;
 
-export function notifyGistListChanged() {
-  setTimeout(() => {
-    postMessage(
-      { type: GIST_CREATED } as GistListChangedEvent,
-      location.origin,
-    );
-  }, 10);
-}
+window.addEventListener('message', (event: MessageEvent<CacheEvent>) => {
+  const emitter = emitters[event.data.type];
 
-export function onGistChanged(listener: (raw: RawGistDetails) => void) {
-  window.addEventListener('message', handler);
-  return () => window.removeEventListener('message', handler);
-
-  function handler(event: MessageEvent<CacheEvent>) {
-    if (event.data.type === GIST_CHANGED) {
-      listener(event.data.raw);
-    }
+  if (emitter) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    emitter(event.data.data as any);
   }
-}
+});
 
-export function onGistListchanged(listener: () => void) {
-  window.addEventListener('message', handler);
-  return () => window.removeEventListener('message', handler);
+const notify = (message: CacheEvent) =>
+  setTimeout(() => postMessage(message, location.origin), 10);
 
-  function handler(event: MessageEvent<CacheEvent>) {
-    if (event.data.type === GIST_CREATED) {
-      listener();
-    }
-  }
-}
+export const notifyGistListChanged = () => notify({ type: LIST_CHANGED });
+
+export const onGistListchanged = (listener: () => void) =>
+  emitters[LIST_CHANGED].subscribe(listener);
+
+export const notifyGistChanged = (raw: RawGistDetails) =>
+  notify({ type: GIST_CHANGED, data: raw });
+
+export const onGistChanged = (listener: (raw: RawGistDetails) => void) =>
+  emitters[GIST_CHANGED].subscribe(listener);

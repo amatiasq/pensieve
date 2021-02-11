@@ -5,8 +5,9 @@ import { render } from 'react-dom';
 import { BrowserRouter, Route, useLocation } from 'react-router-dom';
 
 import { useGithubAuth } from '../hooks/useGithubAuth';
-import { EditGist } from './EditGist/EditGist';
+import { EditGistFromUrl } from './EditGist/EditGistFromUrl';
 import { GistList } from './GistList/GistList';
+import { Placeholder } from './Placeholder';
 
 function App() {
   const location = useLocation();
@@ -19,8 +20,8 @@ function App() {
   return (
     <div className={`app page-${page}`}>
       <GistList />
-      <Route path="/" component={() => <div></div>} exact />
-      <Route path="/gist/:gistId/:filename" component={EditGist}></Route>
+      <Route path="/" component={Placeholder} exact />
+      <Route path="/gist/:gistId/:filename" component={EditGistFromUrl}></Route>
     </div>
   );
 }

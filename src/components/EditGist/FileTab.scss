@@ -7,23 +7,19 @@
     color: #ffffff;
   }
 
-  .remove {
-    padding-left: calc(var(--tab-padding-h) + 4px);
+  &--remove .action--icon {
+    margin-top: 1px;
   }
-}
 
-.tab-name {
-  padding: var(--tab-padding-h) 0px var(--tab-padding-h) var(--tab-padding-v);
-  border: 1px solid transparent;
+  &--tab-name {
+    padding: var(--tab-padding-h) 0px var(--tab-padding-h) var(--tab-padding-v);
 
-  &[contenteditable='true'] {
-    cursor: text;
-    outline: none;
-    border-color: #0071d2;
-    padding-right: var(--tab-padding-v);
+    &.editing {
+      padding-right: var(--tab-padding-v);
 
-    & + .remove {
-      display: none;
+      & + .file-tab--remove {
+        display: none;
+      }
     }
   }
 }

@@ -1,21 +1,62 @@
-.action {
-  cursor: pointer;
-  opacity: 0.8;
-  transform: scale(1);
-  transform-origin: center center;
-  transition: opacity 0.1s, transform 0.1s;
+@mixin center {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 
-  &:hover {
-    opacity: 1;
-    transform: scale(1.1);
+@mixin disable-action() {
+  cursor: not-allowed;
+
+  .action--trigger {
+    opacity: 0.8;
+    pointer-events: none;
   }
+}
 
-  &:active {
-    transition-duration: 0.1s;
-    transform: scale(0.8);
+.action {
+  @include center();
+  --size: 42px;
+  width: var(--size);
+  height: var(--size);
+
+  cursor: pointer;
+
+  &:not(.square) {
+    padding: 4px;
+
+    .action--trigger {
+      border-radius: 100%;
+    }
   }
 
   &--icon {
     color: white;
+  }
+
+  &--trigger {
+    @include center();
+
+    width: 100%;
+    height: 100%;
+    padding: 0;
+
+    opacity: 0.8;
+    text-decoration: none;
+
+    transform: scale(1);
+    transform-origin: center center;
+    transition: opacity 0.1s, transform 0.1s, background-color 0.25s;
+
+    &:hover {
+      opacity: 1;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &:active {
+      transition-duration: 0.1s;
+      transform: scale(0.8);
+      background-color: rgba(255, 255, 255, 0.3);
+    }
   }
 }

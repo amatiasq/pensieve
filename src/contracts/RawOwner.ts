@@ -1,7 +1,7 @@
-import { ValidURL } from './type-aliases';
+import { UserName, ValidURL } from './type-aliases';
 
 export interface RawOwner {
-  login: string;
+  login: UserName;
   id: number;
   node_id: string;
   avatar_url: ValidURL;

@@ -1,10 +1,20 @@
 export function selectElementContents(el: HTMLElement) {
-  const selection = window.getSelection();
   const range = document.createRange();
   range.selectNodeContents(el);
 
+  const selection = clearSelection();
+
   if (selection) {
-    selection.removeAllRanges();
     selection.addRange(range);
   }
+}
+
+export function clearSelection() {
+  const selection = window.getSelection();
+
+  if (selection) {
+    selection.removeAllRanges();
+  }
+
+  return selection;
 }

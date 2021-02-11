@@ -11,15 +11,26 @@
   --tab-padding-v: 16px;
 
   .action {
-    padding: 0 20px;
+    width: var(--tabs-height);
   }
 
   &--actions {
     padding: 0 4px;
 
     .action {
-      padding: 0 8px;
       font-size: 1.5em;
     }
+  }
+
+  &--commments .action--trigger {
+    position: relative;
+  }
+
+  &--comment-count {
+    position: absolute;
+    top: -5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.7);
   }
 }

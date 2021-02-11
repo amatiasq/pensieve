@@ -11,6 +11,7 @@ import {
 } from '../services/cache-invalidation';
 import { fetchGists } from '../services/github_api';
 import { setTopGists } from '../services/settings';
+import { useSetting } from './useSetting';
 
 const storage = new ClientStorage<GistId[]>('gists.order', {
   default: [],
@@ -21,6 +22,7 @@ function getStored() {
 }
 
 export function useGists(loadMore: boolean) {
+  const [_, setUsername] = useSetting('username');
   const [page, setPage] = useState(0);
   const [cache, setCache] = useState<Gist[]>([]);
 
@@ -66,6 +68,12 @@ export function useGists(loadMore: boolean) {
 
   function fetch(page: number, prev: Gist[]) {
     return fetchGists(page).then(list => {
+      const [first] = list;
+
+      if (first) {
+        setUsername(first.owner.login);
+      }
+
       setCache([...prev, ...list.map(x => new Gist(x))]);
     });
   }

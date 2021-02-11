@@ -11,6 +11,7 @@
 - Installable
 - Mobile support (editor is very simplified)
 - Search filters by name (by cached content in future)
+
 - Powerful editor on desktop
   - It's VS Code's Monaco Editor
   - Handles multi-selection
@@ -18,6 +19,10 @@
   - Highlight
   - Syntax
   - ...
+
+- Settings saved into a hidden gist
+  - Settings are consistent across devices
+  -
 
 ## Log
 
@@ -44,16 +49,20 @@
 
 - Button "DOWNLOAD ALL"
 
-- save settings to gist file
-  - cache to local storage
-  - should be hidden from list
-  - should be destroyed and re-create when in position 20+
-  - asume missing if there is one on first fetch
-  - settings button opens settings gist
+- ~~save settings to gist file~~
+  - ~~cache to local storage~~
+  - ~~should be hidden from list~~
+  - ~~should be destroyed and re-create when in position 20+~~
+  - ~~asume missing if there is one on first fetch~~
+  - ~~settings button opens settings gist~~
 
 - Favourite gists
   - ~~to local storage, gist to always be requested and listed first~~
-  - save to settings
+  - ~~save to settings~~
+  - Use starred API
+    - https://docs.github.com/en/rest/reference/gists#list-starred-gists
+
+- Save git history
 
 - Display dates
   - if year is current not show
