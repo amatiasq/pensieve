@@ -10,34 +10,42 @@ import {
 } from './github_api';
 
 export interface Settings {
-  sidebarWidth: number;
   autosave: number;
   reloadIfAwayForSeconds: number;
   rulers: number[];
+  settingsGistRecreateThreshold: number;
+  sidebarWidth: number;
   starred: string[];
+  tabSize: number;
+  wordWrap: boolean;
 }
 
 const DEFAULT = {
   sidebarWidth: 400,
   autosave: 5,
   reloadIfAwayForSeconds: 5,
+  settingsGistRecreateThreshold: 50,
+  tabSize: 2,
+  wordWrap: true,
   rulers: [],
   starred: [],
 } as Settings;
 
-const storage = new ClientStorage<Settings>('gists.settings', {
-  default: DEFAULT,
+const storage = new ClientStorage<Partial<Settings>>('gists.settings', {
+  version: 1,
+  default: {},
 });
 
-const gist = settingsGist();
 const settings = () => storage.get()!;
+const gist = settingsGist();
 
-export const settingsGistId = () => gist.getId();
-export const setTopGists = (list: Gist[]) => gist.topGists(list);
+export const settingsGistId = gist.getId;
+export const getSettingsGist = gist.info;
+export const setTopGists = gist.topGists;
 
 export function getSetting<Key extends keyof Settings>(key: Key) {
   const val = settings()[key];
-  return val == null ? DEFAULT[key] : val;
+  return (val == null ? DEFAULT[key] : val) as NonNullable<Settings[Key]>;
 }
 
 export function setSetting<Key extends keyof Settings>(
@@ -49,8 +57,7 @@ export function setSetting<Key extends keyof Settings>(
 }
 
 function settingsGist() {
-  const RECREATE_THRESHOLD = 20;
-  const FILENAME = 'better-gist--settings.json';
+  const settingsFile = 'better-gist--settings.json';
   const gistId = new ClientStorage<GistId>('gist.settings.id');
   const getId = () => gistId.get();
   let isOperating = false;
@@ -59,16 +66,30 @@ function settingsGist() {
 
   return {
     getId,
-    write,
+    info,
     sync,
     topGists,
+    write,
   };
 
-  function topGists(list: Gist[]) {
+  function info() {
     const id = getId();
-    const index = id
-      ? list.findIndex(x => x.id === id || x.hasFile(FILENAME))
-      : -1;
+    return id ? { id, filename: settingsFile } : null;
+  }
+
+  function topGists(list: Gist[]) {
+    if (!list.length) {
+      return list;
+    }
+
+    const match = list.find(x => x.hasFile(settingsFile));
+
+    if (match) {
+      gistId.set(match.id);
+    }
+
+    const id = getId();
+    const index = id ? list.findIndex(x => x.id === id) : -1;
 
     operate(
       (): Promise<unknown> => {
@@ -76,7 +97,10 @@ function settingsGist() {
           return create(settings());
         }
 
-        if (index === -1 || index > RECREATE_THRESHOLD) {
+        const threshold = getSetting('settingsGistRecreateThreshold');
+        const shouldRecreate = index === -1 || index > threshold;
+
+        if (shouldRecreate) {
           return sync().then(recreate);
         }
 
@@ -88,8 +112,8 @@ function settingsGist() {
       ? list
       : [...list.slice(0, index), ...list.slice(index + 1)];
 
-    function recreate(value: Settings) {
-      return removeGist(id!).then(() => create(value));
+    function recreate(value: Partial<Settings>) {
+      return removeGist(id!).finally(() => create(value));
     }
   }
 
@@ -106,49 +130,50 @@ function settingsGist() {
     const id = getId();
 
     return operate(() => {
-      if (!id) return useStorage();
+      if (!id) return Promise.resolve(settings());
 
       return getGist().then(gist => {
-        if (!gist || gist.updatedAt < storage.lastUpdated) {
-          return useStorage();
+        if (!gist) {
+          return Promise.resolve(settings());
         }
 
         const content = read(gist);
+        const needsUpdate =
+          !content ||
+          (gist.updatedAt < storage.lastUpdated &&
+            serialize(content) !== serialize(settings()));
 
-        if (!content) {
-          return useStorage();
+        if (needsUpdate) {
+          return write(settings());
         }
 
-        storage.set(content);
-        return content;
+        storage.set(content!);
+        return content!;
       });
     }).catch(() => settings());
-
-    function useStorage() {
-      const stored = settings();
-      return write(stored).then(() => stored);
-    }
   }
 
   function read(gist: Gist) {
-    const file = gist.getFileByName(FILENAME);
+    const file = gist.getFileByName(settingsFile);
     return file && deserialize(file.content);
   }
 
-  function write(value: Settings) {
+  function write(value: Partial<Settings>) {
     const id = gistId.get();
-
-    if (id) {
-      return editGist(value).catch(() => create(value));
-    } else {
-      return create(value);
-    }
+    return Promise.resolve(
+      id ? editGist(value).catch(() => create(value)) : create(value),
+    ).then(() => value);
   }
 
-  function create(value: Settings) {
+  function create(value: Partial<Settings>) {
     const content = serialize(value);
 
-    return createGist({ files: { [FILENAME]: { content } } }).then(gist => {
+    return createGist({
+      files: {
+        [settingsFile]: { content },
+        ['defaults.json']: { content: serialize(DEFAULT) },
+      },
+    }).then(gist => {
       gistId.set(gist.id);
       return gist;
     });
@@ -162,14 +187,14 @@ function settingsGist() {
     );
   }
 
-  function editGist(value: Settings) {
+  function editGist(value: Partial<Settings>) {
     const id = gistId.get()!;
-    return setFileContent(id, FILENAME, serialize(value));
+    return setFileContent(id, settingsFile, serialize(value));
   }
 }
 
-function serialize(value: Settings) {
-  return JSON.stringify(value, null, 2);
+function serialize(value: Partial<Settings>) {
+  return JSON.stringify(value, null, 2) + '\n';
 }
 
 function deserialize(content: string) {
