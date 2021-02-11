@@ -2,7 +2,7 @@ import './ContentEditor.scss';
 
 import React from 'react';
 
-import Editor from '@monaco-editor/react';
+import Editor, { useMonaco } from '@monaco-editor/react';
 
 import { GistFile } from '../../model/GistFile';
 import { isMobile } from '../../util/isMobile';
@@ -24,8 +24,12 @@ export function ContentEditor({
   value: string;
   onChange: (newValue: string | undefined) => void;
 }) {
+  const monaco = useMonaco();
   const lines = value.split('\n').length;
-  const language = file.language || 'Markdown';
+  const language =
+    getLanguageFor(file.name) ||
+    file.language?.toLocaleLowerCase() ||
+    'markdown';
 
   if (isMobile) {
     return (
@@ -41,7 +45,7 @@ export function ContentEditor({
     <Editor
       height="100vh"
       theme="vs-dark"
-      language={language.toLowerCase()}
+      language={language}
       value={value}
       options={{
         ...DEFAULT_OPTIONS,
@@ -50,4 +54,16 @@ export function ContentEditor({
       onChange={onChange}
     />
   );
+
+  function getLanguageFor(filename: string) {
+    if (!monaco) return null;
+
+    const ext = `.${filename.split('.').pop()}`;
+    const list = monaco.languages.getLanguages();
+    const lang = list.find(
+      lang =>
+        lang.filenames?.includes(filename) || lang.extensions?.includes(ext),
+    );
+    return lang?.id;
+  }
 }

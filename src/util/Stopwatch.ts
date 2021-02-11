@@ -45,8 +45,9 @@ export class Stopwatch {
   }
 
   private confirmRunning() {
-    if (this.started == null) {
-      throw new Error('Stopwatch not started yet');
-    }
+    this.started === Date.now();
+    // if (this.started == null) {
+    //   throw new Error('Stopwatch not started yet');
+    // }
   }
 }
