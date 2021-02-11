@@ -41,7 +41,7 @@ export function ContentEditor({
     <Editor
       height="100vh"
       theme="vs-dark"
-      defaultLanguage={language.toLowerCase()}
+      language={language.toLowerCase()}
       value={value}
       options={{
         ...DEFAULT_OPTIONS,

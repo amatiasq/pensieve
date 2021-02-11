@@ -48,6 +48,18 @@ export class Gist {
     return getFromStorage(id);
   }
 
+  static getNewer(...gists: Gist[]) {
+    let best = gists[0];
+
+    gists.slice(1).forEach(x => {
+      if (x.updatedAt > best.updatedAt) {
+        best = x;
+      }
+    });
+
+    return best;
+  }
+
   private _files: GistFile[] = [];
 
   get id() {
@@ -64,6 +76,9 @@ export class Gist {
   }
   get createdAt() {
     return new Date(this.raw.created_at);
+  }
+  get updatedAt() {
+    return new Date(this.raw.updated_at);
   }
   get description() {
     return this.raw.description;
@@ -83,6 +98,28 @@ export class Gist {
   constructor(private readonly raw: RawGist) {
     saveToStorage(raw);
     this._files = Object.values(raw.files).map(x => new GistFile(this, x));
+  }
+
+  isSameGist(other: Gist) {
+    return this.id === other.id;
+  }
+
+  isIdentical(other: Gist) {
+    if (
+      this.isSameGist(other) ||
+      this.isPublic !== other.isPublic ||
+      this.updatedAt !== other.updatedAt
+    ) {
+      return false;
+    }
+
+    for (let i = 0; i < this.files.length; i++) {
+      if (!this.files[i].isIdentical(other.files[i])) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   getFileByName(name: string) {

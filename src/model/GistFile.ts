@@ -53,9 +53,8 @@ export class GistFile {
     private raw: RawGistFileItem | RawGistFileDetails,
   ) {}
 
-  setData(raw: RawGistFileItem | RawGistFileDetails) {
-    this.raw = { ...this.raw, ...raw };
-    return this;
+  isIdentical(other: GistFile) {
+    return this.name === other.name && this.content === other.content;
   }
 
   rename(newName: string) {

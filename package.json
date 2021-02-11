@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@amatiasq/client-storage": "2.1",
+    "@amatiasq/emitter": "^4.1.2",
     "@amatiasq/scheduler": "^3.0.0",
     "@monaco-editor/react": "^4.0.9",
     "react": "^17.0.1",

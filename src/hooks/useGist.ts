@@ -4,10 +4,13 @@ import { GistId } from '../contracts/type-aliases';
 import { Gist } from '../model/Gist';
 import { onGistChanged } from '../services/cache-invalidation';
 import { fetchGist } from '../services/github_api';
+import { onPageVisibilityChange as onVisibility } from '../util/page-visibility';
+import { Stopwatch } from '../util/Stopwatch';
 
 export function useGist(id: GistId) {
   const stored = Gist.getById(id);
 
+  const stopwatch = new Stopwatch();
   const [cache, setCache] = useState<Gist | null>(
     stored?.hasContent ? stored : null,
   );
@@ -21,6 +24,27 @@ export function useGist(id: GistId) {
       }
     });
   }, [id]);
+
+  useEffect(() => {
+    const unsubscribe = onVisibility(isVisible => {
+      if (!isVisible) {
+        stopwatch.start();
+        return;
+      }
+
+      if (stopwatch.stop('seconds') > 5) {
+        return cache?.reload().then(updated => {
+          if (!updated.isIdentical(cache)) {
+            setCache(updated);
+          }
+        });
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  });
 
   return cache;
 }
