@@ -4,28 +4,27 @@ import React from 'react';
 
 import Editor, { useMonaco } from '@monaco-editor/react';
 
+import { useSetting } from '../../hooks/useSetting';
 import { GistFile } from '../../model/GistFile';
 import { isMobile } from '../../util/isMobile';
-import { useSetting } from '../../hooks/useSetting';
-
-const DEFAULT_OPTIONS = {
-  contextmenu: false,
-  renderLineHighlight: 'none',
-} as const;
 
 export function ContentEditor({
   file,
   value,
+  readonly,
   onChange,
 }: {
   file: GistFile;
   value: string;
+  readonly?: boolean;
   onChange: (newValue: string | undefined) => void;
 }) {
   const monaco = useMonaco();
   const [rulers] = useSetting('rulers');
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
+  const [renderIndentGuides] = useSetting('renderIndentGuides');
+
   const lines = value.split('\n').length;
   const language =
     getLanguageFor(file.name) ||
@@ -37,6 +36,7 @@ export function ContentEditor({
       <textarea
         className="mobile-fallback"
         defaultValue={value}
+        readOnly={readonly}
         onChange={e => onChange(e.target.value)}
       ></textarea>
     );
@@ -48,14 +48,17 @@ export function ContentEditor({
       theme="vs-dark"
       language={language}
       value={value}
+      onChange={onChange}
       options={{
-        ...DEFAULT_OPTIONS,
+        contextmenu: false,
         minimap: { enabled: lines > 100 },
+        readOnly: readonly,
+        renderIndentGuides,
+        renderLineHighlight: 'none',
         rulers,
         tabSize,
         wordWrap: wordWrap ? 'on' : 'off',
       }}
-      onChange={onChange}
     />
   );
 

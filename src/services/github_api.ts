@@ -7,6 +7,11 @@ import { notifyGistChanged, notifyGistListChanged } from './cache-invalidation';
 
 export const GH_API = 'https://api.github.com';
 
+const DEFAULT_GIST_CONTENT = {
+  public: false,
+  files: { 'New gist.md': { content: '- Do stuff' } },
+};
+
 function url(path: string) {
   const result = `${GH_API}${path}`;
   const booster = `p=${Date.now()}`;
@@ -39,16 +44,12 @@ export const renameGistFile = (id: GistId, oldName: string, newName: string) =>
 export function createGist(body: UpdateGistRequest = {}) {
   return POST<RawGistDetails>(
     url(`/gists`),
-    {
-      public: false,
-      files: { 'New gist.md': { content: 'DO STUFF' } },
-      ...body,
-    },
+    { ...DEFAULT_GIST_CONTENT, ...body },
     withAuth(),
   ).finally(notifyGistListChanged);
 }
 
-function updateGist(id: GistId, body: UpdateGistRequest) {
+export function updateGist(id: GistId, body: UpdateGistRequest) {
   return PATCH<RawGistDetails>(
     url(`/gists/${id}`),
     JSON.stringify(body),

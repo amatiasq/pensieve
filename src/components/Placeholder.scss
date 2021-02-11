@@ -1,0 +1,9 @@
+@import './Action.scss';
+
+.placeholder {
+  opacity: 0.5;
+
+  .editor-tabs--back {
+    @include disable-action();
+  }
+}

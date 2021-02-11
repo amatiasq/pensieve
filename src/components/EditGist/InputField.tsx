@@ -1,55 +1,75 @@
+import './InputField.scss';
+
 import React, { createRef, useEffect, useState } from 'react';
 
-import { escapeHtml } from '../../util/escapeHtml';
-import { selectElementContents } from '../../util/selectElementContents';
+import {
+  clearSelection,
+  selectElementContents
+} from '../../util/selectElementContents';
 
 export function InputField({
   className,
   value,
-  editable,
+  readonly,
+  forceEditMode,
   onSubmit,
   onAbort,
 }: {
   className?: string;
   value: string;
-  editable: boolean;
-  onSubmit(value: string): void;
-  onAbort(): void;
+  readonly?: boolean;
+  forceEditMode?: boolean;
+  onSubmit(value: string, prev: string): void;
+  onAbort?(): void;
 }) {
   const [content, setContent] = useState(value);
-  const submit = () => (content !== value ? onSubmit(content) : onAbort());
+  const [isEditing, setIsEditing] = useState(forceEditMode || false);
   const ref = createRef<HTMLSpanElement>();
-
-  useEffect(() => {
-    const el = ref.current;
-
-    if (editable && el) {
-      el.focus();
-      selectElementContents(el);
-
-      // HACK: selection doesn't work on newly created elements
-      setTimeout(() => {
-        selectElementContents(el);
-      }, 10);
-    }
-  }, [editable]);
+  const cn = `input-field ${className} ${isEditing ? 'editing' : ''}`;
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     ref.current!.innerText = value;
-  }, [ref.current]);
+  }, [value, ref.current]);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    if (readonly || !isEditing) {
+      clearSelection();
+      return;
+    }
+
+    el.focus();
+    selectElementContents(el);
+
+    // HACK: selection doesn't work on newly created elements
+    setTimeout(() => {
+      selectElementContents(el);
+    }, 10);
+  }, [!readonly && isEditing]);
 
   return (
     <span
       ref={ref}
       role="textbox"
-      className={className}
-      contentEditable={editable}
+      className={cn}
+      contentEditable={isEditing}
+      onDoubleClick={() => setIsEditing(true)}
       onInput={onInput}
       onKeyDown={onKeyDown}
       onBlur={submit}
     />
   );
+
+  function submit() {
+    if (content !== value) {
+      onSubmit(content, value);
+    }
+
+    setIsEditing(false);
+  }
 
   function onInput(event: React.FormEvent<HTMLSpanElement>) {
     setContent((event.target as HTMLSpanElement).innerText);
@@ -61,7 +81,11 @@ export function InputField({
     }
 
     if (event.key === 'Escape') {
-      onAbort();
+      setIsEditing(false);
+
+      if (onAbort) {
+        onAbort();
+      }
     }
   }
 }

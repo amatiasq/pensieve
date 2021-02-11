@@ -1,8 +1,7 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 
 import { RawGist } from '../contracts/RawGist';
-import { GistId } from '../contracts/type-aliases';
-import { notifyGistChanged } from '../services/cache-invalidation';
+import { GistId, UserName } from '../contracts/type-aliases';
 import {
   addGileToGist,
   createGist,
@@ -10,7 +9,7 @@ import {
   removeFileFromGist,
   removeGist,
   renameGistFile,
-  setFileContent,
+  setFileContent
 } from '../services/github_api';
 import { mergeGist } from '../util/mergeGist';
 import { GistFile } from './GistFile';
@@ -71,6 +70,12 @@ export class Gist {
   get htmlUrl() {
     return this.raw.html_url;
   }
+  get commentCount() {
+    return this.raw.comments;
+  }
+  get commentsUrl() {
+    return `${this.raw.html_url}#new_comment_field`;
+  }
   get isPublic() {
     return this.raw.public;
   }
@@ -86,11 +91,12 @@ export class Gist {
   get files() {
     return this._files;
   }
-
+  get defaultFile() {
+    return this._files[0];
+  }
   get date() {
     return this.raw.created_at.split('T')[0];
   }
-
   get hasContent() {
     return this._files.every(x => x.isContentLoaded);
   }
@@ -120,6 +126,10 @@ export class Gist {
     }
 
     return true;
+  }
+
+  isOwner(username: UserName) {
+    return this.raw.owner.login === username;
   }
 
   hasFile(name: string) {
@@ -156,6 +166,16 @@ export class Gist {
     return setFileContent(this.id, file.name, content).then(wrap);
   }
 
+  isStarred() {
+    // TODO:
+    throw new Error('Method not implemented.');
+  }
+
+  toggleStar() {
+    // TODO:
+    throw new Error('Method not implemented.');
+  }
+
   toJSON() {
     return this.raw;
   }
@@ -178,6 +198,8 @@ function compress<T extends RawGist>({
   public: p,
   created_at,
   html_url,
+  comments,
+  owner,
 }: T) {
   return {
     description,
@@ -186,5 +208,7 @@ function compress<T extends RawGist>({
     public: p,
     created_at,
     html_url,
+    comments,
+    owner: { login: owner.login },
   } as T;
 }

@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   line-height: var(--gist-item-height);
-  color: #939395;
+  --font-color: #939395;
 
   &--title {
     height: var(--gist-item-height);
@@ -16,6 +16,7 @@
     height: var(--gist-item-height);
     padding-left: calc(var(--padding) + var(--files-padding));
     border-radius: 3px;
+    color: var(--font-color);
 
     &:hover {
       background-color: #252829;
@@ -24,8 +25,17 @@
 
   &--link {
     display: block;
-    color: #939395;
     text-decoration: none;
+
+    &,
+    &:active,
+    &:visited {
+      color: inherit;
+    }
+  }
+
+  &--file {
+    color: var(--font-color);
   }
 
   &.one-file {

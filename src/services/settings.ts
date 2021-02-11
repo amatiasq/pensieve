@@ -1,35 +1,24 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 
-import { GistId } from '../contracts/type-aliases';
+import { GistId, UserName } from '../contracts/type-aliases';
 import { Gist } from '../model/Gist';
-import {
-  createGist,
-  fetchGist,
-  removeGist,
-  setFileContent,
-} from './github_api';
-
-export interface Settings {
-  autosave: number;
-  reloadIfAwayForSeconds: number;
-  rulers: number[];
-  settingsGistRecreateThreshold: number;
-  sidebarWidth: number;
-  starred: string[];
-  tabSize: number;
-  wordWrap: boolean;
-}
+import { createGist, fetchGist, removeGist, updateGist } from './github_api';
 
 const DEFAULT = {
-  sidebarWidth: 400,
   autosave: 5,
   reloadIfAwayForSeconds: 5,
-  settingsGistRecreateThreshold: 50,
-  tabSize: 2,
-  wordWrap: true,
+  renderIndentGuides: false,
   rulers: [],
+  settingsGistRecreateThreshold: 50,
+  sidebarWidth: 400,
   starred: [],
-} as Settings;
+  tabSize: 2,
+  username: '' as UserName,
+  welcomeGist: 'd195304f7bb1b8d5f3e76392c4a6cd01' as GistId,
+  wordWrap: true,
+};
+
+export type Settings = typeof DEFAULT;
 
 const storage = new ClientStorage<Partial<Settings>>('gists.settings', {
   version: 1,
@@ -91,8 +80,8 @@ function settingsGist() {
     const id = getId();
     const index = id ? list.findIndex(x => x.id === id) : -1;
 
-    operate(
-      (): Promise<unknown> => {
+    operate<unknown>(
+      () => {
         if (!id) {
           return create(settings());
         }
@@ -103,9 +92,8 @@ function settingsGist() {
         if (shouldRecreate) {
           return sync().then(recreate);
         }
-
-        return Promise.resolve();
       },
+      () => null,
     );
 
     return index === -1
@@ -117,13 +105,13 @@ function settingsGist() {
     }
   }
 
-  function operate<T>(action: () => Promise<T>) {
+  function operate<T>(action: () => Promise<T> | T, ifBusy: () => T) {
     if (isOperating) {
-      return Promise.reject('Settings gist is busy');
+      return Promise.resolve(ifBusy());
     }
 
     isOperating = true;
-    return action().finally(() => (isOperating = false));
+    return Promise.resolve(action()).finally(() => (isOperating = false));
   }
 
   function sync() {
@@ -150,7 +138,7 @@ function settingsGist() {
         storage.set(content!);
         return content!;
       });
-    }).catch(() => settings());
+    }, settings);
   }
 
   function read(gist: Gist) {
@@ -166,14 +154,7 @@ function settingsGist() {
   }
 
   function create(value: Partial<Settings>) {
-    const content = serialize(value);
-
-    return createGist({
-      files: {
-        [settingsFile]: { content },
-        ['defaults.json']: { content: serialize(DEFAULT) },
-      },
-    }).then(gist => {
+    return createGist(getGistContent(value)).then(gist => {
       gistId.set(gist.id);
       return gist;
     });
@@ -188,8 +169,18 @@ function settingsGist() {
   }
 
   function editGist(value: Partial<Settings>) {
-    const id = gistId.get()!;
-    return setFileContent(id, settingsFile, serialize(value));
+    return updateGist(gistId.get()!, getGistContent(value));
+  }
+
+  function getGistContent(value: Partial<Settings>) {
+    return {
+      description:
+        'Gist created by https://gist.amatiasq.com to store settings',
+      files: {
+        [settingsFile]: { content: serialize(value) },
+        ['defaults.json']: { content: serialize(DEFAULT) },
+      },
+    };
   }
 }
 
@@ -201,6 +192,7 @@ function deserialize(content: string) {
   try {
     return JSON.parse(content) as Settings;
   } catch (error) {
+    console.error(`Invalid settings JSON:`, content);
     return null;
   }
 }

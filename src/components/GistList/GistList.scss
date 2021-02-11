@@ -7,7 +7,6 @@ aside {
 .gist-list {
   flex: 1;
   overflow-y: auto;
-  padding-top: 8px;
 
   --padding: 16px;
   --files-padding: 8px;
@@ -19,8 +18,9 @@ aside {
 
 .filter {
   display: flex;
+  align-items: center;
   padding-left: var(--padding);
-  padding-right: var(--padding);
+  height: var(--tabs-height);
 
   input {
     flex: 1;
