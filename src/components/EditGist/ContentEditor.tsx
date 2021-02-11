@@ -6,13 +6,11 @@ import Editor, { useMonaco } from '@monaco-editor/react';
 
 import { GistFile } from '../../model/GistFile';
 import { isMobile } from '../../util/isMobile';
+import { useSetting } from '../../hooks/useSetting';
 
 const DEFAULT_OPTIONS = {
   contextmenu: false,
-  tabSize: 2,
-  wordWrap: 'on',
   renderLineHighlight: 'none',
-  rulers: [80, 120] as number[],
 } as const;
 
 export function ContentEditor({
@@ -25,6 +23,9 @@ export function ContentEditor({
   onChange: (newValue: string | undefined) => void;
 }) {
   const monaco = useMonaco();
+  const [rulers] = useSetting('rulers');
+  const [tabSize] = useSetting('tabSize');
+  const [wordWrap] = useSetting('wordWrap');
   const lines = value.split('\n').length;
   const language =
     getLanguageFor(file.name) ||
@@ -50,6 +51,9 @@ export function ContentEditor({
       options={{
         ...DEFAULT_OPTIONS,
         minimap: { enabled: lines > 100 },
+        rulers,
+        tabSize,
+        wordWrap: wordWrap ? 'on' : 'off',
       }}
       onChange={onChange}
     />

@@ -6,7 +6,8 @@ export function useSetting<
   Key extends keyof Settings,
   Value extends Settings[Key]
 >(key: Key) {
-  const [value, setValue] = useState(getSetting(key));
+  const value = getSetting(key);
+  const [_, setValue] = useState(value);
 
   return [
     value,

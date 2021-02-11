@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
+import { getSettingsGist } from '../../services/settings';
 import { Action } from '../Action';
 import { FileTab } from './FileTab';
 
@@ -17,12 +18,17 @@ export function EditorTabs({
   active: GistFile;
   onChange: (file: GistFile) => void;
 }) {
+  const settings = getSettingsGist();
   const history = useHistory();
   const [newFileName, setNewFileName] = useState<string | null>(null);
 
   return (
-    <nav className="tabs">
-      <Action name="back-button" icon="chevron-left" navigate="/" />
+    <nav className="editor-tabs">
+      <Action
+        name="editor-tabs--back-button"
+        icon="chevron-left"
+        navigate="/"
+      />
 
       {gist.files.map(file => (
         <FileTab
@@ -36,7 +42,7 @@ export function EditorTabs({
 
       {newFileName == null ? (
         <Action
-          name="new-file"
+          name="editor-tabs--new-file"
           icon="plus"
           onClick={() => setNewFileName('Filename.md')}
         />
@@ -46,12 +52,22 @@ export function EditorTabs({
 
       <div className="spacer"></div>
 
-      <Action
-        name="gh-link"
-        icon="github"
-        target="_blank"
-        href={gist.htmlUrl}
-      />
+      <div className="editor-tabs--actions">
+        <Action
+          name="editor-tabs--gh-link"
+          icon="github"
+          target="_blank"
+          href={gist.htmlUrl}
+        />
+
+        {settings && (
+          <Action
+            name="editor-tabs--settings"
+            icon="cog"
+            navigate={`/gist/${settings.id}/${settings.filename}`}
+          />
+        )}
+      </div>
     </nav>
   );
 
