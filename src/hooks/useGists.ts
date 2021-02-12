@@ -7,19 +7,18 @@ import { GistId } from '../contracts/type-aliases';
 import { Gist } from '../model/Gist';
 import {
   onGistChanged,
-  onGistListchanged,
+  onGistListchanged
 } from '../services/cache-invalidation';
 import { fetchGists } from '../services/github_api';
 import { setTopGists } from '../services/settings';
 import { useSetting } from './useSetting';
 
+let stored: Gist[] | null = null;
 const storage = new ClientStorage<GistId[]>('gists.order', {
   default: [],
 });
 
-function getStored() {
-  return storage.get() as GistId[];
-}
+getStoredFromCache();
 
 export function useGists(loadMore: boolean) {
   const [_, setUsername] = useSetting('username');
@@ -37,22 +36,18 @@ export function useGists(loadMore: boolean) {
   }, [page]);
 
   // If data in chache doesn't match what's stored overwrite storage
-  useEffect(updateStorage, [cache]);
+  useEffect(() => updateStorage(cache), [cache]);
 
   // Update single gist when changes
-  useEffect(() => onGistChanged(updateSingleGist));
+  useEffect(() => onGistChanged(updateSingleGist) as () => void);
 
   // Re-initialize list when gist are added / removed
-  useEffect(() => onGistListchanged(() => fetch(1, [])));
+  useEffect(() => onGistListchanged(() => fetch(1, [])) as () => void);
 
   // If we have data then return it, otherwise return what's in local Storage
-  const result = cache.length
-    ? cache
-    : (getStored()
-        .map(x => Gist.getById(x))
-        .filter(Boolean) as Gist[]);
+  const result = cache.length ? cache : stored;
 
-  return setTopGists(result);
+  return setTopGists(result || []);
 
   function updateSingleGist(raw: RawGist) {
     const index = cache.findIndex(x => x.id === raw.id);
@@ -70,27 +65,70 @@ export function useGists(loadMore: boolean) {
     return fetchGists(page).then(list => {
       const [first] = list;
 
-      if (first) {
+      if (first?.owner) {
         setUsername(first.owner.login);
       }
 
       setCache([...prev, ...list.map(x => new Gist(x))]);
     });
   }
+}
 
-  function updateStorage() {
-    const stored = getStored();
-    let isObsolete = false;
+function getStoredFromCache() {
+  const ids = storage.get() as GistId[];
 
-    for (let i = 0; i < cache.length; i++) {
-      if (stored[i] !== cache[i].id) {
-        isObsolete = true;
-        break;
-      }
+  return Promise.all(ids.map(x => Gist.getById(x)))
+    .then(result => result.filter(Boolean) as Gist[])
+    .then(result => (stored = result));
+}
+
+// merges incomming with the stored list of IDs
+function updateStorage(incoming: Gist[]) {
+  if (stored === null) {
+    return;
+  }
+
+  const result: Gist[] = [];
+  let isObsolete = false;
+
+  // eslint-disable-next-line no-constant-condition
+  for (let ii = 0, si = 0; true; ii++) {
+    // end of stored
+    if (si === stored.length) {
+      isObsolete = true;
+      result.push(...incoming.slice(ii));
+      break;
     }
 
-    if (isObsolete) {
-      storage.set(cache.map(x => x.id));
+    // end of incoming
+    if (ii === incoming.length) {
+      result.push(...stored.slice(si));
+      break;
     }
+
+    result.push(incoming[ii]);
+
+    // happy path
+    if (stored[si].id === incoming[ii].id) {
+      si++;
+      continue;
+    }
+
+    isObsolete = true;
+
+    // search the missing-existing entry in stored
+    const exists = stored.findIndex(x => x.id === incoming[ii].id);
+
+    // item found at ${exists}
+    if (exists !== -1) {
+      si = exists + 1;
+    }
+
+    // if doesn't exists then it's new
+  }
+
+  if (isObsolete) {
+    storage.set(result.map(x => x.id));
+    getStoredFromCache();
   }
 }

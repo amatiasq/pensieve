@@ -1,3 +1,5 @@
+import localforage from 'localforage';
+
 import { ClientStorage } from '@amatiasq/client-storage';
 
 import { RawGist } from '../contracts/RawGist';
@@ -5,6 +7,7 @@ import { GistId, UserName } from '../contracts/type-aliases';
 import {
   addGileToGist,
   createGist,
+  DEFAULT_FILE_CONTENT,
   fetchGist,
   removeFileFromGist,
   removeGist,
@@ -14,28 +17,13 @@ import {
 import { mergeGist } from '../util/mergeGist';
 import { GistFile } from './GistFile';
 
-type Storage = Partial<Record<GistId, RawGist>>;
-
-const storage = new ClientStorage<Storage>('gists.cache', {
-  default: {},
-});
-
-function getFromStorage(id: GistId) {
-  const stored = storage.get() as Storage;
-  return id in stored ? new Gist(stored[id] as RawGist) : null;
-}
+const storage = localforage.createInstance({ name: 'gists.cache' });
 
 function saveToStorage(raw: RawGist) {
-  const stored = storage.get() as Storage;
-  const existing = raw.id in stored ? stored[raw.id] : null;
-  const newEntry = existing ? mergeGist(existing, raw) : raw;
-
-  storage.set({
-    ...stored,
-    [raw.id]: compress(newEntry),
+  return storage.getItem<RawGist>(raw.id).then(existing => {
+    const newEntry = existing ? mergeGist(existing, raw) : raw;
+    return storage.setItem(raw.id, compress(newEntry));
   });
-
-  return raw;
 }
 
 export class Gist {
@@ -44,7 +32,7 @@ export class Gist {
   }
 
   static getById(id: GistId) {
-    return getFromStorage(id);
+    return storage.getItem<RawGist>(id).then(x => x && new Gist(x, true));
   }
 
   static getNewer(...gists: Gist[]) {
@@ -101,8 +89,11 @@ export class Gist {
     return this._files.every(x => x.isContentLoaded);
   }
 
-  constructor(private readonly raw: RawGist) {
-    saveToStorage(raw);
+  constructor(private readonly raw: RawGist, skipStorage?: boolean) {
+    if (!skipStorage) {
+      saveToStorage(raw);
+    }
+
     this._files = Object.values(raw.files).map(x => new GistFile(this, x));
   }
 
@@ -129,7 +120,7 @@ export class Gist {
   }
 
   isOwner(username: UserName) {
-    return this.raw.owner.login === username;
+    return this.raw.owner?.login === username;
   }
 
   hasFile(name: string) {
@@ -144,7 +135,7 @@ export class Gist {
     return fetchGist(this.id).then(wrap);
   }
 
-  addFile(name: string, content = 'Empty!') {
+  addFile(name: string, content = DEFAULT_FILE_CONTENT) {
     return addGileToGist(this.id, name, content).then(wrap);
   }
 
@@ -161,7 +152,7 @@ export class Gist {
     return renameGistFile(this.id, file.name, newName).then(wrap);
   }
 
-  setFileContent(file: GistFile, content: string) {
+  setFileContent(file: GistFile, content = DEFAULT_FILE_CONTENT) {
     this.ensureFileIsMine(file);
     return setFileContent(this.id, file.name, content).then(wrap);
   }
@@ -209,6 +200,6 @@ function compress<T extends RawGist>({
     created_at,
     html_url,
     comments,
-    owner: { login: owner.login },
+    owner: { login: owner?.login },
   } as T;
 }

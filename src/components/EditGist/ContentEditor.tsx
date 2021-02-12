@@ -49,6 +49,7 @@ export function ContentEditor({
       language={language}
       value={value}
       onChange={onChange}
+      onMount={x => x.focus()}
       options={{
         contextmenu: false,
         minimap: { enabled: lines > 100 },

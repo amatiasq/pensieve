@@ -1,0 +1,49 @@
+@keyframes tooltip-show-hide {
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 1;
+
+  border: 1px solid #3c3c3c;
+  background-color: #212122;
+  color: #c5c5c5;
+
+  padding: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8rem;
+
+  animation-name: tooltip-show-hide;
+  animation-duration: 3s;
+
+  &.top {
+    transform: translate(-50%, calc(-100% - 16px));
+  }
+
+  &.bottom {
+    transform: translate(-50%, 16px);
+  }
+
+  &.left {
+    transform: translate(calc(-100% - 16px), -50%);
+  }
+
+  &.right {
+    transform: translate(16px, -50%);
+  }
+}

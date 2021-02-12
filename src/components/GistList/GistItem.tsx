@@ -1,12 +1,11 @@
 import './GistItem.scss';
 
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 
 import { Gist } from '../../model/Gist';
-import { GistFile } from '../../model/GistFile';
 import { updateGist } from '../../services/github_api';
-import { InputField } from '../EditGist/InputField';
+import { Action } from '../atoms/Action';
+import { InputField } from '../atoms/InputField';
 
 export function GistItem({ gist }: { gist: Gist }) {
   const { date, files } = gist;
@@ -29,27 +28,17 @@ export function GistItem({ gist }: { gist: Gist }) {
       <ol className="gist-item--file-list">
         {files.map(file => (
           <li key={file.name} className="gist-item--file-item">
-            <Link
-              className="gist-item--link"
-              to={`/gist/${gist.id}/${file.name}`}
+            <Action
+              name="gist-item--link"
+              navigate={`/gist/${gist.id}/${file.name}`}
             >
-              <InputField
-                className="gist-item--file"
-                value={print(file.name)}
-                onSubmit={name => renameFile(file, name)}
-              />
-            </Link>
+              <div className="gist-item--file">{print(file.name)}</div>
+            </Action>
           </li>
         ))}
       </ol>
     </li>
   );
-
-  function renameFile(file: GistFile, newName: string) {
-    return file.rename(
-      file.name.startsWith(title) ? `${title} ${newName}` : newName,
-    );
-  }
 
   function print(name: string) {
     return name.startsWith(title) ? name.substr(title.length).trim() : name;

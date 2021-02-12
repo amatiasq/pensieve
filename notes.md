@@ -26,6 +26,30 @@
 
 ## Log
 
+###  2021-02-12
+
+- Hide sidebar on CTRL+B
+- Markdown: ~ ~ ~~should strike text~~ ~ ~
+- Button "INDEX GISTS"
+- Save gist history
+- Search should include all files' content in storage
+
+- Favourite gists
+  - Use starred API
+    - https://docs.github.com/en/rest/reference/gists#list-starred-gists
+
+- Controls (go one by one)
+  - CMD+W means "close gist and focus tree"
+    - `class Keyboard {}`
+  - Shortcut to create gist
+  - Shortcut to add file to gist
+  - Shortcut to navigate through files
+  - Arrow navigation on tree
+
+- LONG: Offline support
+  - Should render without issues
+  - Should save operation until back online
+
 ###  [2021-02-10](https://gist.github.com/amatiasq/73a3b78622533205eac1ac6cfbee231e)
 
 ~~PRIORIZE THIS LIST~~
@@ -52,39 +76,24 @@
   - ~~asume missing if there is one on first fetch~~
   - ~~settings button opens settings gist~~
 
-- LOCALSTORAGE PERFORMANCE ISSUES
+- ~~Error when new filename left untouched~~
+- ~~Focus on editor when file created~~
+- ~~Back button should go back~~~
+- ~~Business indicator~
+
+- ~~LOCALSTORAGE PERFORMANCE ISSUES~~
 
 - Favourite gists
   - ~~to local storage, gist to always be requested and listed first~~
   - ~~save to settings~~
-  - Use starred API
-    - https://docs.github.com/en/rest/reference/gists#list-starred-gists
-
-- Markdown: ~ ~ ~~should strike text~~ ~ ~
-- Button "DOWNLOAD ALL"
-- Save gist history
 
 - ~~Display dates~~ nah
   - ~~if year is current not show~~
   - ~~if month is not current don't show~~
 
-- On github button click also copy to clipboard
+- ~~On github button click also copy to clipboard~~
   - ~~double click maybe?~~
   - ~~right click? meh~~
-  - LONG PRESS (0.5ms?) / shift+click
+  - ~~LONG PRESS (0.5ms?) / shift+click~~
 
-
-- Controls (go one by one)
-  - CMD+W means "close gist and focus tree"
-    - `class Keyboard {}`
-  - Shortcut to create gist
-  - Shortcut to add file to gist
-  - Shortcut to navigate through files
-  - Arrow navigation on tree
-
-- LONG: When no gist open display static tutorial
-- LONG: Search should include all files' content in storage
-
-- LONG: Offline support
-  - Should render without issues
-  - Should save operation until back onli
+- ~~LONG: When no gist open display static tutorial~~

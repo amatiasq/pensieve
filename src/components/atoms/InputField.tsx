@@ -12,6 +12,7 @@ export function InputField({
   value,
   readonly,
   forceEditMode,
+  submitIfNotModified,
   onSubmit,
   onAbort,
 }: {
@@ -19,6 +20,7 @@ export function InputField({
   value: string;
   readonly?: boolean;
   forceEditMode?: boolean;
+  submitIfNotModified?: boolean;
   onSubmit(value: string, prev: string): void;
   onAbort?(): void;
 }) {
@@ -27,10 +29,7 @@ export function InputField({
   const ref = createRef<HTMLSpanElement>();
   const cn = `input-field ${className} ${isEditing ? 'editing' : ''}`;
 
-  useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    ref.current!.innerText = value;
-  }, [value, ref.current]);
+  useEffect(resetContent, [value, ref.current]);
 
   useEffect(() => {
     const el = ref.current;
@@ -64,8 +63,10 @@ export function InputField({
   );
 
   function submit() {
-    if (content !== value) {
+    if (content !== value || submitIfNotModified) {
       onSubmit(content, value);
+    } else if (onAbort) {
+      onAbort();
     }
 
     setIsEditing(false);
@@ -82,10 +83,16 @@ export function InputField({
 
     if (event.key === 'Escape') {
       setIsEditing(false);
+      resetContent();
 
       if (onAbort) {
         onAbort();
       }
     }
+  }
+
+  function resetContent() {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    ref.current!.innerText = value;
   }
 }

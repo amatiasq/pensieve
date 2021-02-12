@@ -1,4 +1,5 @@
 import { emitter } from '@amatiasq/emitter';
+
 import { RawGistDetails } from '../contracts/RawGist';
 
 export const GIST_CHANGED = 'GIST_CHANGED' as const;

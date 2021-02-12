@@ -7,6 +7,8 @@ import { useScheduler } from '../../hooks/useScheduler';
 import { useSetting } from '../../hooks/useSetting';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
+import { DEFAULT_FILE_CONTENT } from '../../services/github_api';
+import { BusinessIndicator } from '../atoms/BusinessIndicator';
 import { ContentEditor } from './ContentEditor';
 import { EditorTabs } from './EditorTabs';
 
@@ -67,11 +69,13 @@ export function GistEditor({
         onChange={onFileChange}
       />
       <ContentEditor
+        key={file.name}
         file={file}
         value={value}
         readonly={readonly}
         onChange={onChange}
       />
+      <BusinessIndicator />
     </main>
   );
 
@@ -91,8 +95,7 @@ export function GistEditor({
   }
 
   function saveFile(file: GistFile, value: string | null) {
-    const content = value || "Don't leave this empty";
     setIsSaved(true);
-    return file.setContent(content);
+    return file.setContent(value || DEFAULT_FILE_CONTENT);
   }
 }
