@@ -22,7 +22,7 @@
 
 - Settings saved into a hidden gist
   - Settings are consistent across devices
-  -
+  - Local storage as backup
 
 ## Log
 
@@ -34,8 +34,8 @@
 - ~~Replace Monaco Editor with textarea in mobile (touch screen detection?)~~
 
 - ~~**onPageFocus if 5+ mins (to settings: REFRESHAL_RATE) without looking fetch again**~~
-  - EVEN IF CHANGES!!!
-    - Update: no, if changes we leave as it is because that's not going to happen from a visibility change
+  - ~~EVEN IF CHANGES!!!~~
+    - ~~Update: no, if changes we leave as it is because that's not going to happen from a visibility change~~
 
 - ~~Autosave to 5 secs~~
   - ~~To settings~~
@@ -45,10 +45,6 @@
 
 - ~~Revisar `language` en JS snippet~~
 
-- Markdown: ~ ~ ~~should strike text~~ ~ ~
-
-- Button "DOWNLOAD ALL"
-
 - ~~save settings to gist file~~
   - ~~cache to local storage~~
   - ~~should be hidden from list~~
@@ -56,17 +52,21 @@
   - ~~asume missing if there is one on first fetch~~
   - ~~settings button opens settings gist~~
 
+- LOCALSTORAGE PERFORMANCE ISSUES
+
 - Favourite gists
   - ~~to local storage, gist to always be requested and listed first~~
   - ~~save to settings~~
   - Use starred API
     - https://docs.github.com/en/rest/reference/gists#list-starred-gists
 
-- Save git history
+- Markdown: ~ ~ ~~should strike text~~ ~ ~
+- Button "DOWNLOAD ALL"
+- Save gist history
 
-- Display dates
-  - if year is current not show
-  - if month is not current don't show
+- ~~Display dates~~ nah
+  - ~~if year is current not show~~
+  - ~~if month is not current don't show~~
 
 - On github button click also copy to clipboard
   - ~~double click maybe?~~

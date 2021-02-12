@@ -1,12 +1,14 @@
+import { useState } from 'react';
+
 import { useScheduler } from './useScheduler';
 
 type Event = React.MouseEvent<HTMLDivElement, MouseEvent>;
 
 export function useLongPress(handler?: () => void, duration = 500) {
-  let isLongPress = false;
+  const [isLongPress, setIsLongPress] = useState(false);
 
   const longPressWaiter = useScheduler(duration, () => {
-    isLongPress = true;
+    setIsLongPress(true);
 
     if (handler) {
       handler();
@@ -21,7 +23,7 @@ export function useLongPress(handler?: () => void, duration = 500) {
   };
 
   function onMouseDown() {
-    isLongPress = false;
+    setIsLongPress(false);
     longPressWaiter.start();
   }
 
@@ -32,14 +34,13 @@ export function useLongPress(handler?: () => void, duration = 500) {
   function onMouseLeave(event: Event) {
     if (isLongPress) {
       event.preventDefault();
-      isLongPress = false;
     }
   }
 
   function onClick(event: Event) {
     if (isLongPress) {
       event.preventDefault();
-      isLongPress = false;
+      setIsLongPress(false);
     }
   }
 }

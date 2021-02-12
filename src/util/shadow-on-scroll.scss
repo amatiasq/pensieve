@@ -1,0 +1,33 @@
+@mixin shadow-on-scroll($direction, $backgroundColor, $shadowColor, $size) {
+  @if $direction == horizontal {
+    @include shadow-on-scroll-horizontal($backgroundColor, $shadowColor, $size);
+  } @else {
+    @include shadow-on-scroll-vertical($backgroundColor, $shadowColor, $size);
+  }
+}
+
+@mixin shadow-on-scroll-vertical($backgroundColor, $shadowColor, $size) {
+  background: linear-gradient($backgroundColor 33%, rgba(21, 0, 255, 0)),
+    linear-gradient(rgba(21, 0, 255, 0), $backgroundColor 66%) 0 100%,
+    radial-gradient(farthest-side at 0 0, $shadowColor, rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 0 100%, $shadowColor, rgba(0, 0, 0, 0)) 0
+      100%;
+
+  background-color: $backgroundColor;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: 100% ($size * 3), 100% ($size * 3), 200% $size, 200% $size;
+}
+
+@mixin shadow-on-scroll-horizontal($backgroundColor, $shadowColor, $size) {
+  background: linear-gradient($backgroundColor 33%, rgba(21, 0, 255, 0)),
+    linear-gradient(rgba(21, 0, 255, 0), $backgroundColor 66%) 0 100%,
+    radial-gradient(farthest-side at 0 0, $shadowColor, rgba(0, 0, 0, 0)),
+    radial-gradient(farthest-side at 100% 0, $shadowColor, rgba(0, 0, 0, 0))
+      100% 0;
+
+  background-color: $backgroundColor;
+  background-repeat: no-repeat;
+  background-attachment: local, local, scroll, scroll;
+  background-size: ($size * 3) 100%, ($size * 3) 100%, $size 200%, $size 200%;
+}
