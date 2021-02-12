@@ -16,9 +16,10 @@
 
   &--file-item {
     height: var(--gist-item-height);
-    padding-left: calc(var(--padding) + var(--files-padding));
-    border-radius: 3px;
     color: var(--font-color);
+    overflow: hidden;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    --border-radius: 3px;
 
     &:hover {
       background-color: #252829;
@@ -37,7 +38,11 @@
   }
 
   &--file {
+    display: block;
     color: var(--font-color);
+    padding-left: calc(var(--padding) + var(--files-padding));
+    height: var(--gist-item-height);
+    --corner-gap: 0;
   }
 
   &.one-file {
@@ -57,11 +62,15 @@
 
   &.one-file &--file-item {
     @include fit-parent();
-    padding-left: calc(var(--files-padding) / 2);
-    padding-right: var(--files-padding);
+    border-radius: var(--border-radius);
   }
 
   &.one-file &--link {
     @include ellipsis();
+  }
+
+  &.one-file &--file {
+    padding-left: calc(var(--files-padding) / 2);
+    padding-right: var(--files-padding);
   }
 }

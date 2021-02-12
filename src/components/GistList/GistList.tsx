@@ -7,8 +7,8 @@ import { useGists } from '../../hooks/useGists';
 import { useSetting } from '../../hooks/useSetting';
 import { Gist } from '../../model/Gist';
 import StringComparer from '../../util/StringComparer';
-import { Action } from '../Action';
-import { Resizer } from '../Resizer';
+import { Action } from '../atoms/Action';
+import { Resizer } from '../atoms/Resizer';
 import { FilterBox } from './FilterBox';
 import { GistItem } from './GistItem';
 
@@ -18,10 +18,7 @@ export function GistList() {
   const [size, setSize] = useSetting('sidebarWidth');
   const [filter, setFilter] = useState<StringComparer | null>(null);
   const gists = useGists(loadMore);
-
-  const filtered = filter
-    ? gists.filter(gist => gist.files.some(x => filter.matches(x.name)))
-    : gists;
+  const filtered = filter ? applyFilter(gists, filter) : gists;
 
   useEffect(() => {
     setLoadMore(false);
@@ -69,4 +66,13 @@ export function GistList() {
       setLoadMore(true);
     }
   }
+}
+
+function applyFilter(list: Gist[], comparer: StringComparer) {
+  return list.filter(gist => {
+    return (
+      comparer.matches(gist.description || '') ||
+      gist.files.some(x => comparer.matches(x.name))
+    );
+  });
 }

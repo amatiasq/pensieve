@@ -2,7 +2,7 @@ import React, { createRef, useState } from 'react';
 
 import { useScheduler } from '../../hooks/useScheduler';
 import StringComparer from '../../util/StringComparer';
-import { Action } from '../Action';
+import { Action } from '../atoms/Action';
 
 export function FilterBox({
   onChange,

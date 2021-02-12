@@ -3,12 +3,18 @@ import './Action.scss';
 import React, { PropsWithChildren } from 'react';
 import { Link } from 'react-router-dom';
 
-import { useLongPress } from '../hooks/useLongPress';
+import { tooltip } from '../../dom/tooltip';
+import { useLongPress } from '../../hooks/useLongPress';
+import { copyToClipboard } from '../../util/copyToClipboard';
+import { Icon } from './Icon';
+
+type Event = React.MouseEvent<HTMLAnchorElement, MouseEvent>;
 
 interface BaseActionProps {
-  icon: string;
-  name?: string;
+  name: string;
+  icon?: string;
   square?: boolean;
+  disabled?: boolean;
   className?: string;
   onLongPress?: () => void;
 }
@@ -32,15 +38,29 @@ export type ActionProps =
   | RouterActionProps;
 
 export function Action(props: PropsWithChildren<ActionProps>) {
-  const { name, square } = props;
-  const [prefix, icon] = props.icon.includes(' ')
-    ? props.icon.split(' ')
-    : ['fas', props.icon];
+  const { name, square, disabled, onLongPress } = props;
+  const title = name.split('--').pop();
 
-  const iconEl = <i className={`action--icon ${prefix} fa-${icon}`}></i>;
-  const title = name && name.split('--').pop();
-  const longPress = useLongPress(props.onLongPress);
-  const cn = ['action', name, square ? 'square' : null, props.className]
+  const icon = props.icon ? (
+    <Icon name={props.icon} className="action--icon" />
+  ) : null;
+
+  const longPress = useLongPress(() => {
+    toClipboard();
+
+    if (onLongPress) {
+      onLongPress();
+    }
+  });
+
+  const cn = [
+    'action',
+    name,
+    square ? 'square' : null,
+    icon ? 'has-icon' : null,
+    disabled ? 'disabled' : null,
+    props.className,
+  ]
     .filter(Boolean)
     .join(' ');
 
@@ -50,20 +70,40 @@ export function Action(props: PropsWithChildren<ActionProps>) {
     </div>
   );
 
+  function toClipboard() {
+    const url = isLinkAction(props)
+      ? props.href
+      : isRouterAction(props)
+      ? `${location.origin}${props.navigate}`
+      : null;
+
+    if (url) {
+      copyToClipboard(url);
+      tooltip('URL copied to clipboard', 'bottom');
+    }
+  }
+
   function getUserControl(cn: string) {
     if (isButtonAction(props)) {
       return (
-        <button className={cn} onClick={props.onClick}>
-          {iconEl}
+        <button className={cn} disabled={disabled} onClick={props.onClick}>
+          {icon}
           {props.children}
         </button>
       );
     }
 
+    const onClick = disabled ? (e: Event) => e.preventDefault() : undefined;
+
     if (isLinkAction(props)) {
       return (
-        <a className={cn} target={props.target} href={props.href}>
-          {iconEl}
+        <a
+          className={cn}
+          target={props.target}
+          href={props.href}
+          onClick={onClick}
+        >
+          {icon}
           {props.children}
         </a>
       );
@@ -71,8 +111,8 @@ export function Action(props: PropsWithChildren<ActionProps>) {
 
     if (isRouterAction(props)) {
       return (
-        <Link className={cn} to={props.navigate}>
-          {iconEl}
+        <Link className={cn} to={props.navigate} onClick={onClick}>
+          {icon}
           {props.children}
         </Link>
       );

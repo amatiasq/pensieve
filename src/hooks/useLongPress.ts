@@ -19,7 +19,7 @@ export function useLongPress(handler?: () => void, duration = 500) {
     onMouseUp,
     onMouseLeave,
     onMouseDown,
-    onClick,
+    onClickCapture,
   };
 
   function onMouseDown() {
@@ -33,12 +33,14 @@ export function useLongPress(handler?: () => void, duration = 500) {
 
   function onMouseLeave(event: Event) {
     if (isLongPress) {
+      event.nativeEvent.stopImmediatePropagation();
       event.preventDefault();
     }
   }
 
-  function onClick(event: Event) {
+  function onClickCapture(event: Event) {
     if (isLongPress) {
+      event.nativeEvent.stopImmediatePropagation();
       event.preventDefault();
       setIsLongPress(false);
     }

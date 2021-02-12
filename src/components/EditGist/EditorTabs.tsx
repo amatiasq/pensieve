@@ -3,12 +3,11 @@ import './EditorTabs.scss';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { useTooltip } from '../../hooks/useTooltip';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
 import { getSettingsGist } from '../../services/settings';
-import { copyToClipboard } from '../../util/copyToClipboard';
-import { Action } from '../Action';
+import { Action } from '../atoms/Action';
+import { BackButton } from '../atoms/BackButton';
 import { FileTab } from './FileTab';
 
 export function EditorTabs({
@@ -25,18 +24,10 @@ export function EditorTabs({
   const settings = getSettingsGist();
   const history = useHistory();
   const [newFileName, setNewFileName] = useState<string | null>(null);
-  const [tooltip, showTooltip] = useTooltip('Copied to clipboard', {
-    position: 'left',
-  });
 
   return (
     <nav className="editor-tabs">
-      <Action
-        name="editor-tabs--back"
-        icon="chevron-left"
-        navigate="/"
-        square
-      />
+      <BackButton />
 
       <div className="editor-tabs--files">
         {gist.files.map(file => (
@@ -79,16 +70,11 @@ export function EditorTabs({
           </span>
         </Action>
 
-        {tooltip}
         <Action
           name="editor-tabs--github"
           icon="fab github"
           target="_blank"
           href={gist.htmlUrl}
-          onLongPress={() => {
-            showTooltip();
-            copyToClipboard(gist.htmlUrl);
-          }}
         />
 
         {settings && (

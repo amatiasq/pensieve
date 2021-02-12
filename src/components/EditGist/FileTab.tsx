@@ -4,8 +4,8 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { GistFile } from '../../model/GistFile';
-import { Action } from '../Action';
-import { InputField } from './InputField';
+import { Action } from '../atoms/Action';
+import { InputField } from '../atoms/InputField';
 
 interface ExistingFileProps {
   file: GistFile;
@@ -31,7 +31,8 @@ export function FileTab(props: FileTabProps) {
         <InputField
           className="file-tab--tab-name"
           value="type a file name.md"
-          forceEditMode={true}
+          forceEditMode
+          submitIfNotModified
           onSubmit={props.onSubmit}
           onAbort={props.onAbort}
         />
@@ -66,8 +67,8 @@ export function FileTab(props: FileTabProps) {
 
   function remove() {
     const message = file.isOnlyFile
-      ? 'Permanently delete THE GIST?'
-      : `Permanently remove ${file.name}?`;
+      ? 'PERMANENTLY DELETE THE GIST?'
+      : `Remove ${file.name}?`;
 
     if (confirm(message)) {
       return file
