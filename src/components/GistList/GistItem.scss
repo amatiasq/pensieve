@@ -1,3 +1,4 @@
+@import '../../util/ellipsis.scss';
 @import '../../util/fit-parent.scss';
 
 .gist-item {
@@ -7,6 +8,7 @@
   --font-color: #939395;
 
   &--title {
+    @include ellipsis();
     height: var(--gist-item-height);
     padding-left: var(--padding);
     color: #c7c7c7;
@@ -45,6 +47,7 @@
 
   &.one-file &--title {
     padding-right: calc(var(--files-padding) / 2);
+    max-width: 50%;
   }
 
   &.one-file &--file-list {
@@ -59,7 +62,6 @@
   }
 
   &.one-file &--link {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    @include ellipsis();
   }
 }

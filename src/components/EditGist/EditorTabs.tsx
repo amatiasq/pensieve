@@ -3,9 +3,11 @@ import './EditorTabs.scss';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { useTooltip } from '../../hooks/useTooltip';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
 import { getSettingsGist } from '../../services/settings';
+import { copyToClipboard } from '../../util/copyToClipboard';
 import { Action } from '../Action';
 import { FileTab } from './FileTab';
 
@@ -23,6 +25,9 @@ export function EditorTabs({
   const settings = getSettingsGist();
   const history = useHistory();
   const [newFileName, setNewFileName] = useState<string | null>(null);
+  const [tooltip, showTooltip] = useTooltip('Copied to clipboard', {
+    position: 'left',
+  });
 
   return (
     <nav className="editor-tabs">
@@ -33,28 +38,28 @@ export function EditorTabs({
         square
       />
 
-      {gist.files.map(file => (
-        <FileTab
-          key={file.name}
-          file={file}
-          isActive={file === active}
-          readonly={readonly}
-          onSelect={onChange}
-          onRename={name => file.rename(name)}
-        />
-      ))}
+      <div className="editor-tabs--files">
+        {gist.files.map(file => (
+          <FileTab
+            key={file.name}
+            file={file}
+            isActive={file === active}
+            readonly={readonly}
+            onSelect={onChange}
+            onRename={name => file.rename(name)}
+          />
+        ))}
 
-      {newFileName == null ? (
-        <Action
-          name="editor-tabs--new-file"
-          icon="plus"
-          onClick={() => setNewFileName('Filename.md')}
-        />
-      ) : (
-        <FileTab onSubmit={addFile} onAbort={() => setNewFileName(null)} />
-      )}
-
-      <div className="spacer"></div>
+        {newFileName == null ? (
+          <Action
+            name="editor-tabs--new-file"
+            icon="plus"
+            onClick={() => setNewFileName('Filename.md')}
+          />
+        ) : (
+          <FileTab onSubmit={addFile} onAbort={() => setNewFileName(null)} />
+        )}
+      </div>
 
       <div className="editor-tabs--actions">
         {/* <Action
@@ -74,11 +79,16 @@ export function EditorTabs({
           </span>
         </Action>
 
+        {tooltip}
         <Action
           name="editor-tabs--github"
           icon="fab github"
           target="_blank"
           href={gist.htmlUrl}
+          onLongPress={() => {
+            showTooltip();
+            copyToClipboard(gist.htmlUrl);
+          }}
         />
 
         {settings && (

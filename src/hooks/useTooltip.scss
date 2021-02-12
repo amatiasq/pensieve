@@ -1,0 +1,48 @@
+[data-tooltip] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+
+  &::after {
+    content: attr(data-tooltip);
+    box-sizing: content-box;
+    position: absolute;
+    border: 0px solid #3c3c3c;
+    background-color: #212122;
+    color: #c5c5c5;
+    padding: 8px;
+    font-size: 1rem;
+    line-height: 1rem;
+    white-space: nowrap;
+    z-index: 1;
+    transition: max-width 0.5s ease-out;
+    overflow: hidden;
+    max-width: 0;
+  }
+
+  &.visible::after {
+    border-width: 1px;
+    max-width: 1000px;
+  }
+
+  &.top,
+  &.bottom {
+    flex-direction: column;
+  }
+
+  &.top::after {
+    bottom: 5px;
+  }
+
+  &.left::after {
+    right: 5px;
+  }
+
+  &.right::after {
+    left: 5px;
+  }
+
+  &.bottom::after {
+    top: 5px;
+  }
+}
