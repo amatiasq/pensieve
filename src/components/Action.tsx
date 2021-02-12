@@ -1,12 +1,16 @@
 import './Action.scss';
 
-import React, { createRef, PropsWithChildren } from 'react';
+import React, { PropsWithChildren } from 'react';
 import { Link } from 'react-router-dom';
 
+import { useLongPress } from '../hooks/useLongPress';
+
 interface BaseActionProps {
-  name?: string;
   icon: string;
+  name?: string;
   square?: boolean;
+  className?: string;
+  onLongPress?: () => void;
 }
 
 interface InteractiveActionProps extends BaseActionProps {
@@ -35,12 +39,13 @@ export function Action(props: PropsWithChildren<ActionProps>) {
 
   const iconEl = <i className={`action--icon ${prefix} fa-${icon}`}></i>;
   const title = name && name.split('--').pop();
+  const longPress = useLongPress(props.onLongPress);
+  const cn = ['action', name, square ? 'square' : null, props.className]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div
-      className={`action ${name || ''} ${square ? 'square' : ''}`}
-      title={title}
-    >
+    <div className={cn} title={title} {...longPress}>
       {getUserControl('action--trigger')}
     </div>
   );
