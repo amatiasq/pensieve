@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { useGists } from '../../hooks/useGists';
 import { useSetting } from '../../hooks/useSetting';
 import { Gist } from '../../model/Gist';
+import { registerCommand } from '../../services/commands';
 import StringComparer from '../../util/StringComparer';
 import { Action } from '../atoms/Action';
 import { Resizer } from '../atoms/Resizer';
@@ -15,10 +16,12 @@ import { GistItem } from './GistItem';
 export let createAndNavigateToGist: () => Promise<void>;
 
 export function GistList() {
-  const history = useHistory();
   const [loadMore, setLoadMore] = useState(true);
-  const [size, setSize] = useSetting('sidebarWidth');
+  const [isHidden, setIsHidden] = useState(false);
   const [filter, setFilter] = useState<StringComparer | null>(null);
+
+  const history = useHistory();
+  const [size, setSize] = useSetting('sidebarWidth');
   const gists = useGists(loadMore);
   const filtered = filter ? applyFilter(gists, filter) : gists;
 
@@ -29,6 +32,8 @@ export function GistList() {
     setLoadMore(false);
   }, [gists.length]);
 
+  registerCommand('hideSidebar', () => setIsHidden(!isHidden));
+
   const content = filtered.length ? (
     filtered.map(gist => <GistItem key={gist.id} gist={gist} />)
   ) : filter ? (
@@ -38,7 +43,7 @@ export function GistList() {
   );
 
   return (
-    <aside style={{ width: size }}>
+    <aside style={{ width: size, display: isHidden ? 'null' : '' }}>
       <ul className="gist-list" onScroll={onScroll}>
         <li className="filter">
           <FilterBox onChange={setFilter} />

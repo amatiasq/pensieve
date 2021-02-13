@@ -1,23 +1,25 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 
-import { CommandName } from '../components/Shortcuts';
 import { GistId, UserName } from '../contracts/type-aliases';
 import { tooltip } from '../dom/tooltip';
 import { Gist } from '../model/Gist';
 import { notifySettingsChanged, onGistChanged } from './cache-invalidation';
+import { CommandName } from './commands';
 import { createGist, fetchGist, removeGist, updateGist } from './github_api';
 
 const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
+  'CMD+S': 'saveCurrentFile',
+  'CTRL+S': 'saveCurrentFile',
   'CMD+B': 'hideSidebar',
   'CTRL+B': 'hideSidebar',
-  'CTRL+TAB': 'goBack',
-  'CTRL+SHIFT+TAB': 'goForward',
-  'CMD+W': 'goHome',
-  'CTRL+W': 'goHome',
-  'CMD+N': 'createGist',
-  'CTRL+N': 'createGist',
-  'CMD+T': 'createFile',
-  'CTRL+T': 'createFile',
+  // 'CTRL+TAB': 'goBack',
+  // 'CTRL+SHIFT+TAB': 'goForward',
+  // 'CMD+W': 'goHome',
+  // 'CTRL+W': 'goHome',
+  // 'CMD+N': 'createGist',
+  // 'CTRL+N': 'createGist',
+  // 'CMD+T': 'createFile',
+  // 'CTRL+T': 'createFile',
 
   // 'ALT+CTRL+META+SHIFT+Space': () =>
   // 'ALT+CMD+CTRL+SHIFT+Space': () =>
@@ -62,8 +64,8 @@ export function getSetting<Key extends keyof Settings>(key: Key) {
 
   if (isPlainObject(val) && isPlainObject(def)) {
     return {
-      ...(def as Record<string, unknown>),
-      ...(val as Record<string, unknown>),
+      ...(def as Record<string, any>),
+      ...(val as Record<string, any>),
     };
   }
 

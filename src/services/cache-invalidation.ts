@@ -1,61 +1,54 @@
-import { emitter } from '@amatiasq/emitter';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { Emitter, emitter } from '@amatiasq/emitter';
 
 import { RawGistDetails } from '../contracts/RawGist';
 
-export const GIST_CHANGED = 'GIST_CHANGED' as const;
-export const LIST_CHANGED = 'LIST_CHANGED' as const;
-export const SETTINGS_CHANGED = 'SETTINGS_CHANGED' as const;
+const emitters: Record<string, Emitter<any>> = {};
 
-interface GistChangedEvent {
-  type: typeof GIST_CHANGED;
-  data: RawGistDetails;
-}
+export const [notifyGistListChanged, onGistListchanged] = getFunctions(
+  'LIST_CHANGED',
+  () => ({
+    type: 'LIST_CHANGED' as const,
+    data: undefined,
+  }),
+);
 
-interface GistListChangedEvent {
-  type: typeof LIST_CHANGED;
-  data?: never;
-}
+export const [notifyGistChanged, onGistChanged] = getFunctions(
+  'GIST_CHANGED',
+  (raw: RawGistDetails) => ({
+    type: 'GIST_CHANGED' as const,
+    data: raw,
+  }),
+);
 
-interface SettingsChangedEvent {
-  type: typeof SETTINGS_CHANGED;
-  data?: never;
-}
+export const [notifySettingsChanged, onSettingsChanged] = getFunctions(
+  'SETTINGS_CHANGED',
+  () => ({
+    type: 'SETTINGS_CHANGED' as const,
+    data: undefined,
+  }),
+);
 
-type CacheEvent =
-  | GistChangedEvent
-  | GistListChangedEvent
-  | SettingsChangedEvent;
+// ---
 
-const emitters = {
-  [GIST_CHANGED]: emitter<RawGistDetails>(),
-  [LIST_CHANGED]: emitter<void>(),
-  [SETTINGS_CHANGED]: emitter<void>(),
-} as const;
-
-window.addEventListener('message', (event: MessageEvent<CacheEvent>) => {
+window.addEventListener('message', (event: MessageEvent<any>) => {
   const emitter = emitters[event.data.type];
 
-  if (emitter) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    emitter(event.data.data as any);
+  if (typeof emitter === 'function') {
+    emitter(event.data.data);
   }
 });
 
-const notify = (message: CacheEvent) =>
-  setTimeout(() => postMessage(message, location.origin), 10);
+function getFunctions<Key extends string, Data>(
+  key: Key,
+  createEvent: (data: Data) => { type: Key; data: Data },
+) {
+  const emit = emitter<Data>();
+  emitters[key] = emit;
 
-export const notifyGistListChanged = () => notify({ type: LIST_CHANGED });
+  const notify = (data: Data) =>
+    setTimeout(() => postMessage(createEvent(data), location.origin), 10);
 
-export const onGistListchanged = (listener: () => void) =>
-  emitters[LIST_CHANGED].subscribe(listener);
-
-export const notifyGistChanged = (raw: RawGistDetails) =>
-  notify({ type: GIST_CHANGED, data: raw });
-
-export const onGistChanged = (listener: (raw: RawGistDetails) => void) =>
-  emitters[GIST_CHANGED].subscribe(listener);
-
-export const notifySettingsChanged = () => notify({ type: SETTINGS_CHANGED });
-
-export const onSettingsChanged = (listener: () => void) =>
-  emitters[SETTINGS_CHANGED].subscribe(listener);
+  return [notify, emit.subscribe] as const;
+}

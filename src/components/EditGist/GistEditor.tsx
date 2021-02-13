@@ -7,6 +7,7 @@ import { useScheduler } from '../../hooks/useScheduler';
 import { useSetting } from '../../hooks/useSetting';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
+import { registerCommand } from '../../services/commands';
 import { DEFAULT_FILE_CONTENT } from '../../services/github_api';
 import { BusinessIndicator } from '../atoms/BusinessIndicator';
 import { ContentEditor } from './ContentEditor';
@@ -26,7 +27,7 @@ export function GistEditor({
   const [isSaved, setIsSaved] = useState(true);
   const [value, setValue] = useState<string>(file.content);
 
-  // useShortcut('CMD+S', () => scheduler.run());
+  registerCommand('saveCurrentFile', () => scheduler.run());
 
   const scheduler = useScheduler(autosave * 1000, () => {
     if (autosave === 0) {
@@ -51,14 +52,14 @@ export function GistEditor({
     if (isSaved) setValue(file.content);
   }, [file.content]);
 
-  useEffect(() => {
-    window.addEventListener('keydown', event => {
-      if (event.metaKey && event.key === 's') {
-        event.preventDefault();
-        scheduler.run();
-      }
-    });
-  }, []);
+  // useEffect(() => {
+  //   window.addEventListener('keydown', event => {
+  //     if (event.metaKey && event.key === 's') {
+  //       event.preventDefault();
+  //       scheduler.run();
+  //     }
+  //   });
+  // }, []);
 
   if (value == null) return <p>Loading...</p>;
 
