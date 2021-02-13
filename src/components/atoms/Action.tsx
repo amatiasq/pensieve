@@ -46,7 +46,7 @@ export function Action(props: PropsWithChildren<ActionProps>) {
   ) : null;
 
   const longPress = useLongPress(() => {
-    toClipboard();
+    share();
 
     if (onLongPress) {
       onLongPress();
@@ -70,14 +70,18 @@ export function Action(props: PropsWithChildren<ActionProps>) {
     </div>
   );
 
-  function toClipboard() {
+  function share() {
     const url = isLinkAction(props)
       ? props.href
       : isRouterAction(props)
       ? `${location.origin}${props.navigate}`
       : null;
 
-    if (url) {
+    if (!url) return;
+
+    if (typeof navigator.share === 'function') {
+      navigator.share({ title, url });
+    } else {
       copyToClipboard(url);
       tooltip('URL copied to clipboard', 'bottom');
     }
