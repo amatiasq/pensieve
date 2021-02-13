@@ -1,4 +1,5 @@
 import { renderApp } from './components/App';
+import { onVirtualKeyboardDisplayChange } from './util/virtualKeyboardDetector';
 
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
@@ -13,3 +14,11 @@ if (!container) {
 }
 
 renderApp(container);
+
+onVirtualKeyboardDisplayChange(isVisible => {
+  if (isVisible) {
+    container.classList.add('is-virtual-keyboard-open');
+  } else {
+    container.classList.remove('is-virtual-keyboard-open');
+  }
+});
