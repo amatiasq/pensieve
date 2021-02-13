@@ -51,6 +51,7 @@
 #### Details
 - ~~`class Keyboard {}`~~
 - ~~Configurable via file in settings `shortcuts.ts`~~
+- Use shortcut
 - Arrow navigation on tree
 
 ### Other features
