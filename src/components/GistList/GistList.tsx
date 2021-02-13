@@ -12,6 +12,8 @@ import { Resizer } from '../atoms/Resizer';
 import { FilterBox } from './FilterBox';
 import { GistItem } from './GistItem';
 
+export let createAndNavigateToGist: () => Promise<void>;
+
 export function GistList() {
   const history = useHistory();
   const [loadMore, setLoadMore] = useState(true);
@@ -19,6 +21,9 @@ export function GistList() {
   const [filter, setFilter] = useState<StringComparer | null>(null);
   const gists = useGists(loadMore);
   const filtered = filter ? applyFilter(gists, filter) : gists;
+
+  createAndNavigateToGist = () =>
+    Gist.create().then(x => history.push(x.files[0].path));
 
   useEffect(() => {
     setLoadMore(false);
@@ -37,7 +42,11 @@ export function GistList() {
       <ul className="gist-list" onScroll={onScroll}>
         <li className="filter">
           <FilterBox onChange={setFilter} />
-          <Action name="add-gist" icon="plus" onClick={addGist} />
+          <Action
+            name="add-gist"
+            icon="plus"
+            onClick={createAndNavigateToGist}
+          />
         </li>
 
         {content}
@@ -45,10 +54,6 @@ export function GistList() {
       <Resizer size={size} onChange={setSize} />
     </aside>
   );
-
-  function addGist() {
-    Gist.create().then(x => history.push(x.files[0].path));
-  }
 
   function onScroll(event: React.UIEvent<HTMLElement, UIEvent>) {
     const SCROLL_OFFSET = 50;

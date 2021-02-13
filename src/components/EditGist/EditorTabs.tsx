@@ -10,6 +10,8 @@ import { Action } from '../atoms/Action';
 import { BackButton } from '../atoms/BackButton';
 import { FileTab } from './FileTab';
 
+export let requestNewFile: () => void = () => undefined;
+
 export function EditorTabs({
   gist,
   active,
@@ -24,6 +26,9 @@ export function EditorTabs({
   const settings = getSettingsGist();
   const history = useHistory();
   const [newFileName, setNewFileName] = useState<string | null>(null);
+
+  requestNewFile = () => !readonly && setNewFileName('Filename.md');
+  (window as any).requestNewFile = requestNewFile;
 
   return (
     <nav className="editor-tabs">
@@ -45,7 +50,7 @@ export function EditorTabs({
           <Action
             name="editor-tabs--new-file"
             icon="plus"
-            onClick={() => setNewFileName('Filename.md')}
+            onClick={requestNewFile}
           />
         ) : (
           <FileTab onSubmit={addFile} onAbort={() => setNewFileName(null)} />

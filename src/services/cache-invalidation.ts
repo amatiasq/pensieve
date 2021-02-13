@@ -4,6 +4,7 @@ import { RawGistDetails } from '../contracts/RawGist';
 
 export const GIST_CHANGED = 'GIST_CHANGED' as const;
 export const LIST_CHANGED = 'LIST_CHANGED' as const;
+export const SETTINGS_CHANGED = 'SETTINGS_CHANGED' as const;
 
 interface GistChangedEvent {
   type: typeof GIST_CHANGED;
@@ -15,11 +16,20 @@ interface GistListChangedEvent {
   data?: never;
 }
 
-type CacheEvent = GistChangedEvent | GistListChangedEvent;
+interface SettingsChangedEvent {
+  type: typeof SETTINGS_CHANGED;
+  data?: never;
+}
+
+type CacheEvent =
+  | GistChangedEvent
+  | GistListChangedEvent
+  | SettingsChangedEvent;
 
 const emitters = {
   [GIST_CHANGED]: emitter<RawGistDetails>(),
   [LIST_CHANGED]: emitter<void>(),
+  [SETTINGS_CHANGED]: emitter<void>(),
 } as const;
 
 window.addEventListener('message', (event: MessageEvent<CacheEvent>) => {
@@ -44,3 +54,8 @@ export const notifyGistChanged = (raw: RawGistDetails) =>
 
 export const onGistChanged = (listener: (raw: RawGistDetails) => void) =>
   emitters[GIST_CHANGED].subscribe(listener);
+
+export const notifySettingsChanged = () => notify({ type: SETTINGS_CHANGED });
+
+export const onSettingsChanged = (listener: () => void) =>
+  emitters[SETTINGS_CHANGED].subscribe(listener);

@@ -8,6 +8,7 @@ import { useGithubAuth } from '../hooks/useGithubAuth';
 import { EditGistFromUrl } from './EditGist/EditGistFromUrl';
 import { GistList } from './GistList/GistList';
 import { Placeholder } from './Placeholder';
+import { Shortcuts } from './shortcuts';
 
 function App() {
   const location = useLocation();
@@ -19,6 +20,7 @@ function App() {
 
   return (
     <div className={`app page-${page}`}>
+      <Shortcuts />
       <GistList />
       <Route path="/" component={Placeholder} exact />
       <Route path="/gist/:gistId/:filename" component={EditGistFromUrl}></Route>
