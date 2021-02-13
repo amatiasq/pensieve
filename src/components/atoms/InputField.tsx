@@ -36,7 +36,6 @@ export function InputField({
     if (!el) return;
 
     if (readonly || !isEditing) {
-      clearSelection();
       return;
     }
 
