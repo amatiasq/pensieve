@@ -20,6 +20,7 @@
     "@amatiasq/emitter": "^4.1.2",
     "@amatiasq/scheduler": "^3.0.0",
     "@monaco-editor/react": "^4.0.9",
+    "@uiw/react-markdown-preview": "^2.1.1",
     "localforage": "^1.9.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
