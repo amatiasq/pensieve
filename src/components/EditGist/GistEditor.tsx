@@ -26,6 +26,8 @@ export function GistEditor({
   const [isSaved, setIsSaved] = useState(true);
   const [value, setValue] = useState<string>(file.content);
 
+  // useShortcut('CMD+S', () => scheduler.run());
+
   const scheduler = useScheduler(autosave * 1000, () => {
     if (autosave === 0) {
       return;
