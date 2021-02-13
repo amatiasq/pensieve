@@ -2,6 +2,10 @@
   cursor: default;
   border: 1px solid transparent;
 
+  &:not(.editing) {
+    user-select: none;
+  }
+
   &.editing {
     outline: none;
     border-color: #0071d2;

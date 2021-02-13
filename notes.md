@@ -11,6 +11,8 @@
 - Installable
 - Mobile support (editor is very simplified)
 - Search filters by name (by cached content in future)
+- Tutorial
+- Intense caching
 
 - Powerful editor on desktop
   - It's VS Code's Monaco Editor
@@ -26,29 +28,52 @@
 
 ## Log
 
-###  2021-02-12
+###  [2021-02-12](https://gist.github.com/b02fa55a018d2532f8a81f479c95a8cb9)
 
-- Hide sidebar on CTRL+B
-- Markdown: ~ ~ ~~should strike text~~ ~ ~
-- Button "INDEX GISTS"
+### Feedback
+- Preview Markdown by default in Mobile
+  - Edit on touch
+- Guest mode
+- On mobile keyboard takes screen space
+- Backspace in search field looses focus? WTF
+
+### Shortcuts
+- CTRL+B => `document.querySelector('aside').style.display = 'none'`
+- CTRL+TAB `history().goBack()` o "next file"
+- CTRL+SHIFT+TAB `history.goForward()` o "prev file"
+- CMD+W: "close gist and focus tree"
+- CMD+N: `createGist()`
+- CMD+T: `addTabToGist()`
+
+#### Details
+- `class Keyboard {}`
+- Configurable via file in settings `shortcuts.ts`
+  - Arrow navigation on tree
+
+### Other features
+
 - Save gist history
+  - Show previously open gists (not just yours)
+
+- Markdown: ~ ~ ~~should strike text~~ ~ ~
+  - Don't know how to do it
+
+- Button "INDEX GISTS"
+  - Triggers a full download of all gists
+  - Carefully, one by one
+  - Change button to stop
+
 - Search should include all files' content in storage
+  - `localforage.iterate()` must help
 
 - Favourite gists
   - Use starred API
     - https://docs.github.com/en/rest/reference/gists#list-starred-gists
 
-- Controls (go one by one)
-  - CMD+W means "close gist and focus tree"
-    - `class Keyboard {}`
-  - Shortcut to create gist
-  - Shortcut to add file to gist
-  - Shortcut to navigate through files
-  - Arrow navigation on tree
-
 - LONG: Offline support
   - Should render without issues
   - Should save operation until back online
+
 
 ###  [2021-02-10](https://gist.github.com/amatiasq/73a3b78622533205eac1ac6cfbee231e)
 
