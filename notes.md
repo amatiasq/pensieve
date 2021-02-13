@@ -38,22 +38,31 @@
 - ~~Backspace in search field looses focus? WTF~~
 
 ### Shortcuts
-- CTRL+B => `document.querySelector('aside').style.display = 'none'`
-- CTRL+TAB `history().goBack()` o "next file"
-- CTRL+SHIFT+TAB `history.goForward()` o "prev file"
-- CMD+W: "close gist and focus tree"
-- CMD+N: `createGist()`
-- CMD+T: `addTabToGist()`
+- ~~CTRL+B => `document.querySelector('aside').style.display = 'none'`~~
+- ~~CTRL+TAB `history().goBack()` o "next file"~~
+- ~~CTRL+SHIFT+TAB `history.goForward()` o "prev file"~~
+
+#### Not possible, using CTRL instead
+- ~~CMD+W: "close gist and focus tree"~~
+- ~~CMD+N: `createGist()`~~
+- ~~CMD+T: `addTabToGist()`~~
 
 #### Details
-- `class Keyboard {}`
-- Configurable via file in settings `shortcuts.ts`
-  - Arrow navigation on tree
+- ~~`class Keyboard {}`~~
+- ~~Configurable via file in settings `shortcuts.ts`~~
+- Arrow navigation on tree
 
 ### Other features
 
 - Save gist history
   - Show previously open gists (not just yours)
+
+- Search should include all files' content in storage
+  - `localforage.iterate()` must help
+
+- Favourite gists
+  - Use starred API
+    - https://docs.github.com/en/rest/reference/gists#list-starred-gists
 
 - Markdown: ~ ~ ~~should strike text~~ ~ ~
   - Don't know how to do it
@@ -62,13 +71,6 @@
   - Triggers a full download of all gists
   - Carefully, one by one
   - Change button to stop
-
-- Search should include all files' content in storage
-  - `localforage.iterate()` must help
-
-- Favourite gists
-  - Use starred API
-    - https://docs.github.com/en/rest/reference/gists#list-starred-gists
 
 - LONG: Offline support
   - Should render without issues

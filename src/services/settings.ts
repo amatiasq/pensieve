@@ -1,15 +1,35 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 
+import { CommandName } from '../components/Shortcuts';
 import { GistId, UserName } from '../contracts/type-aliases';
+import { tooltip } from '../dom/tooltip';
 import { Gist } from '../model/Gist';
+import { notifySettingsChanged, onGistChanged } from './cache-invalidation';
 import { createGist, fetchGist, removeGist, updateGist } from './github_api';
 
-const DEFAULT = {
+const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
+  'CMD+B': 'hideSidebar',
+  'CTRL+B': 'hideSidebar',
+  'CTRL+TAB': 'goBack',
+  'CTRL+SHIFT+TAB': 'goForward',
+  'CMD+W': 'goHome',
+  'CTRL+W': 'goHome',
+  'CMD+N': 'createGist',
+  'CTRL+N': 'createGist',
+  'CMD+T': 'createFile',
+  'CTRL+T': 'createFile',
+
+  // 'ALT+CTRL+META+SHIFT+Space': () =>
+  // 'ALT+CMD+CTRL+SHIFT+Space': () =>
+};
+
+const DEFAULT_SETTINGS = {
   autosave: 5,
   reloadIfAwayForSeconds: 5,
   renderIndentGuides: false,
   rulers: [],
   settingsGistRecreateThreshold: 50,
+  shortcuts: DEFAULT_SHORTCUTS,
   sidebarWidth: 400,
   starred: [],
   tabSize: 2,
@@ -18,7 +38,7 @@ const DEFAULT = {
   wordWrap: true,
 };
 
-export type Settings = typeof DEFAULT;
+export type Settings = typeof DEFAULT_SETTINGS;
 
 const storage = new ClientStorage<Partial<Settings>>('gists.settings', {
   version: 1,
@@ -33,8 +53,21 @@ export const getSettingsGist = gist.info;
 export const setTopGists = gist.topGists;
 
 export function getSetting<Key extends keyof Settings>(key: Key) {
-  const val = settings()[key];
-  return (val == null ? DEFAULT[key] : val) as NonNullable<Settings[Key]>;
+  const val = settings()[key] as Settings[Key];
+  const def = DEFAULT_SETTINGS[key] as Settings[Key];
+
+  if (val == null) {
+    return def;
+  }
+
+  if (isPlainObject(val) && isPlainObject(def)) {
+    return {
+      ...(def as Record<string, unknown>),
+      ...(val as Record<string, unknown>),
+    };
+  }
+
+  return val;
 }
 
 export function setSetting<Key extends keyof Settings>(
@@ -43,6 +76,7 @@ export function setSetting<Key extends keyof Settings>(
 ) {
   storage.set({ ...settings(), [key]: value });
   gist.sync();
+  notifySettingsChanged();
 }
 
 function settingsGist() {
@@ -50,6 +84,13 @@ function settingsGist() {
   const gistId = new ClientStorage<GistId>('gist.settings.id');
   const getId = () => gistId.get();
   let isOperating = false;
+
+  onGistChanged(raw => {
+    if (raw.id === getId()) {
+      storage.set(read(new Gist(raw)) || DEFAULT_SETTINGS);
+      notifySettingsChanged();
+    }
+  });
 
   sync();
 
@@ -178,7 +219,7 @@ function settingsGist() {
         'Gist created by https://gist.amatiasq.com to store settings',
       files: {
         [settingsFile]: { content: serialize(value) },
-        ['defaults.json']: { content: serialize(DEFAULT) },
+        ['defaults.json']: { content: serialize(DEFAULT_SETTINGS) },
       },
     };
   }
@@ -193,6 +234,15 @@ function deserialize(content: string) {
     return JSON.parse(content) as Settings;
   } catch (error) {
     console.error(`Invalid settings JSON:`, content);
+    tooltip(`Error in settings file: ${error.message}`);
     return null;
   }
+}
+
+function isPlainObject(target: unknown): target is Record<string, any> {
+  if (target == null || Array.isArray(target) || typeof target !== 'object') {
+    return false;
+  }
+
+  return Object.getPrototypeOf(target) === Object.prototype;
 }
