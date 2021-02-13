@@ -1,28 +1,19 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { createRef, useState } from 'react';
 
 import { useScheduler } from '../../hooks/useScheduler';
 import StringComparer from '../../util/StringComparer';
 import { Action } from '../atoms/Action';
-
-let instance = 0;
 
 export function FilterBox({
   onChange,
 }: {
   onChange: (comparer: StringComparer | null) => void;
 }) {
-  const [inst] = useState(instance++);
-  console.log(inst);
-
   const ref = createRef<HTMLInputElement>();
   const [term, setTerm] = useState('');
   const scheduler = useScheduler(50, () =>
     onChange(term ? new StringComparer(term) : null),
   );
-
-  useEffect(() => {
-    ref.current?.addEventListener('blur', e => console.log('BLUR'));
-  }, []);
 
   return (
     <>

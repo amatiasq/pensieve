@@ -1,6 +1,6 @@
 import { emitter } from '@amatiasq/emitter';
 
-import { isMobile } from './isMobile';
+import { isMobile } from '../util/isMobile';
 
 type Size = { w: number; h: number };
 const isSameSize = (a: Size, b: Size) => a.w === b.w && a.h === b.h;
@@ -9,6 +9,7 @@ const isHeightBigger = (a: Size, b: Size) => a.w === b.w && a.h > b.h;
 const initial: Size = { w: window.innerWidth, h: window.innerHeight };
 let prev: Size = { w: window.innerWidth, h: window.innerHeight };
 let current: Size = { w: window.innerWidth, h: window.innerHeight };
+let isKeyboardShown = false;
 
 const emit = emitter<boolean>();
 
@@ -20,13 +21,20 @@ if (isMobile) {
     current = { w: window.innerWidth, h: window.innerHeight };
 
     if (isSameSize(current, initial) && isHeightBigger(current, prev)) {
-      console.log(false);
+      setStatus(false);
       return;
     }
 
     if (isSameSize(prev, initial) && isHeightBigger(prev, current)) {
-      console.log(true);
+      setStatus(false);
       return;
     }
   });
+}
+
+function setStatus(value: boolean) {
+  if (isKeyboardShown !== value) {
+    isKeyboardShown = value;
+    emit(value);
+  }
 }
