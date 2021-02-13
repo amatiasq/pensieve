@@ -8,7 +8,7 @@ import { useGithubAuth } from '../hooks/useGithubAuth';
 import { EditGistFromUrl } from './EditGist/EditGistFromUrl';
 import { GistList } from './GistList/GistList';
 import { Placeholder } from './Placeholder';
-import { Shortcuts } from './shortcuts';
+import { Shortcuts } from './Shortcuts';
 
 function App() {
   const location = useLocation();

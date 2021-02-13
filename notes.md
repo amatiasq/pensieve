@@ -13,6 +13,7 @@
 - Search filters by name (by cached content in future)
 - Tutorial
 - Intense caching
+- Shortcuts (try CMD/CTRL + B)
 
 - Powerful editor on desktop
   - It's VS Code's Monaco Editor
