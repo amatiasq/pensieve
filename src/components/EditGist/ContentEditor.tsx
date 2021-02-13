@@ -1,8 +1,9 @@
 import './ContentEditor.scss';
 
-import React from 'react';
+import React, { useState } from 'react';
 
 import Editor, { useMonaco } from '@monaco-editor/react';
+import MarkdownPreview from '@uiw/react-markdown-preview';
 
 import { useSetting } from '../../hooks/useSetting';
 import { GistFile } from '../../model/GistFile';
@@ -25,6 +26,8 @@ export function ContentEditor({
   const [wordWrap] = useSetting('wordWrap');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
 
+  const [isPreview, setIsPreview] = useState(isMobile);
+
   const lines = value.split('\n').length;
   const language =
     getLanguageFor(file.name) ||
@@ -32,11 +35,19 @@ export function ContentEditor({
     'markdown';
 
   if (isMobile) {
-    return (
+    return isPreview && language === 'markdown' ? (
+      <div className="markdown-preview" onClick={() => setIsPreview(false)}>
+        <MarkdownPreview
+          className="markdown-preview--renderer"
+          source={value}
+        />
+      </div>
+    ) : (
       <textarea
         className="mobile-fallback"
         defaultValue={value}
         readOnly={readonly}
+        autoFocus
         onChange={e => onChange(e.target.value)}
       ></textarea>
     );
