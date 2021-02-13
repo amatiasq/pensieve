@@ -1,4 +1,4 @@
-@import '../../util/hide-scrollbar.scss';
+@import '../../dom/hide-scrollbar.scss';
 
 .markdown-preview {
   @include hide-scrollbar();

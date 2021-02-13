@@ -1,7 +1,5 @@
 import localforage from 'localforage';
 
-import { ClientStorage } from '@amatiasq/client-storage';
-
 import { RawGist } from '../contracts/RawGist';
 import { GistId, UserName } from '../contracts/type-aliases';
 import {
@@ -14,8 +12,8 @@ import {
   renameGistFile,
   setFileContent
 } from '../services/github_api';
-import { mergeGist } from '../util/mergeGist';
 import { GistFile } from './GistFile';
+import { mergeGist } from './mergeGist';
 
 const storage = localforage.createInstance({ name: 'gists.cache' });
 

@@ -5,7 +5,7 @@ import React, { createRef, useEffect, useState } from 'react';
 import {
   clearSelection,
   selectElementContents
-} from '../../util/selectElementContents';
+} from '../../dom/selectElementContents';
 
 export function InputField({
   className,

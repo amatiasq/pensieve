@@ -3,9 +3,9 @@ import './Action.scss';
 import React, { PropsWithChildren } from 'react';
 import { Link } from 'react-router-dom';
 
+import { copyToClipboard } from '../../dom/copyToClipboard';
 import { tooltip } from '../../dom/tooltip';
 import { useLongPress } from '../../hooks/useLongPress';
-import { copyToClipboard } from '../../util/copyToClipboard';
 import { Icon } from './Icon';
 
 type Event = React.MouseEvent<HTMLAnchorElement, MouseEvent>;
