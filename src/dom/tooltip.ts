@@ -1,7 +1,7 @@
 import './tooltip.scss';
 
-import { escapeHtml } from '../util/escapeHtml';
-import { getMousePosition } from '../util/Mouse';
+import { escapeHtml } from '../dom/escapeHtml';
+import { getMousePosition } from '../dom/Mouse';
 
 export function tooltip(
   text: string,

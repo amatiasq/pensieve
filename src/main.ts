@@ -1,5 +1,5 @@
 import { renderApp } from './components/App';
-import { onVirtualKeyboardDisplayChange } from './util/virtualKeyboardDetector';
+import { onVirtualKeyboardDisplayChange } from './dom/virtualKeyboardDetector';
 
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {

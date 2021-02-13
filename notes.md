@@ -31,11 +31,11 @@
 ###  [2021-02-12](https://gist.github.com/b02fa55a018d2532f8a81f479c95a8cb9)
 
 ### Feedback
-- Preview Markdown by default in Mobile
-  - Edit on touch
+- ~~Preview Markdown by default in Mobile~~
+  - ~~Edit on touch~~
 - Guest mode
-- On mobile keyboard takes screen space
-- Backspace in search field looses focus? WTF
+- ~~On mobile keyboard takes screen space~~
+- ~~Backspace in search field looses focus? WTF~~
 
 ### Shortcuts
 - CTRL+B => `document.querySelector('aside').style.display = 'none'`
