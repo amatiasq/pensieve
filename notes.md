@@ -4,7 +4,7 @@
 ## Features
 
 - Create & remove gists and files from them
-- Open gist link
+- Open gistº link
 - Autosave every 5 seconds (configurable)
 - Full history visible through Github's page (follow link)
 - Auto refresh if await for more than 5 seconds (configurable)
@@ -14,6 +14,7 @@
 - Tutorial
 - Intense caching
 - Shortcuts (try CMD/CTRL + B)
+- Starred gists
 
 - Powerful editor on desktop
   - It's VS Code's Monaco Editor
@@ -29,7 +30,33 @@
 
 ## Log
 
-###  [2021-02-12](https://gist.github.com/b02fa55a018d2532f8a81f479c95a8cb9)
+### [2021-02-14]
+
+- Refactor settings to add 'memory.json' file
+
+- Save gist history
+  - Show previously open gists (not just yours)
+
+- <<< Display number of comments if comments?
+- Drag and drop files across gists
+- Add display sidebar config option
+
+- Search should include all files' content in storage
+  - `localforage.iterate()` must help
+
+- Markdown: ~ ~ ~~should strike text~~ ~ ~
+  - Don't know how to do it
+
+- Button "INDEX GISTS"
+  - Triggers a full download of all gists
+  - Carefully, one by one
+  - Change button to stop
+
+- LONG: Offline support
+  - Should render without issues
+  - Should save operation until back online
+
+### [2021-02-12](https://gist.github.com/b02fa55a018d2532f8a81f479c95a8cb9)
 
 ### Feedback
 - ~~Preview Markdown by default in Mobile~~
@@ -56,28 +83,9 @@
 
 ### Other features
 
-- Save gist history
-  - Show previously open gists (not just yours)
-
-- Search should include all files' content in storage
-  - `localforage.iterate()` must help
-
-- Favourite gists
-  - Use starred API
-    - https://docs.github.com/en/rest/reference/gists#list-starred-gists
-
-- Markdown: ~ ~ ~~should strike text~~ ~ ~
-  - Don't know how to do it
-
-- Button "INDEX GISTS"
-  - Triggers a full download of all gists
-  - Carefully, one by one
-  - Change button to stop
-
-- LONG: Offline support
-  - Should render without issues
-  - Should save operation until back online
-
+- ~~Favourite gists~~
+  - ~~Use starred API~~
+    - ~~https://docs.github.com/en/rest/reference/gists#list-starred-gists~~
 
 ###  [2021-02-10](https://gist.github.com/amatiasq/73a3b78622533205eac1ac6cfbee231e)
 

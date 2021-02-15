@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 
 import { useGists } from '../../hooks/useGists';
 import { useSetting } from '../../hooks/useSetting';
+import { useStarredGists } from '../../hooks/useStarredGists';
 import { Gist } from '../../model/Gist';
 import { registerCommand } from '../../services/commands';
 import StringComparer from '../../util/StringComparer';
@@ -22,8 +23,15 @@ export function GistList() {
 
   const history = useHistory();
   const [size, setSize] = useSetting('sidebarWidth');
+  const starred = useStarredGists();
   const gists = useGists(loadMore);
-  const filtered = filter ? applyFilter(gists, filter) : gists;
+
+  const starredIds = starred.map(x => x.id);
+  const allGists = [
+    ...starred,
+    ...gists.filter(x => !starredIds.includes(x.id)),
+  ];
+  const filtered = filter ? applyFilter(allGists, filter) : allGists;
 
   createAndNavigateToGist = () =>
     Gist.create().then(x => history.push(x.files[0].path));

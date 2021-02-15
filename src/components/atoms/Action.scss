@@ -79,5 +79,11 @@
     transform: scale(1);
     transform-origin: center center;
     transition: opacity 0.1s, transform 0.1s, background-color 0.25s;
+
+    &,
+    &:active,
+    &:visited {
+      color: inherit;
+    }
   }
 }

@@ -2,75 +2,81 @@
 @import '../../dom/fit-parent.scss';
 
 .gist-item {
-  display: flex;
-  flex-direction: column;
-  line-height: var(--gist-item-height);
-  --font-color: #939395;
+  line-height: calc(var(--gist-item-height) - 2px);
+  --border-radius: 3px;
+
+  &:hover &--actions {
+    display: block;
+  }
+
+  &--actions {
+    display: none;
+  }
+
+  &--star.action.has-icon {
+    --size: var(--gist-item-height);
+  }
 
   &--title {
     @include ellipsis();
-    height: var(--gist-item-height);
     padding-left: var(--padding);
-    color: #c7c7c7;
   }
 
-  &--file-item {
-    height: var(--gist-item-height);
-    color: var(--font-color);
+  &--link {
     overflow: hidden;
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-    --border-radius: 3px;
 
     &:hover {
       background-color: #252829;
     }
   }
 
-  &--link {
-    display: block;
-    text-decoration: none;
-
-    &,
-    &:active,
-    &:visited {
-      color: inherit;
-    }
-  }
-
   &--file {
-    display: block;
-    color: var(--font-color);
-    padding-left: calc(var(--padding) + var(--files-padding));
-    height: var(--gist-item-height);
-    --corner-gap: 0;
-  }
-
-  &.one-file {
-    flex-direction: row;
-    white-space: nowrap;
-  }
-
-  &.one-file &--title {
-    padding-right: calc(var(--files-padding) / 2);
-    max-width: 50%;
-  }
-
-  &.one-file &--file-list {
-    @include fit-parent();
-    display: flex;
-  }
-
-  &.one-file &--file-item {
-    @include fit-parent();
-    border-radius: var(--border-radius);
-  }
-
-  &.one-file &--link {
     @include ellipsis();
   }
+}
 
-  &.one-file &--file {
-    padding-left: calc(var(--files-padding) / 2);
-    padding-right: var(--files-padding);
+.gist-item.single-file {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  height: var(--gist-item-height);
+
+  .gist-item {
+    &--title {
+      flex-shrink: 0;
+      max-width: 60%;
+      padding-right: calc(var(--files-padding) / 2);
+    }
+
+    &--link {
+      @include fit-parent();
+      border-radius: var(--border-radius);
+    }
+
+    &--file {
+      padding-left: calc(var(--files-padding) / 2);
+      padding-top: 1px;
+    }
+  }
+}
+
+.gist-item.multiple-files {
+  .gist-item {
+    &--header {
+      display: flex;
+      flex-direction: row;
+    }
+
+    &--title {
+      flex: 1;
+    }
+
+    &--link {
+      border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+
+    &--file {
+      padding-left: calc(var(--padding) + var(--files-padding));
+    }
   }
 }

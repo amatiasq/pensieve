@@ -2,9 +2,13 @@ import { RawGistDetails, RawGistItem } from '../contracts/RawGist';
 import { GistId } from '../contracts/type-aliases';
 import { UpdateGistRequest } from '../contracts/UpdateGistRequest';
 import { getGithubHeaders } from '../hooks/useGithubAuth';
-import { DELETE, GET, PATCH, POST } from './api';
+import { DELETE, GET, PATCH, POST, PUT } from './api';
 import { busyWhile } from './busy-indicator';
-import { notifyGistChanged, notifyGistListChanged } from './cache-invalidation';
+import {
+  notifyGistChanged,
+  notifyGistListChanged,
+  notifyGistStarChanged
+} from './cache-invalidation';
 
 export const GH_API = 'https://api.github.com';
 
@@ -26,14 +30,25 @@ export const fetchGists = (page = 1) =>
     GET<RawGistItem[]>(url(`/gists?per_page=100&page=${page}`), withAuth()),
   );
 
+export const fetchStarredGists = () =>
+  busyWhile(GET<RawGistItem[]>(url(`/gists/starred`), withAuth()));
+
 export const fetchGist = (id: GistId) =>
   busyWhile(GET<RawGistDetails>(url(`/gists/${id}`), withAuth()));
 
 export const removeGist = (id: GistId) =>
-  busyWhile(
-    DELETE<unknown>(url(`/gists/${id}`), withAuth()).finally(
-      notifyGistListChanged,
-    ),
+  busyWhile(DELETE<unknown>(url(`/gists/${id}`), withAuth())).finally(
+    notifyGistListChanged,
+  );
+
+export const starGist = (id: GistId) =>
+  busyWhile(PUT(url(`/gists/${id}/star`), null, withAuth())).then(() =>
+    notifyGistStarChanged(id),
+  );
+
+export const unstarGist = (id: GistId) =>
+  busyWhile(DELETE(url(`/gists/${id}/star`), withAuth())).then(() =>
+    notifyGistStarChanged(id),
   );
 
 export const addGileToGist = (id: GistId, name: string, content: string) =>
@@ -54,8 +69,8 @@ export function createGist(body: UpdateGistRequest = {}) {
       url(`/gists`),
       { ...DEFAULT_GIST_CONTENT, ...body },
       withAuth(),
-    ).finally(notifyGistListChanged),
-  );
+    ),
+  ).finally(notifyGistListChanged);
 }
 
 export function updateGist(id: GistId, body: UpdateGistRequest) {
@@ -64,11 +79,11 @@ export function updateGist(id: GistId, body: UpdateGistRequest) {
       url(`/gists/${id}`),
       JSON.stringify(body),
       withAuth(),
-    ).then(raw => {
-      notifyGistChanged(raw);
-      return raw;
-    }),
-  );
+    ),
+  ).then(raw => {
+    notifyGistChanged(raw);
+    return raw;
+  });
 }
 
 function withAuth() {

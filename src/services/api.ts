@@ -37,6 +37,12 @@ export const POST = <T>(
   options: RequestOptions = {},
 ) => request<T>(url, { method: 'POST', body, ...options });
 
+export const PUT = <T>(
+  url: string,
+  body: RequestBody = null,
+  options: RequestOptions = {},
+) => request<T>(url, { method: 'PUT', body, ...options });
+
 export const PATCH = <T>(
   url: string,
   body: RequestBody = null,
