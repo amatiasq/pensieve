@@ -1,6 +1,16 @@
 type Executor = () => void;
 
-export type CommandName = 'hideSidebar' | 'saveCurrentFile';
+export type CommandName =
+  | 'createFile'
+  | 'createGist'
+  | 'goBack'
+  | 'goForward'
+  | 'goHome'
+  | 'hideSidebar'
+  | 'nextFile'
+  | 'prevFile'
+  | 'saveCurrentFile'
+  | 'settings';
 
 const commands: Partial<Record<CommandName, Executor>> = {};
 

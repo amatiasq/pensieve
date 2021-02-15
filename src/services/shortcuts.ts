@@ -12,6 +12,8 @@ onSettingsChanged(() => (shortcuts = getShortcuts()));
 onShortcut(event => {
   const keys = event.keys.join('+').toUpperCase();
 
+  console.log(keys);
+
   if (keys in shortcuts) {
     const commandName = shortcuts[keys];
     const command = getCommand(commandName);
