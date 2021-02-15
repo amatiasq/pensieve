@@ -8,18 +8,25 @@ import { CommandName } from './commands';
 import { createGist, fetchGist, removeGist, updateGist } from './github_api';
 
 const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
+  'CTRL+TAB': 'goBack',
+  'CTRL+SHIFT+TAB': 'goForward',
+
   'CMD+S': 'saveCurrentFile',
-  'CTRL+S': 'saveCurrentFile',
+  'CMD+,': 'settings',
   'CMD+B': 'hideSidebar',
+  'CMD+W': 'goHome',
+  'CMD+N': 'createGist',
+  'CMD+T': 'createFile',
+
+  // 'CMD+ArrowRight': 'nextFile',
+  // 'CMD+ArrowLeft': 'prevFile',
+
+  'CTRL+S': 'saveCurrentFile',
+  'CTRl+,': 'settings',
   'CTRL+B': 'hideSidebar',
-  // 'CTRL+TAB': 'goBack',
-  // 'CTRL+SHIFT+TAB': 'goForward',
-  // 'CMD+W': 'goHome',
-  // 'CTRL+W': 'goHome',
-  // 'CMD+N': 'createGist',
-  // 'CTRL+N': 'createGist',
-  // 'CMD+T': 'createFile',
-  // 'CTRL+T': 'createFile',
+  'CTRL+W': 'goHome',
+  'CTRL+N': 'createGist',
+  'CTRL+T': 'createFile',
 
   // 'ALT+CTRL+META+SHIFT+Space': () =>
   // 'ALT+CMD+CTRL+SHIFT+Space': () =>

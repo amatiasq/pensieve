@@ -5,12 +5,11 @@ import { useHistory } from 'react-router-dom';
 
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
+import { registerCommand } from '../../services/commands';
 import { getSettingsGist } from '../../services/settings';
 import { Action } from '../atoms/Action';
-import { BackButton } from '../atoms/BackButton';
+import { BackButton } from '../BackButton';
 import { FileTab } from './FileTab';
-
-export let requestNewFile: () => void = () => undefined;
 
 export function EditorTabs({
   gist,
@@ -27,8 +26,17 @@ export function EditorTabs({
   const history = useHistory();
   const [newFileName, setNewFileName] = useState<string | null>(null);
 
-  requestNewFile = () => !readonly && setNewFileName('Filename.md');
-  (window as any).requestNewFile = requestNewFile;
+  const settingsUrl = settings
+    ? `/gist/${settings.id}/${settings.filename}`
+    : null;
+
+  if (settingsUrl) {
+    registerCommand('settings', () => history.push(settingsUrl));
+  }
+
+  const requestNewFile = () => !readonly && setNewFileName('Filename.md');
+
+  registerCommand('createFile', requestNewFile);
 
   return (
     <nav className="editor-tabs">
@@ -82,11 +90,11 @@ export function EditorTabs({
           href={gist.htmlUrl}
         />
 
-        {settings && (
+        {settingsUrl && (
           <Action
             name="editor-tabs--settings"
             icon="cog"
-            navigate={`/gist/${settings.id}/${settings.filename}`}
+            navigate={settingsUrl}
           />
         )}
       </div>

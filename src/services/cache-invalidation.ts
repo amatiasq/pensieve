@@ -47,8 +47,17 @@ function getFunctions<Key extends string, Data>(
   const emit = emitter<Data>();
   emitters[key] = emit;
 
-  const notify = (data: Data) =>
+  const notify = (data: Data) => {
     setTimeout(() => postMessage(createEvent(data), location.origin), 10);
+  };
 
-  return [notify, emit.subscribe] as const;
+  return [
+    notify as RemoveUndefinedArguments<typeof notify>,
+    emit.subscribe,
+  ] as const;
 }
+
+type RemoveUndefinedArguments<
+  T extends (...a: any[]) => any,
+  U = ReturnType<T>
+> = T extends (x: undefined) => U ? () => U : T;

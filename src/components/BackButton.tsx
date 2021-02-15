@@ -1,11 +1,16 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { Action } from './Action';
+import { registerCommand } from '../services/commands';
+import { Action } from './atoms/Action';
 
 export function BackButton() {
   const history = useHistory();
   const isHome = history.location.pathname === '/';
+
+  registerCommand('goBack', () => history.goBack());
+  registerCommand('goForward', () => history.goForward());
+  registerCommand('goHome', () => history.push('/'));
 
   return (
     <Action

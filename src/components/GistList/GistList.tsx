@@ -28,6 +28,8 @@ export function GistList() {
   createAndNavigateToGist = () =>
     Gist.create().then(x => history.push(x.files[0].path));
 
+  registerCommand('createGist', createAndNavigateToGist);
+
   useEffect(() => {
     setLoadMore(false);
   }, [gists.length]);
