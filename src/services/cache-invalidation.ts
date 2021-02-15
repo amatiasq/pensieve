@@ -58,6 +58,6 @@ function getFunctions<Key extends string, Data>(
 }
 
 type RemoveUndefinedArguments<
-  T extends (...a: any[]) => any,
+  T extends (x: any) => U,
   U = ReturnType<T>
 > = T extends (x: undefined) => U ? () => U : T;
