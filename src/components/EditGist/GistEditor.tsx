@@ -34,7 +34,7 @@ export function GistEditor({
       return;
     }
 
-    if (!isSaved && file.content !== value) {
+    if (file.content !== value) {
       saveFile(file, value);
     }
   });
@@ -52,44 +52,35 @@ export function GistEditor({
     if (isSaved) setValue(file.content);
   }, [file.content]);
 
-  // useEffect(() => {
-  //   window.addEventListener('keydown', event => {
-  //     if (event.metaKey && event.key === 's') {
-  //       event.preventDefault();
-  //       scheduler.run();
-  //     }
-  //   });
-  // }, []);
+  useEffect(() => {
+    const handler = () => saveFile(file, value);
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  });
+
+  useEffect(() =>
+    history.listen(x => {
+      if (x.pathname !== file.path) {
+        saveFile(file, value);
+      }
+    }),
+  );
 
   if (value == null) return <p>Loading...</p>;
 
   return (
     <main className={`gist-editor ${readonly ? 'readonly' : ''}`}>
-      <EditorTabs
-        gist={gist}
-        active={file}
-        readonly={readonly}
-        onChange={onFileChange}
-      />
+      <EditorTabs gist={gist} active={file} readonly={readonly} />
       <ContentEditor
         key={file.name}
         file={file}
-        value={value}
+        value={value === DEFAULT_FILE_CONTENT ? '' : value}
         readonly={readonly}
         onChange={onChange}
       />
       <BusinessIndicator />
     </main>
   );
-
-  function onFileChange(newFile: GistFile) {
-    if (!isSaved && value != null) {
-      saveFile(file, value);
-      scheduler.stop();
-    }
-
-    history.push(`/gist/${gist.id}/${newFile.name}`);
-  }
 
   function onChange(value?: string) {
     setIsSaved(false);
@@ -98,7 +89,12 @@ export function GistEditor({
   }
 
   function saveFile(file: GistFile, value: string | null) {
+    if (isSaved) {
+      return Promise.resolve(file);
+    }
+
     setIsSaved(true);
+    scheduler.stop();
     return file.setContent(value || DEFAULT_FILE_CONTENT);
   }
 }
