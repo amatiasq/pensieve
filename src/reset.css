@@ -167,5 +167,5 @@ input[type='text'] {
 }
 
 #app-container.is-virtual-keyboard-open .mobile-fallback {
-  height: 90%;
+  height: 50%;
 }
