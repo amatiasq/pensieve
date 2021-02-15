@@ -12,6 +12,7 @@ import {
   renameGistFile,
   setFileContent
 } from '../services/github_api';
+import { isGistStarred, setGistStarred } from '../services/starred-gists';
 import { GistFile } from './GistFile';
 import { mergeGist } from './mergeGist';
 
@@ -86,6 +87,9 @@ export class Gist {
   get hasContent() {
     return this._files.every(x => x.isContentLoaded);
   }
+  get isStarred() {
+    return isGistStarred(this.id);
+  }
 
   constructor(private readonly raw: RawGist, skipStorage?: boolean) {
     if (!skipStorage) {
@@ -155,14 +159,8 @@ export class Gist {
     return setFileContent(this.id, file.name, content).then(wrap);
   }
 
-  isStarred() {
-    // TODO:
-    throw new Error('Method not implemented.');
-  }
-
   toggleStar() {
-    // TODO:
-    throw new Error('Method not implemented.');
+    return setGistStarred(this.id, !this.isStarred);
   }
 
   toJSON() {

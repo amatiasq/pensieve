@@ -3,6 +3,7 @@
 import { Emitter, emitter } from '@amatiasq/emitter';
 
 import { RawGistDetails } from '../contracts/RawGist';
+import { GistId } from '../contracts/type-aliases';
 
 const emitters: Record<string, Emitter<any>> = {};
 
@@ -19,6 +20,14 @@ export const [notifyGistChanged, onGistChanged] = getFunctions(
   (raw: RawGistDetails) => ({
     type: 'GIST_CHANGED' as const,
     data: raw,
+  }),
+);
+
+export const [notifyGistStarChanged, onGistStarChanged] = getFunctions(
+  'GIST_STAR_CHANGED',
+  (id: GistId) => ({
+    type: 'GIST_STAR_CHANGED' as const,
+    data: id,
   }),
 );
 

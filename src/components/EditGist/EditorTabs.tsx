@@ -3,6 +3,7 @@ import './EditorTabs.scss';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { useStar } from '../../hooks/useStar';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
 import { registerCommand } from '../../services/commands';
@@ -22,6 +23,7 @@ export function EditorTabs({
 }) {
   const settings = getSettingsGist();
   const history = useHistory();
+  const isStarred = useStar(gist.id);
   const [newFileName, setNewFileName] = useState<string | null>(null);
 
   const settingsUrl = settings
@@ -63,11 +65,11 @@ export function EditorTabs({
       </div>
 
       <div className="editor-tabs--actions">
-        {/* <Action
+        <Action
           name="editor-tabs--fav"
-          icon={gist.isStarred ? 'star' : 'far star'}
-          onClick={gist.toggleStar()}
-        /> */}
+          icon={isStarred ? 'star' : 'far star'}
+          onClick={() => gist.toggleStar()}
+        />
 
         <Action
           name="editor-tabs--commments"
