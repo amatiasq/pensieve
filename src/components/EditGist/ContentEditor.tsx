@@ -55,7 +55,7 @@ export function ContentEditor({
 
   return (
     <Editor
-      height="100vh"
+      height={`${window.innerHeight - 42}px`} // 100vh
       theme="vs-dark"
       language={language}
       value={value}

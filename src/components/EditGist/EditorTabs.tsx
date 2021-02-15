@@ -15,12 +15,10 @@ export function EditorTabs({
   gist,
   active,
   readonly,
-  onChange,
 }: {
   gist: Gist;
   active: GistFile;
   readonly?: boolean;
-  onChange: (file: GistFile) => void;
 }) {
   const settings = getSettingsGist();
   const history = useHistory();
@@ -49,7 +47,6 @@ export function EditorTabs({
             file={file}
             isActive={file === active}
             readonly={readonly}
-            onSelect={onChange}
             onRename={name => file.rename(name)}
           />
         ))}

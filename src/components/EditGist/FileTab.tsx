@@ -1,7 +1,7 @@
 import './FileTab.scss';
 
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import { GistFile } from '../../model/GistFile';
 import { Action } from '../atoms/Action';
@@ -11,7 +11,7 @@ interface ExistingFileProps {
   file: GistFile;
   isActive: boolean;
   readonly?: boolean;
-  onSelect(file: GistFile): void;
+  // onSelect(file: GistFile): void;
   onRename(name: string): Promise<GistFile>;
 }
 
@@ -40,14 +40,11 @@ export function FileTab(props: FileTabProps) {
     );
   }
 
-  const { file, isActive, onSelect, onRename } = props;
+  const { file, isActive, onRename } = props;
   const classNames = `file-tab ${isActive ? 'active' : ''}`;
 
   return (
-    <div
-      className={classNames}
-      onClick={isActive ? undefined : () => onSelect(file)}
-    >
+    <Link className={classNames} to={file.path}>
       <InputField
         className="file-tab--tab-name"
         value={file.name}
@@ -56,7 +53,7 @@ export function FileTab(props: FileTabProps) {
       />
 
       <Action name="file-tab--remove" icon="times" onClick={remove} />
-    </div>
+    </Link>
   );
 
   function rename(name: string) {
