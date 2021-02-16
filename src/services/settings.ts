@@ -39,6 +39,7 @@ const DEFAULT_SETTINGS = {
   rulers: [],
   settingsGistRecreateThreshold: 50,
   shortcuts: DEFAULT_SHORTCUTS,
+  sidebarVisible: true,
   sidebarWidth: 400,
   starred: [],
   tabSize: 2,

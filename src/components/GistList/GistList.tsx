@@ -18,11 +18,12 @@ export let createAndNavigateToGist: () => Promise<void>;
 
 export function GistList() {
   const [loadMore, setLoadMore] = useState(true);
-  const [isHidden, setIsHidden] = useState(false);
   const [filter, setFilter] = useState<StringComparer | null>(null);
 
-  const history = useHistory();
+  const [isVisible, setIsVisible] = useSetting('sidebarVisible');
   const [size, setSize] = useSetting('sidebarWidth');
+
+  const history = useHistory();
   const starred = useStarredGists();
   const gists = useGists(loadMore);
 
@@ -42,7 +43,7 @@ export function GistList() {
     setLoadMore(false);
   }, [gists.length]);
 
-  registerCommand('hideSidebar', () => setIsHidden(!isHidden));
+  registerCommand('hideSidebar', () => setIsVisible(!isVisible));
 
   const content = filtered.length ? (
     filtered.map(gist => <GistItem key={gist.id} gist={gist} />)
@@ -53,7 +54,7 @@ export function GistList() {
   );
 
   return (
-    <aside style={{ width: size, display: isHidden ? 'null' : '' }}>
+    <aside style={{ width: size, display: isVisible ? '' : 'none' }}>
       <ul className="gist-list" onScroll={onScroll}>
         <li className="filter">
           <FilterBox onChange={setFilter} />
