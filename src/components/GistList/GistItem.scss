@@ -5,18 +5,6 @@
   line-height: calc(var(--gist-item-height) - 2px);
   --border-radius: 3px;
 
-  &:hover &--actions {
-    display: block;
-  }
-
-  &--actions {
-    display: none;
-  }
-
-  &--star.action.has-icon {
-    --size: var(--gist-item-height);
-  }
-
   &--title {
     @include ellipsis();
     padding-left: var(--padding);
@@ -32,6 +20,19 @@
 
   &--file {
     @include ellipsis();
+  }
+
+  // FIXME: These selectors suck, fix Action selectors
+
+  &--actions .action.has-icon:not(.square) {
+    display: none;
+    padding: 0;
+    --size: var(--gist-item-height);
+  }
+
+  &:hover &--actions .action.has-icon,
+  &.starred &--actions &--star {
+    display: block;
   }
 }
 

@@ -13,7 +13,7 @@ export function GistItem({ gist }: { gist: Gist }) {
   const { date, files } = gist;
   const [title, setTitle] = useState(gist.description || date);
   const isStarred = useStar(gist.id);
-  const extraClasses = files.length === 1 ? 'one-file' : '';
+  const extraClasses = isStarred ? 'starred' : '';
 
   const setDescription = (description: string) => {
     updateGist(gist.id, { description }).then(() =>
