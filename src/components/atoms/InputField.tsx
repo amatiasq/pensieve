@@ -77,6 +77,7 @@ export function InputField({
 
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === 'Enter') {
+      event.preventDefault();
       submit();
     }
 
