@@ -52,7 +52,7 @@ export function FileTab(props: FileTabProps) {
         onSubmit={rename}
       />
 
-      <Action name="file-tab--remove" icon="times" onClick={remove} />
+      <Action name="file-tab--remove" icon="trash" onClick={remove} />
     </Link>
   );
 
