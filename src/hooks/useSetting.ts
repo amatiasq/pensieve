@@ -8,35 +8,33 @@ const serialize = JSON.stringify;
 export function useSetting<Key extends keyof Settings>(key: Key) {
   const get = () => getSetting(key) as Settings[Key];
   const value = get();
-  const [_, setValue] = useState(value);
+  const [, setValue] = useState(value);
 
   let isEditing = false;
 
-  useEffect(() => {
-    setValue(value);
-  }, [serialize(value)]);
+  useEffect(() => setValue(value), [serialize(value)]);
 
-  useEffect(
-    () =>
-      onSettingsChanged(() => {
-        const newValue = serialize(get());
-        const existing = serialize(value);
+  useEffect(() =>
+    onSettingsChanged(() => {
+      const newValue = serialize(get());
+      const existing = serialize(value);
 
-        if (!isEditing && newValue !== existing) {
-          setValue(get());
-        }
-      }) as () => void,
+      if (!isEditing && newValue !== existing) {
+        setValue(get());
+      }
+    }),
   );
 
-  return [
-    value,
-    newValue => {
-      if (value !== newValue) {
-        isEditing = true;
-        setSetting(key, newValue);
-        setValue(newValue);
-        isEditing = false;
-      }
-    },
-  ] as [NonNullable<Settings[Key]>, (newValue: Settings[Key]) => void];
+  return [value, set] as const;
+
+  function set(newValue: Settings[Key]) {
+    if (value === newValue) {
+      return;
+    }
+
+    isEditing = true;
+    setSetting(key, newValue);
+    setValue(newValue);
+    isEditing = false;
+  }
 }

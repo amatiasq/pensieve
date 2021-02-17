@@ -55,7 +55,7 @@ const storage = new ClientStorage<Partial<Settings>>('gists.settings', {
   default: {},
 });
 
-const settings = () => storage.get()!;
+const settings = () => storage.cache;
 const gist = settingsGist();
 
 export const settingsGistId = gist.getId;
@@ -91,8 +91,8 @@ export function setSetting<Key extends keyof Settings>(
 
 function settingsGist() {
   const settingsFile = 'better-gist--settings.json';
-  const gistId = new ClientStorage<GistId>('gist.settings.id');
-  const getId = () => gistId.get();
+  const gistId = new ClientStorage<GistId | null>('gist.settings.id', {});
+  const getId = () => gistId.cache;
   let isOperating = false;
 
   onGistChanged(raw => {
@@ -220,7 +220,7 @@ function settingsGist() {
   }
 
   function editGist(value: Partial<Settings>) {
-    return updateGist(gistId.get()!, getGistContent(value));
+    return updateGist(getId()!, getGistContent(value));
   }
 
   function getGistContent(value: Partial<Settings>) {

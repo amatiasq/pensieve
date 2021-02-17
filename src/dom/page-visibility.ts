@@ -16,7 +16,7 @@ document.addEventListener(
 );
 
 export function onPageVisibilityChange(listener: VisibilityChangeListener) {
-  return emitVisibilityChange.subscribe(listener);
+  return emitVisibilityChange.subscribe(listener) as () => void;
 }
 
 function getKeyNames() {

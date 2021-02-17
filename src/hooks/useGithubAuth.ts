@@ -15,16 +15,17 @@ const redirect_uri = isLocalHost
 const AUTH_ROOT = 'https://github.com/login/oauth';
 const AUTH_ENDPOINT = 'https://gist.amatiasq.com/auth';
 
-const requestState = new ClientStorage<string>('gists.gh-state');
-const auth = new ClientStorage<string>('gists.gh-token');
+const requestState = new ClientStorage<string | null>('gists.gh-state', {});
+
+const auth = new ClientStorage<string | null>('gists.gh-token', {});
 
 export const getGithubHeaders = () => ({
-  Authorization: `token ${auth.get()}`,
+  Authorization: `token ${auth.cache}`,
   Accept: 'application/vnd.github.v3+json',
 });
 
 export function useGithubAuth() {
-  const [token, setToken] = useState<string | null>(auth.get());
+  const [token, setToken] = useState<string | null>(auth.cache);
 
   const { code, state } = getCodeFromParams();
 
@@ -58,14 +59,14 @@ function requestAccessToken(code: string, state: string) {
 function getCodeFromParams() {
   const { code, state } = parseParams(location.toString());
 
-  if (state && state !== requestState.get()) {
+  if (state && state !== requestState.cache) {
     throw new Error(
-      `Request state do not match: "${state}" - "${requestState.get()}`,
+      `Request state do not match: "${state}" - "${requestState.cache}`,
     );
   }
 
   if (code) {
-    requestState.clear();
+    requestState.reset();
     history.pushState({}, '', redirect_uri);
   }
 

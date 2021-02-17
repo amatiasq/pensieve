@@ -3,11 +3,11 @@ import './GistList.scss';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { useGists } from '../../hooks/useGists';
 import { useSetting } from '../../hooks/useSetting';
-import { useStarredGists } from '../../hooks/useStarredGists';
 import { Gist } from '../../model/Gist';
 import { registerCommand } from '../../services/commands';
+import { useGistList } from '../../services/gist/list';
+import { useStarredGists } from '../../services/gist/starred';
 import StringComparer from '../../util/StringComparer';
 import { Action } from '../atoms/Action';
 import { Resizer } from '../atoms/Resizer';
@@ -25,7 +25,7 @@ export function GistList() {
 
   const history = useHistory();
   const starred = useStarredGists();
-  const gists = useGists(loadMore);
+  const gists = useGistList(loadMore);
 
   const starredIds = starred.map(x => x.id);
   const allGists = [

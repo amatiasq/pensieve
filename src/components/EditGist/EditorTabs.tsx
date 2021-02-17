@@ -3,10 +3,10 @@ import './EditorTabs.scss';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
-import { useStar } from '../../hooks/useStar';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
 import { registerCommand } from '../../services/commands';
+import { useStar } from '../../services/gist/starred';
 import { getSettingsGist } from '../../services/settings';
 import { Action } from '../atoms/Action';
 import { BackButton } from '../BackButton';
