@@ -62,7 +62,7 @@ function getFunctions<Key extends string, Data>(
 
   return [
     notify as RemoveUndefinedArguments<typeof notify>,
-    emit.subscribe,
+    emit.subscribe as (listener: (data: Data) => void) => () => void,
   ] as const;
 }
 

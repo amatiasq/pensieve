@@ -29,11 +29,11 @@ export class GistFile {
   }
 
   get content() {
-    if (!('content' in this.raw)) {
-      throw new Error(`Accessing ${this.name} before fetching it's data`);
-    }
+    // if (!('content' in this.raw)) {
+    //   throw new Error(`Accessing ${this.name} before fetching it's data`);
+    // }
 
-    return this.raw.content;
+    return 'content' in this.raw ? this.raw.content : null;
   }
 
   get isContentLoaded() {

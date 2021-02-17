@@ -1,3 +1,5 @@
+import localforage from 'localforage';
+
 import { renderApp } from './components/App';
 import { onVirtualKeyboardDisplayChange } from './dom/virtualKeyboardDetector';
 
@@ -22,3 +24,5 @@ onVirtualKeyboardDisplayChange(isVisible => {
     container.classList.remove('is-virtual-keyboard-open');
   }
 });
+
+Object.assign(window, { localforage });

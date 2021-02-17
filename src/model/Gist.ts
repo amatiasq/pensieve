@@ -2,6 +2,7 @@ import localforage from 'localforage';
 
 import { RawGist } from '../contracts/RawGist';
 import { GistId, UserName } from '../contracts/type-aliases';
+import { isGistStarred, setGistStarred } from '../services/gist/starred';
 import {
   addGileToGist,
   createGist,
@@ -12,7 +13,6 @@ import {
   renameGistFile,
   setFileContent
 } from '../services/github_api';
-import { isGistStarred, setGistStarred } from '../services/starred-gists';
 import { GistFile } from './GistFile';
 import { mergeGist } from './mergeGist';
 
@@ -32,6 +32,16 @@ export class Gist {
 
   static getById(id: GistId) {
     return storage.getItem<RawGist>(id).then(x => x && new Gist(x, true));
+  }
+
+  static getAllById(ids: GistId[]) {
+    return Promise.all(ids.map(Gist.getById)).then(
+      x => x.filter(Boolean) as Gist[],
+    );
+  }
+
+  static comparer(a: Gist, b: Gist) {
+    return a.id === b.id;
   }
 
   static getNewer(...gists: Gist[]) {

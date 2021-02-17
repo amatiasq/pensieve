@@ -2,9 +2,9 @@ import './GistItem.scss';
 
 import React, { useState } from 'react';
 
-import { useStar } from '../../hooks/useStar';
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
+import { useStar } from '../../services/gist/starred';
 import { updateGist } from '../../services/github_api';
 import { Action } from '../atoms/Action';
 import { InputField } from '../atoms/InputField';
