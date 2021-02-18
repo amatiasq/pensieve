@@ -11,7 +11,7 @@ import { mergeSortedLists } from '../../util/mergeSortedLists';
 import { updateArrayItem } from '../../util/updateArrayItem';
 import { onGistChanged, onGistListchanged } from '../cache-invalidation';
 import { fetchGists } from '../github_api';
-import { settingsGistId, setTopGists } from '../settings';
+import { setTopGists } from '../settings';
 
 const storage = new ClientStorage<GistId[]>('bg.list', {
   default: [],
@@ -37,20 +37,14 @@ export function useGistList(loadMore: boolean) {
   useEffect(() => onGistChanged(updateSingleGist));
   useEffect(() => onGistListchanged(() => fetch(1, [])));
 
-  const settingsId = settingsGistId();
   const result = list.length ? list : storage.cache;
-  const clean = settingsId ? result.filter(x => x.id !== settingsId) : result;
-
-  return clean;
+  return setTopGists(result);
 
   function fetch(page: number, current: Gist[]) {
     return fetchGists(page).then(list => {
       readUsernameFrom(list);
       setPage(page);
-
-      const result = [...current, ...list.map(x => new Gist(x))];
-      setList(result);
-      setTopGists(result);
+      setList([...current, ...list.map(x => new Gist(x))]);
     });
   }
 
