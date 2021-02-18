@@ -175,6 +175,7 @@ export class Gist {
   }
 
   toggleStar() {
+    console.log({ isStarred: this.isStarred });
     return setGistStarred(this.id, !this.isStarred);
   }
 

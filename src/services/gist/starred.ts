@@ -13,7 +13,7 @@ import {
   onGistListchanged,
   onGistStarChanged
 } from '../cache-invalidation';
-import { fetchStarredGists, starGist } from '../github_api';
+import { fetchStarredGists, starGist, unstarGist } from '../github_api';
 
 const storedIds = new ClientStorage<GistId[]>('bg.starred', {
   default: [],
@@ -26,7 +26,10 @@ const storage = storedIds.transform<Gist[]>({
   revert: list => list.map(x => x.id),
 });
 
-const ids = () => new Set(storedIds.cache);
+const ids = () => {
+  console.log(storedIds.cache);
+  return new Set(storedIds.cache);
+};
 
 export const isGistStarred = (id: GistId) => ids().has(id);
 
@@ -91,6 +94,8 @@ export function setGistStarred(id: GistId, isStarred: boolean) {
   const all = ids();
   const currentlyStarred = all.has(id);
 
+  console.log({ all });
+
   if (currentlyStarred === isStarred) {
     return Promise.resolve();
   }
@@ -102,7 +107,7 @@ export function setGistStarred(id: GistId, isStarred: boolean) {
     operation = starGist;
   } else {
     all.delete(id);
-    operation = starGist;
+    operation = unstarGist;
   }
 
   storedIds.set([...all]);
