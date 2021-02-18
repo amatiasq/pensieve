@@ -41,7 +41,7 @@ export function GistItem({ gist }: { gist: Gist }) {
       <Action
         name="gist-item--add-file"
         icon="plus"
-        navigate={gist.createFilePath}
+        onClick={() => gist.addFile().then(file => history.push(file.path))}
       />
       <Action
         name="gist-item--star"

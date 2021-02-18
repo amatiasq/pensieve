@@ -1,9 +1,9 @@
 import './EditorTabs.scss';
 
-import React, { useEffect, useState } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import React from 'react';
+import { useHistory } from 'react-router-dom';
 
-import { DEFAULT_FILE_NAME, Gist } from '../../model/Gist';
+import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
 import { registerCommand } from '../../services/commands';
 import { useStar } from '../../services/gist/starred';
@@ -21,16 +21,9 @@ export function EditorTabs({
   active: GistFile;
   readonly?: boolean;
 }) {
-  const { filename } = useParams() as { [key: string]: string };
   const settings = getSettingsGist();
   const history = useHistory();
   const isStarred = useStar(gist.id);
-
-  const [newFileName, setNewFileName] = useState<string | null>(null);
-
-  useEffect(() => {
-    setNewFileName(filename === active.name ? null : filename);
-  }, [filename, active.name]);
 
   const settingsUrl = settings
     ? `/gist/${settings.id}/${settings.filename}`
@@ -40,10 +33,10 @@ export function EditorTabs({
     registerCommand('settings', () => history.push(settingsUrl));
   }
 
-  registerCommand(
-    'createFile',
-    () => !readonly && history.push(gist.createFilePath),
-  );
+  const createFile = () =>
+    !readonly && gist.addFile().then(file => history.push(file.path));
+
+  registerCommand('createFile', createFile);
 
   return (
     <nav className="editor-tabs">
@@ -60,20 +53,12 @@ export function EditorTabs({
           />
         ))}
 
-        {newFileName == null ? (
-          <Action
-            name="editor-tabs--new-file"
-            icon="plus"
-            disabled={readonly}
-            navigate={gist.createFilePath}
-          />
-        ) : (
-          <FileTab
-            name={newFileName}
-            onSubmit={addFile}
-            onAbort={() => setNewFileName(null)}
-          />
-        )}
+        <Action
+          name="editor-tabs--new-file"
+          icon="plus"
+          disabled={readonly}
+          onClick={createFile}
+        />
       </div>
 
       <div className="editor-tabs--actions">
@@ -112,17 +97,17 @@ export function EditorTabs({
     </nav>
   );
 
-  function addFile(name: string) {
-    setNewFileName(null);
+  // function addFile(name: string) {
+  //   setNewFileName(null);
 
-    if (name === DEFAULT_FILE_NAME) {
-      return;
-    }
+  //   if (name === DEFAULT_FILE_NAME) {
+  //     return;
+  //   }
 
-    return gist.addFile(name).then(x => {
-      const file = x.getFileByName(name) as GistFile;
-      history.push(file.path);
-      return file;
-    });
-  }
+  //   return gist.addFile(name).then(x => {
+  //     const file = x.getFileByName(name) as GistFile;
+  //     history.push(file.path);
+  //     return file;
+  //   });
+  // }
 }

@@ -7,42 +7,17 @@ import { GistFile } from '../../model/GistFile';
 import { Action } from '../atoms/Action';
 import { InputField } from '../atoms/InputField';
 
-interface ExistingFileProps {
+interface FileTabProps {
   file: GistFile;
   isActive: boolean;
   readonly?: boolean;
-  // onSelect(file: GistFile): void;
   onRename(name: string): Promise<GistFile>;
 }
-
-interface CreateFileProps {
-  name: string;
-  onSubmit(name: string): void;
-  onAbort(): void;
-}
-
-type FileTabProps = ExistingFileProps | CreateFileProps;
 
 export function FileTab(props: FileTabProps) {
   const history = useHistory();
   const remove = () =>
     file.removeWithConfirm().then(path => history.push(path));
-
-  if (isCreateFile(props)) {
-    return (
-      <div className="file-tab active">
-        <InputField
-          className="file-tab--tab-name"
-          value={props.name}
-          forceEditMode
-          scrollIntoView
-          submitIfNotModified
-          onSubmit={props.onSubmit}
-          onAbort={props.onAbort}
-        />
-      </div>
-    );
-  }
 
   const { file, isActive, onRename } = props;
   const classNames = `file-tab ${isActive ? 'active' : ''}`;
@@ -65,8 +40,4 @@ export function FileTab(props: FileTabProps) {
       onRename(name).then(file => history.push(file.path));
     }
   }
-}
-
-function isCreateFile(props: FileTabProps): props is CreateFileProps {
-  return !('file' in props);
 }
