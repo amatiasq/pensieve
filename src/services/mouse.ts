@@ -1,5 +1,10 @@
 type Position = { x: number; y: number };
 
+interface MouseMoveEvent {
+  pos: Position;
+  stop: () => void;
+}
+
 let pos: Position = { x: 0, y: 0 };
 
 const update = (event: MouseEvent) =>
@@ -10,13 +15,9 @@ document.addEventListener('mouseup', update);
 
 onMouseMove(({ stop }) => stop());
 
-export function getMousePosition() {
-  return pos;
-}
+export const getMousePosition = () => pos;
 
-export function onMouseMove(
-  listener: (event: { pos: Position; stop: () => void }) => void,
-) {
+export function onMouseMove(listener: (event: MouseMoveEvent) => void) {
   document.addEventListener('mousemove', handler);
   const stop = () => document.addEventListener('mousemove', update);
 

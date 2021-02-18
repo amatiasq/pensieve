@@ -1,14 +1,9 @@
-import { RawGistDetails, RawGistItem } from '../contracts/RawGist';
+import { RawGist, RawGistDetails, RawGistItem } from '../contracts/RawGist';
 import { GistId } from '../contracts/type-aliases';
 import { UpdateGistRequest } from '../contracts/UpdateGistRequest';
 import { getGithubHeaders } from '../hooks/useGithubAuth';
-import { DELETE, GET, PATCH, POST, PUT } from './api';
-import { busyWhile } from './busy-indicator';
-import {
-  notifyGistChanged,
-  notifyGistListChanged,
-  notifyGistStarChanged
-} from './cache-invalidation';
+import { messageBus } from '../util/messageBus';
+import { DELETE, GET, PATCH, POST, PUT } from './http';
 
 export const GH_API = 'https://api.github.com';
 
@@ -25,29 +20,39 @@ function url(path: string) {
   return result.includes('?') ? `${result}&${booster}` : `${result}?${booster}`;
 }
 
+// LISTENERS
+
+const [notifyGistListChanged, onGistListchanged] = messageBus('LIST_CHANGED');
+const [notifyGistChanged, onGistChanged] = messageBus<RawGist>('GIST_CHANGED');
+const [notifyGistStarChanged, onGistStarChanged] = messageBus<GistId>(
+  'GIST_STAR_CHANGED',
+);
+
+export { onGistListchanged, onGistChanged, onGistStarChanged };
+
+// ENDPOINTS
+
 export const fetchGists = (page = 1) =>
-  busyWhile(
-    GET<RawGistItem[]>(url(`/gists?per_page=100&page=${page}`), withAuth()),
-  );
+  GET<RawGistItem[]>(url(`/gists?per_page=100&page=${page}`), withAuth());
 
 export const fetchStarredGists = () =>
-  busyWhile(GET<RawGistItem[]>(url(`/gists/starred`), withAuth()));
+  GET<RawGistItem[]>(url(`/gists/starred`), withAuth());
 
 export const fetchGist = (id: GistId) =>
-  busyWhile(GET<RawGistDetails>(url(`/gists/${id}`), withAuth()));
+  GET<RawGistDetails>(url(`/gists/${id}`), withAuth());
 
 export const removeGist = (id: GistId) =>
-  busyWhile(DELETE<unknown>(url(`/gists/${id}`), withAuth())).finally(
+  DELETE<unknown>(url(`/gists/${id}`), withAuth()).finally(
     notifyGistListChanged,
   );
 
 export const starGist = (id: GistId) =>
-  busyWhile(PUT(url(`/gists/${id}/star`), null, withAuth())).then(() =>
+  PUT<void>(url(`/gists/${id}/star`), null, withAuth()).finally(() =>
     notifyGistStarChanged(id),
   );
 
 export const unstarGist = (id: GistId) =>
-  busyWhile(DELETE(url(`/gists/${id}/star`), withAuth())).then(() =>
+  DELETE<void>(url(`/gists/${id}/star`), withAuth()).finally(() =>
     notifyGistStarChanged(id),
   );
 
@@ -64,22 +69,18 @@ export const renameGistFile = (id: GistId, oldName: string, newName: string) =>
   updateGist(id, { files: { [oldName]: { filename: newName } } });
 
 export function createGist(body: UpdateGistRequest = {}) {
-  return busyWhile(
-    POST<RawGistDetails>(
-      url(`/gists`),
-      { ...DEFAULT_GIST_CONTENT, ...body },
-      withAuth(),
-    ),
+  return POST<RawGistDetails>(
+    url(`/gists`),
+    { ...DEFAULT_GIST_CONTENT, ...body },
+    withAuth(),
   ).finally(notifyGistListChanged);
 }
 
 export function updateGist(id: GistId, body: UpdateGistRequest) {
-  return busyWhile(
-    PATCH<RawGistDetails>(
-      url(`/gists/${id}`),
-      JSON.stringify(body),
-      withAuth(),
-    ),
+  return PATCH<RawGistDetails>(
+    url(`/gists/${id}`),
+    JSON.stringify(body),
+    withAuth(),
   ).then(raw => {
     notifyGistChanged(raw);
     return raw;

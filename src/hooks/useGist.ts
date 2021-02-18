@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react';
 import { GistId } from '../contracts/type-aliases';
 import { onPageVisibilityChange as onVisibility } from '../dom/page-visibility';
 import { Gist } from '../model/Gist';
-import { onGistChanged } from '../services/cache-invalidation';
-import { fetchGist } from '../services/github_api';
+import { fetchGist, onGistChanged } from '../services/github_api';
 import { Stopwatch } from '../util/Stopwatch';
 import { useSetting } from './useSetting';
 

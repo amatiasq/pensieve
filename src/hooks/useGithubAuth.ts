@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { ClientStorage } from '@amatiasq/client-storage';
 
-import { POST } from '../services/api';
+import { POST } from '../services/http';
 import { parseParams, withParams } from '../services/url';
 
 const isLocalHost = location.hostname === 'localhost';

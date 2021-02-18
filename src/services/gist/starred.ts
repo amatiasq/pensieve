@@ -9,11 +9,13 @@ import { Gist } from '../../model/Gist';
 import { mergeSortedLists } from '../../util/mergeSortedLists';
 import { updateArrayItem } from '../../util/updateArrayItem';
 import {
+  fetchStarredGists,
   onGistChanged,
   onGistListchanged,
-  onGistStarChanged
-} from '../cache-invalidation';
-import { fetchStarredGists, starGist, unstarGist } from '../github_api';
+  onGistStarChanged,
+  starGist,
+  unstarGist
+} from '../github_api';
 
 const storedIds = new ClientStorage<GistId[]>('bg.starred', {
   default: [],

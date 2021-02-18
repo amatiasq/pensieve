@@ -24,30 +24,32 @@ const emit = emitter<ShortcutEvent>();
 export const onShortcut = emit.subscribe;
 
 if (!isMobile) {
-  document.addEventListener(
-    'keydown',
-    event => {
-      const keys = [];
-      if (event.metaKey) keys.push('META');
-      if (event.ctrlKey) keys.push('CTRL');
-      if (event.altKey) keys.push('ALT');
-      if (event.shiftKey) keys.push('SHIFT');
+  document.addEventListener('keydown', onKeyDown, true);
+}
 
-      if (event.key in CONTROL_KEYS) {
-        return;
-      }
+function onKeyDown(event: KeyboardEvent) {
+  const keys = [];
 
-      const key =
-        event.key in KEY_ALIASES
-          ? KEY_ALIASES[event.key as keyof typeof KEY_ALIASES]
-          : event.key;
+  if (event.metaKey) keys.push('META');
+  if (event.ctrlKey) keys.push('CTRL');
+  if (event.altKey) keys.push('ALT');
+  if (event.shiftKey) keys.push('SHIFT');
 
-      emit({
-        key: event.key,
-        keys: [...keys.sort(), key],
-        preventDefault: () => event.preventDefault(),
-      });
-    },
-    true,
-  );
+  if (event.key in CONTROL_KEYS) {
+    return;
+  }
+
+  const key = getKey(event.key);
+
+  emit({
+    key: event.key,
+    keys: [...keys.sort(), key],
+    preventDefault: () => event.preventDefault(),
+  });
+}
+
+function getKey(key: string) {
+  return key in KEY_ALIASES
+    ? KEY_ALIASES[key as keyof typeof KEY_ALIASES]
+    : key;
 }

@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
-import { onSettingsChanged } from '../services/cache-invalidation';
-import { getSetting, setSetting, Settings } from '../services/settings';
+import {
+  getSetting,
+  onSettingsChanged,
+  setSetting,
+  Settings
+} from '../services/settings';
 
 const serialize = JSON.stringify;
 

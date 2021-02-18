@@ -2,10 +2,7 @@ import './InputField.scss';
 
 import React, { createRef, useEffect, useState } from 'react';
 
-import {
-  clearSelection,
-  selectElementContents
-} from '../../dom/selectElementContents';
+import { selectElementContents } from '../../dom/selectElementContents';
 
 export function InputField({
   className,

@@ -2,28 +2,17 @@ import { RawGistFileDetails, RawGistFileItem } from '../contracts/RawGistFile';
 import { Gist } from './Gist';
 
 export class GistFile {
-  get url() {
-    return this.raw.raw_url;
-  }
   get name() {
     return this.raw.filename;
-  }
-  get type() {
-    return this.raw.type;
   }
   get language() {
     return this.raw.language;
   }
-  get size() {
-    return this.raw.size;
+  get path() {
+    return `/gist/${this.gist.id}/${this.name}`;
   }
-
-  get truncated() {
-    if (!('truncated' in this.raw)) {
-      throw new Error(`Accessing ${this.name} before fetching it's data`);
-    }
-
-    return this.raw.truncated;
+  private get isOnlyFile() {
+    return this.gist.files.length === 1;
   }
 
   get content() {
@@ -33,18 +22,6 @@ export class GistFile {
 
     /// DEFAULT_FILE_CONTENT
     return this.raw.content;
-  }
-
-  get isContentLoaded() {
-    return 'content' in this.raw;
-  }
-
-  get path() {
-    return `/gist/${this.gist.id}/${this.name}`;
-  }
-
-  get isOnlyFile() {
-    return this.gist.files.length === 1;
   }
 
   constructor(
