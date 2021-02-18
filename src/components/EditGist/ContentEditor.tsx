@@ -1,6 +1,7 @@
 import './ContentEditor.scss';
 
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
 import Editor, { useMonaco } from '@monaco-editor/react';
 import MarkdownPreview from '@uiw/react-markdown-preview';
@@ -20,13 +21,17 @@ export function ContentEditor({
   readonly?: boolean;
   onChange: (newValue: string | undefined) => void;
 }) {
+  const { filename } = useParams() as { [key: string]: string };
   const monaco = useMonaco();
+
   const [rulers] = useSetting('rulers');
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
 
   const [isPreview, setIsPreview] = useState(isMobile);
+
+  const autofocus = file.name === filename;
 
   const lines = value.split('\n').length;
   const language =
@@ -47,7 +52,7 @@ export function ContentEditor({
         className="mobile-fallback"
         defaultValue={value}
         readOnly={readonly}
-        autoFocus
+        autoFocus={autofocus}
         onChange={e => onChange(e.target.value)}
       ></textarea>
     );
@@ -60,7 +65,7 @@ export function ContentEditor({
       language={language}
       value={value}
       onChange={onChange}
-      onMount={x => x.focus()}
+      onMount={x => autofocus && x.focus()}
       options={{
         contextmenu: false,
         minimap: { enabled: lines > 100 },

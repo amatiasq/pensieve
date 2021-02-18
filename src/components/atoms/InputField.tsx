@@ -13,6 +13,7 @@ export function InputField({
   readonly,
   forceEditMode,
   submitIfNotModified,
+  scrollIntoView,
   onSubmit,
   onAbort,
 }: {
@@ -21,6 +22,7 @@ export function InputField({
   readonly?: boolean;
   forceEditMode?: boolean;
   submitIfNotModified?: boolean;
+  scrollIntoView?: boolean;
   onSubmit(value: string, prev: string): void;
   onAbort?(): void;
 }) {
@@ -37,6 +39,10 @@ export function InputField({
 
     if (readonly || !isEditing) {
       return;
+    }
+
+    if (scrollIntoView) {
+      el.scrollIntoView();
     }
 
     el.focus();

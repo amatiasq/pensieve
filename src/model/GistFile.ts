@@ -82,6 +82,20 @@ export class GistFile {
     return this.gist.removeFile(this);
   }
 
+  removeWithConfirm() {
+    const message = this.isOnlyFile
+      ? 'PERMANENTLY DELETE THE GIST?'
+      : `Remove ${this.name}?`;
+
+    if (!confirm(message)) {
+      return Promise.reject();
+    }
+
+    return this.remove().then(gist =>
+      gist == null ? '/' : gist.files[0].path,
+    );
+  }
+
   toJSON() {
     return this.raw;
   }

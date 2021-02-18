@@ -1,7 +1,7 @@
 import './GistEditor.scss';
 
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import { useScheduler } from '../../hooks/useScheduler';
 import { useSetting } from '../../hooks/useSetting';
