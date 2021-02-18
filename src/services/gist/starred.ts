@@ -28,10 +28,7 @@ const storage = storedIds.transform<Gist[]>({
   revert: list => list.map(x => x.id),
 });
 
-const ids = () => {
-  console.log(storedIds.cache);
-  return new Set(storedIds.cache);
-};
+const ids = () => new Set(storedIds.cache);
 
 export const isGistStarred = (id: GistId) => ids().has(id);
 

@@ -30,6 +30,7 @@ export function useGist(id: GistId) {
 
     return onGistChanged(raw => {
       if (raw.id === id) {
+        console.log('CHANGED', Object.keys(raw.files));
         setValue(new Gist(raw));
       }
     });

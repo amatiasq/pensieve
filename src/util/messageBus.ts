@@ -8,17 +8,9 @@ window.addEventListener('message', (event: MessageEvent<any>) => {
   const emitter = emitters[event.data.type];
 
   if (typeof emitter === 'function') {
-    emitter(event.data);
+    emitter(event.data.data);
   }
 });
-
-// const [notifySettingsChanged, onSettingsChanged] = messageBus(
-//   'SETTINGS_CHANGED',
-//   () => ({
-//     type: 'SETTINGS_CHANGED' as const,
-//     data: undefined,
-//   }),
-// );
 
 export function messageBus<Data = undefined>(key: string) {
   const emit = emitter<Data>();

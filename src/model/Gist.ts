@@ -78,16 +78,12 @@ export class Gist {
   get date() {
     return this.raw.created_at.split('T')[0];
   }
-  get createFilePath() {
-    return `/gist/${this.id}/${DEFAULT_FILE_NAME}`;
-  }
 
   constructor(private readonly raw: RawGist, skipStorage = false) {
     if (!skipStorage) {
       saveToStorage(raw);
     }
 
-    console.log(`Created ${raw.id}`);
     this._files = Object.values(raw.files).map(x => new GistFile(this, x));
   }
 
@@ -133,9 +129,9 @@ export class Gist {
       return Promise.reject(`Invalid filename name: ${name}`);
     }
 
-    return addGileToGist(this.id, name, content || DEFAULT_FILE_CONTENT).then(
-      wrap,
-    );
+    return addGileToGist(this.id, name, content || DEFAULT_FILE_CONTENT)
+      .then(wrap)
+      .then(gist => gist.getFileByName(name)!);
   }
 
   removeFile(file: GistFile): Promise<null | Gist> {
