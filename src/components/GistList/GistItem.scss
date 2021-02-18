@@ -10,6 +10,14 @@
     padding-left: var(--padding);
   }
 
+  &--actions {
+    display: flex;
+  }
+
+  &--file {
+    display: flex;
+  }
+
   &--link {
     overflow: hidden;
 
@@ -18,19 +26,20 @@
     }
   }
 
-  &--file {
+  &--filename {
     @include ellipsis();
   }
 
   // FIXME: These selectors suck, fix Action selectors
 
-  &--actions .action.has-icon:not(.square) {
+  .action.has-icon:not(.square) {
     display: none;
     padding: 0;
-    --size: var(--gist-item-height);
+    --size: calc(var(--gist-item-height) - 2px);
   }
 
   &:hover &--actions .action.has-icon,
+  &--file:hover &--file-actions .action.has-icon,
   &.starred &--actions &--star {
     display: block;
   }
@@ -49,12 +58,16 @@
       padding-right: calc(var(--files-padding) / 2);
     }
 
+    &--file {
+      flex: 1;
+    }
+
     &--link {
       @include fit-parent();
       border-radius: var(--border-radius);
     }
 
-    &--file {
+    &--filename {
       padding-left: calc(var(--files-padding) / 2);
       padding-top: 1px;
     }
@@ -73,10 +86,11 @@
     }
 
     &--link {
+      flex: 1;
       border-radius: 0 var(--border-radius) var(--border-radius) 0;
     }
 
-    &--file {
+    &--filename {
       padding-left: calc(var(--padding) + var(--files-padding));
     }
   }

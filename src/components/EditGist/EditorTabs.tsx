@@ -1,9 +1,9 @@
 import './EditorTabs.scss';
 
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 
-import { Gist } from '../../model/Gist';
+import { DEFAULT_FILE_NAME, Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
 import { registerCommand } from '../../services/commands';
 import { useStar } from '../../services/gist/starred';
@@ -21,10 +21,16 @@ export function EditorTabs({
   active: GistFile;
   readonly?: boolean;
 }) {
+  const { filename } = useParams() as { [key: string]: string };
   const settings = getSettingsGist();
   const history = useHistory();
   const isStarred = useStar(gist.id);
+
   const [newFileName, setNewFileName] = useState<string | null>(null);
+
+  useEffect(() => {
+    setNewFileName(filename === active.name ? null : filename);
+  }, [filename, active.name]);
 
   const settingsUrl = settings
     ? `/gist/${settings.id}/${settings.filename}`
@@ -34,9 +40,10 @@ export function EditorTabs({
     registerCommand('settings', () => history.push(settingsUrl));
   }
 
-  const requestNewFile = () => !readonly && setNewFileName('Filename.md');
-
-  registerCommand('createFile', requestNewFile);
+  registerCommand(
+    'createFile',
+    () => !readonly && history.push(gist.createFilePath),
+  );
 
   return (
     <nav className="editor-tabs">
@@ -57,10 +64,15 @@ export function EditorTabs({
           <Action
             name="editor-tabs--new-file"
             icon="plus"
-            onClick={requestNewFile}
+            disabled={readonly}
+            navigate={gist.createFilePath}
           />
         ) : (
-          <FileTab onSubmit={addFile} onAbort={() => setNewFileName(null)} />
+          <FileTab
+            name={newFileName}
+            onSubmit={addFile}
+            onAbort={() => setNewFileName(null)}
+          />
         )}
       </div>
 
@@ -102,6 +114,10 @@ export function EditorTabs({
 
   function addFile(name: string) {
     setNewFileName(null);
+
+    if (name === DEFAULT_FILE_NAME) {
+      return;
+    }
 
     return gist.addFile(name).then(x => {
       const file = x.getFileByName(name) as GistFile;

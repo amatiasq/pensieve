@@ -1,6 +1,7 @@
 import './GistItem.scss';
 
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { Gist } from '../../model/Gist';
 import { GistFile } from '../../model/GistFile';
@@ -11,9 +12,15 @@ import { InputField } from '../atoms/InputField';
 
 export function GistItem({ gist }: { gist: Gist }) {
   const { date, files } = gist;
+
   const [title, setTitle] = useState(gist.description || date);
+
   const isStarred = useStar(gist.id);
+  const history = useHistory();
   const extraClasses = isStarred ? 'starred' : '';
+
+  const remove = (file: GistFile) =>
+    file.removeWithConfirm().then(path => history.push(path));
 
   const setDescription = (description: string) => {
     updateGist(gist.id, { description }).then(() =>
@@ -32,6 +39,11 @@ export function GistItem({ gist }: { gist: Gist }) {
   const actions = (
     <div className="gist-item--actions">
       <Action
+        name="gist-item--add-file"
+        icon="plus"
+        navigate={gist.createFilePath}
+      />
+      <Action
         name="gist-item--star"
         icon={isStarred ? 'star' : 'far star'}
         onClick={() => gist.toggleStar()}
@@ -43,7 +55,7 @@ export function GistItem({ gist }: { gist: Gist }) {
     return (
       <li className={`gist-item single-file ${extraClasses}`}>
         {input}
-        {fileLink(files[0])}
+        <div className="gist-item--file">{fileLink(files[0])}</div>
         {actions}
       </li>
     );
@@ -56,9 +68,11 @@ export function GistItem({ gist }: { gist: Gist }) {
         {actions}
       </header>
 
-      <ol className="gist-item--file-list">
+      <ol>
         {files.map(file => (
-          <li key={file.name}>{fileLink(file)}</li>
+          <li key={file.name} className="gist-item--file">
+            {fileLink(file)}
+          </li>
         ))}
       </ol>
     </li>
@@ -66,9 +80,18 @@ export function GistItem({ gist }: { gist: Gist }) {
 
   function fileLink(file: GistFile) {
     return (
-      <Action name="gist-item--link" navigate={file.path}>
-        <div className="gist-item--file">{print(file.name)}</div>
-      </Action>
+      <>
+        <Action name="gist-item--link" navigate={file.path}>
+          <div className="gist-item--filename">{print(file.name)}</div>
+        </Action>
+        <div className="gist-item--file-actions">
+          <Action
+            name="gist-item--trash"
+            icon="trash"
+            onClick={() => remove(file)}
+          />
+        </div>
+      </>
     );
   }
 

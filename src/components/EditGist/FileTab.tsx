@@ -16,6 +16,7 @@ interface ExistingFileProps {
 }
 
 interface CreateFileProps {
+  name: string;
   onSubmit(name: string): void;
   onAbort(): void;
 }
@@ -24,14 +25,17 @@ type FileTabProps = ExistingFileProps | CreateFileProps;
 
 export function FileTab(props: FileTabProps) {
   const history = useHistory();
+  const remove = () =>
+    file.removeWithConfirm().then(path => history.push(path));
 
   if (isCreateFile(props)) {
     return (
       <div className="file-tab active">
         <InputField
           className="file-tab--tab-name"
-          value="type a file name.md"
+          value={props.name}
           forceEditMode
+          scrollIntoView
           submitIfNotModified
           onSubmit={props.onSubmit}
           onAbort={props.onAbort}
@@ -59,18 +63,6 @@ export function FileTab(props: FileTabProps) {
   function rename(name: string) {
     if (name !== file.name) {
       onRename(name).then(file => history.push(file.path));
-    }
-  }
-
-  function remove() {
-    const message = file.isOnlyFile
-      ? 'PERMANENTLY DELETE THE GIST?'
-      : `Remove ${file.name}?`;
-
-    if (confirm(message)) {
-      return file
-        .remove()
-        .then(gist => history.push(gist == null ? '/' : gist.files[0].path));
     }
   }
 }

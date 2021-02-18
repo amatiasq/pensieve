@@ -25,6 +25,8 @@ function saveToStorage(raw: RawGist) {
   });
 }
 
+export const DEFAULT_FILE_NAME = 'Filename.md';
+
 export class Gist {
   static create() {
     return createGist().then(wrap);
@@ -99,6 +101,9 @@ export class Gist {
   }
   get isStarred() {
     return isGistStarred(this.id);
+  }
+  get createFilePath() {
+    return `/gist/${this.id}/${DEFAULT_FILE_NAME}`;
   }
 
   constructor(private readonly raw: RawGist, skipStorage?: boolean) {
