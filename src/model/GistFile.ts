@@ -2,8 +2,6 @@ import { RawGistFileDetails, RawGistFileItem } from '../contracts/RawGistFile';
 import { Gist } from './Gist';
 
 export class GistFile {
-  private isDisposed = false;
-
   get url() {
     return this.raw.raw_url;
   }
@@ -29,11 +27,12 @@ export class GistFile {
   }
 
   get content() {
-    // if (!('content' in this.raw)) {
-    //   throw new Error(`Accessing ${this.name} before fetching it's data`);
-    // }
+    if (!('content' in this.raw)) {
+      throw new Error(`Accessing ${this.name} before fetching it's data`);
+    }
 
-    return 'content' in this.raw ? this.raw.content : null;
+    /// DEFAULT_FILE_CONTENT
+    return this.raw.content;
   }
 
   get isContentLoaded() {
