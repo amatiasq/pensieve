@@ -1,6 +1,7 @@
 import localforage from 'localforage';
 
 import { RawGist } from '../contracts/RawGist';
+import { compressGist, mergeGist } from '../contracts/RawGist_extensions';
 import { GistId, UserName } from '../contracts/type-aliases';
 import { isGistStarred, setGistStarred } from '../services/gist/starred';
 import {
@@ -14,14 +15,13 @@ import {
   setFileContent
 } from '../services/github_api';
 import { GistFile } from './GistFile';
-import { mergeGist } from './mergeGist';
 
 const storage = localforage.createInstance({ name: 'gists.cache' });
 
 function saveToStorage(raw: RawGist) {
   return storage.getItem<RawGist>(raw.id).then(existing => {
     const newEntry = existing ? mergeGist(existing, raw) : raw;
-    return storage.setItem(raw.id, compress(newEntry));
+    return storage.setItem(raw.id, compressGist(newEntry));
   });
 }
 
@@ -46,25 +46,10 @@ export class Gist {
     return a.id === b.id;
   }
 
-  static getNewer(...gists: Gist[]) {
-    let best = gists[0];
-
-    gists.slice(1).forEach(x => {
-      if (x.updatedAt > best.updatedAt) {
-        best = x;
-      }
-    });
-
-    return best;
-  }
-
   private _files: GistFile[] = [];
 
   get id() {
     return this.raw.id;
-  }
-  get url() {
-    return this.raw.url;
   }
   get htmlUrl() {
     return this.raw.html_url;
@@ -77,9 +62,6 @@ export class Gist {
   }
   get isPublic() {
     return this.raw.public;
-  }
-  get createdAt() {
-    return new Date(this.raw.created_at);
   }
   get updatedAt() {
     return new Date(this.raw.updated_at);
@@ -96,31 +78,22 @@ export class Gist {
   get date() {
     return this.raw.created_at.split('T')[0];
   }
-  get hasContent() {
-    return this._files.every(x => x.isContentLoaded);
-  }
-  get isStarred() {
-    return isGistStarred(this.id);
-  }
   get createFilePath() {
     return `/gist/${this.id}/${DEFAULT_FILE_NAME}`;
   }
 
-  constructor(private readonly raw: RawGist, skipStorage?: boolean) {
+  constructor(private readonly raw: RawGist, skipStorage = false) {
     if (!skipStorage) {
       saveToStorage(raw);
     }
 
+    console.log(`Created ${raw.id}`);
     this._files = Object.values(raw.files).map(x => new GistFile(this, x));
-  }
-
-  isSameGist(other: Gist) {
-    return this.id === other.id;
   }
 
   isIdentical(other: Gist) {
     if (
-      this.isSameGist(other) ||
+      !Gist.comparer(this, other) ||
       this.isPublic !== other.isPublic ||
       this.updatedAt !== other.updatedAt
     ) {
@@ -152,8 +125,17 @@ export class Gist {
     return fetchGist(this.id).then(wrap);
   }
 
-  addFile(name: string, content = DEFAULT_FILE_CONTENT) {
-    return addGileToGist(this.id, name, content).then(wrap);
+  addFile(
+    name = prompt('Name for the new file'),
+    content = DEFAULT_FILE_CONTENT,
+  ) {
+    if (!name) {
+      return Promise.reject(`Invalid filename name: ${name}`);
+    }
+
+    return addGileToGist(this.id, name, content || DEFAULT_FILE_CONTENT).then(
+      wrap,
+    );
   }
 
   removeFile(file: GistFile): Promise<null | Gist> {
@@ -175,8 +157,7 @@ export class Gist {
   }
 
   toggleStar() {
-    console.log({ isStarred: this.isStarred });
-    return setGistStarred(this.id, !this.isStarred);
+    return setGistStarred(this.id, !isGistStarred(this.id));
   }
 
   toJSON() {
@@ -192,26 +173,4 @@ export class Gist {
 
 function wrap(raw: RawGist) {
   return new Gist(raw);
-}
-
-function compress<T extends RawGist>({
-  description,
-  files,
-  id,
-  public: p,
-  created_at,
-  html_url,
-  comments,
-  owner,
-}: T) {
-  return {
-    description,
-    files,
-    id,
-    public: p,
-    created_at,
-    html_url,
-    comments,
-    owner: { login: owner?.login },
-  } as T;
 }

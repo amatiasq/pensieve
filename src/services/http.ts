@@ -1,4 +1,6 @@
-export type RequestBody = Record<string, any> | string | null;
+import { busyWhile } from './busy-indicator';
+
+export type RequestBody = Record<string, unknown> | string | null;
 
 type FetchOptions = NonNullable<Parameters<typeof fetch>[1]>;
 
@@ -17,15 +19,17 @@ function request<T>(url: string, extras: RequestOptions = {}) {
     body,
   } as FetchOptions;
 
-  return fetch(url, options).then(x => {
-    if (x.status === 404) {
-      throw new Error('Not found');
-    }
+  return busyWhile(
+    fetch(url, options).then(x => {
+      if (x.status === 404) {
+        throw new Error('Not found');
+      }
 
-    return isJsonResponse(x)
-      ? (x.json() as Promise<T>)
-      : ((x.text() as unknown) as Promise<T>);
-  });
+      return isJsonResponse(x)
+        ? (x.json() as Promise<T>)
+        : ((x.text() as unknown) as Promise<T>);
+    }),
+  );
 }
 
 export const GET = <T>(url: string, options: RequestOptions = {}) =>

@@ -9,8 +9,7 @@ import { useSetting } from '../../hooks/useSetting';
 import { Gist } from '../../model/Gist';
 import { mergeSortedLists } from '../../util/mergeSortedLists';
 import { updateArrayItem } from '../../util/updateArrayItem';
-import { onGistChanged, onGistListchanged } from '../cache-invalidation';
-import { fetchGists } from '../github_api';
+import { fetchGists, onGistChanged, onGistListchanged } from '../github_api';
 import { setTopGists } from '../settings';
 
 const storage = new ClientStorage<GistId[]>('bg.list', {

@@ -1,7 +1,6 @@
 import { getCommand } from '../services/commands';
-import { onSettingsChanged } from './cache-invalidation';
 import { onShortcut } from './keyboard';
-import { getSetting } from './settings';
+import { getSetting, onSettingsChanged } from './settings';
 
 const normalizeKeys = (x: string) =>
   x.toUpperCase().replace(/CMD|WINDOWS|WIN/, 'META');

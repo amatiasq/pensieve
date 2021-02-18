@@ -3,9 +3,15 @@ import { ClientStorage } from '@amatiasq/client-storage';
 import { GistId, UserName } from '../contracts/type-aliases';
 import { tooltip } from '../dom/tooltip';
 import { Gist } from '../model/Gist';
-import { notifySettingsChanged, onGistChanged } from './cache-invalidation';
+import { messageBus } from '../util/messageBus';
 import { CommandName } from './commands';
-import { createGist, fetchGist, removeGist, updateGist } from './github_api';
+import {
+  createGist,
+  fetchGist,
+  onGistChanged,
+  removeGist,
+  updateGist
+} from './github_api';
 
 const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
   'CTRL+TAB': 'goBack',
@@ -49,6 +55,12 @@ const DEFAULT_SETTINGS = {
 };
 
 export type Settings = typeof DEFAULT_SETTINGS;
+
+const [notifySettingsChanged, onSettingsChanged] = messageBus(
+  'SETTINGS_CHANGED',
+);
+
+export { onSettingsChanged };
 
 const storage = new ClientStorage<Partial<Settings>>('gists.settings', {
   version: 1,
