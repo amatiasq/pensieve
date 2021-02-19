@@ -5,6 +5,7 @@ import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, useLocation } from 'react-router-dom';
 
+// Only exception to layer hierarchy
 import { EditGistFromUrl } from '../7-components/EditGist/EditGistFromUrl';
 import { GistList } from '../7-components/GistList/GistList';
 import { Placeholder } from '../7-components/Placeholder';
