@@ -15,6 +15,9 @@ export class GistFile {
     return this.gist.files.length === 1;
   }
 
+  get hasContent() {
+    return 'content' in this.raw;
+  }
   get content() {
     if (!('content' in this.raw)) {
       throw new Error(`Accessing ${this.name} before fetching it's data`);

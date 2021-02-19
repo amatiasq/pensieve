@@ -10,7 +10,8 @@ export type CommandName =
   | 'nextFile'
   | 'prevFile'
   | 'saveCurrentFile'
-  | 'settings';
+  | 'settings'
+  | 'toggleWordWrap';
 
 const commands: Partial<Record<CommandName, Executor>> = {};
 

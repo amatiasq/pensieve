@@ -1,35 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ClientStorage } from '@amatiasq/client-storage';
 
-import { CommandName } from '../1-core/commands';
 import { messageBus } from '../1-core/messageBus';
 import { GistId, UserName } from '../2-github/type-aliases';
 import { settingsGist } from './settingsGist';
-
-const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
-  'CTRL+TAB': 'goBack',
-  'CTRL+SHIFT+TAB': 'goForward',
-
-  'CMD+S': 'saveCurrentFile',
-  'CMD+,': 'settings',
-  'CMD+B': 'hideSidebar',
-  'CMD+W': 'goHome',
-  'CMD+N': 'createGist',
-  'CMD+T': 'createFile',
-
-  // 'CMD+ArrowRight': 'nextFile',
-  // 'CMD+ArrowLeft': 'prevFile',
-
-  'CTRL+S': 'saveCurrentFile',
-  'CTRl+,': 'settings',
-  'CTRL+B': 'hideSidebar',
-  'CTRL+W': 'goHome',
-  'CTRL+N': 'createGist',
-  'CTRL+T': 'createFile',
-
-  // 'ALT+CTRL+META+SHIFT+Space': () =>
-  // 'ALT+CMD+CTRL+SHIFT+Space': () =>
-};
+import { DEFAULT_SHORTCUTS } from './shortcuts';
 
 const DEFAULT_SETTINGS = {
   autosave: 5,
