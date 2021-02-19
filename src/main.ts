@@ -1,7 +1,7 @@
 import localforage from 'localforage';
 
-import { renderApp } from './components/App';
-import { onVirtualKeyboardDisplayChange } from './dom/virtualKeyboardDetector';
+import { onVirtualKeyboardDisplayChange } from './4-dom/virtualKeyboardDetector';
+import { renderApp } from './5-app/App';
 
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {

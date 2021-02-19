@@ -1,0 +1,31 @@
+@import '../4-dom/fit-parent.scss';
+
+.app {
+  display: flex;
+  flex: 1;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+
+  --gist-item-height: 28px;
+  --tabs-height: 42px;
+  --tabs-font-size: 1em;
+
+  > aside {
+    width: 400px;
+  }
+
+  > main {
+    @include fit-parent();
+  }
+}
+
+@media (max-width: 850px) {
+  .app.page-home > main,
+  .app.page-gist > aside {
+    display: none;
+  }
+
+  .app.page-home > aside {
+    width: 100% !important;
+  }
+}

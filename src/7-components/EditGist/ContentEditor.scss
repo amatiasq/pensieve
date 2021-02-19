@@ -1,0 +1,30 @@
+@import '../../4-dom/hide-scrollbar.scss';
+
+.markdown-preview {
+  @include hide-scrollbar();
+
+  height: 100%;
+  overflow: auto;
+  padding: 16px;
+  background-color: #1c1c1c;
+
+  &--renderer.wmde-markdown {
+    font-size: 14px;
+
+    pre {
+      background-color: #252526;
+    }
+  }
+}
+
+.mobile-fallback {
+  appearance: none;
+  border: none;
+  outline: none;
+  padding: 8px;
+  background-color: #1c1c1c;
+  color: inherit;
+  width: 100%;
+  height: calc(80% - var(--tabs-height));
+  padding: 32px;
+}

@@ -1,0 +1,50 @@
+@import '../../4-dom/hide-scrollbar.scss';
+
+.editor-tabs {
+  display: flex;
+  color: #8b8b8b;
+  background-color: var(--background);
+
+  vertical-align: middle;
+  height: var(--tabs-height);
+  line-height: var(--tabs-height);
+
+  --background: #252526;
+  --tab-padding-h: 12px;
+  --tab-padding-v: 16px;
+
+  .action {
+    width: var(--tabs-height);
+  }
+
+  &--files {
+    @include hide-scrollbar();
+
+    flex: 1 1;
+    display: flex;
+    white-space: nowrap;
+    overflow-y: auto;
+  }
+
+  &--actions {
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+
+    .action {
+      font-size: 1.5em;
+    }
+  }
+
+  &--commments .action--trigger {
+    position: relative;
+  }
+
+  &--comment-count {
+    position: absolute;
+    top: -5px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
