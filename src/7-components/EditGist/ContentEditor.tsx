@@ -60,7 +60,7 @@ export function ContentEditor({
 
   return (
     <Editor
-      height={`${window.innerHeight - 42}px`} // 100vh
+      height="calc(100vh - 42px)"
       theme="vs-dark"
       language={language}
       value={value}

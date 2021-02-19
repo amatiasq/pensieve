@@ -9,6 +9,7 @@ import { Gist } from '../../3-gist/Gist';
 import { GistFile } from '../../3-gist/GistFile';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
+import { useStack } from '../../6-hooks/useStack';
 import { BusinessIndicator } from '../atoms/BusinessIndicator';
 import { ContentEditor } from './ContentEditor';
 import { EditorTabs } from './EditorTabs';
@@ -24,20 +25,22 @@ export function GistEditor({
 }) {
   const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
-  const [isSaved, setIsSaved] = useState(true);
+  const [saved, addSaved] = useStack<string>(5, file.content);
   const [value, setValue] = useState<string>(file.content);
 
-  registerCommand('saveCurrentFile', () => scheduler.run());
+  registerCommand('saveCurrentFile', save);
 
   const scheduler = useScheduler(autosave * 1000, () => {
-    if (autosave === 0) {
-      return;
+    if (autosave !== 0) {
+      save();
     }
+  });
 
+  function save() {
     if (file.content !== value) {
       saveFile(file, value);
     }
-  });
+  }
 
   useEffect(() => {
     if (file) {
@@ -49,7 +52,9 @@ export function GistEditor({
   }, [file.name]);
 
   useEffect(() => {
-    if (isSaved) setValue(file.content);
+    if (value !== file.content && !saved.includes(file.content)) {
+      setValue(file.content);
+    }
   }, [file.content]);
 
   useEffect(() => {
@@ -83,18 +88,19 @@ export function GistEditor({
   );
 
   function onChange(value?: string) {
-    setIsSaved(false);
     setValue(value || '');
     scheduler.restart();
   }
 
   function saveFile(file: GistFile, value: string | null) {
-    if (isSaved) {
+    if (saved) {
       return Promise.resolve(file);
     }
 
-    setIsSaved(true);
     scheduler.stop();
-    return file.setContent(value || DEFAULT_FILE_CONTENT);
+
+    const content = value || DEFAULT_FILE_CONTENT;
+    addSaved(content);
+    return file.setContent(content);
   }
 }
