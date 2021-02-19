@@ -2,6 +2,7 @@ import localforage from 'localforage';
 
 import { onVirtualKeyboardDisplayChange } from './4-dom/virtualKeyboardDetector';
 import { renderApp } from './5-app/App';
+import { initShorcuts } from './5-app/shortcuts';
 
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
@@ -16,6 +17,7 @@ if (!container) {
 }
 
 renderApp(container);
+initShorcuts();
 
 onVirtualKeyboardDisplayChange(isVisible => {
   if (isVisible) {

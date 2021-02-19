@@ -12,7 +12,7 @@ export function EditGistFromUrl() {
   const gist = useGist(gistId as GistId);
   const file = gist?.getFileByName(filename) || gist?.defaultFile;
 
-  if (!gist || !file || !file.content) {
+  if (!gist || !file || !file.hasContent) {
     return <p>Loading...</p>;
   }
 
