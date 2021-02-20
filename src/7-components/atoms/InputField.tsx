@@ -43,12 +43,10 @@ export function InputField({
     }
 
     el.focus();
-    el.scrollIntoView();
     selectElementContents(el);
 
     // HACK: selection doesn't work on newly created elements
     setTimeout(() => {
-      el.scrollIntoView();
       selectElementContents(el);
     }, 10);
   }, [!readonly && isEditing]);
