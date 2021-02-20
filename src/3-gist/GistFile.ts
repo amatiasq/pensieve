@@ -38,7 +38,7 @@ export class GistFile {
 
   async rename(newName: string) {
     if (this.name === newName) {
-      console.log(`File name is already "${newName}"`);
+      console.log('File name is already:', { name: this.name, newName });
       return Promise.reject(`File name is already "${newName}"`);
     }
 
@@ -48,8 +48,14 @@ export class GistFile {
 
   async setContent(content: string) {
     if (this.content === content) {
-      console.log(`File content is already "${content}"`);
-      return Promise.reject(`File content is already "${content}"`);
+      console.log('File content is already: ', {
+        content: this.content,
+        newContent: content,
+      });
+
+      return Promise.reject(
+        `File content is already "${content.slice(0, 100)}..."`,
+      );
     }
 
     const newGist = await this.gist.setFileContent(this, content);
