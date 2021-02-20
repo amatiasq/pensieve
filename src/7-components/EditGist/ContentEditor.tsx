@@ -1,14 +1,12 @@
-import './ContentEditor.scss';
-
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
 
 import Editor, { useMonaco } from '@monaco-editor/react';
-import MarkdownPreview from '@uiw/react-markdown-preview';
 
 import { isMobile } from '../../1-core/isMobile';
 import { GistFile } from '../../3-gist/GistFile';
 import { useSetting } from '../../6-hooks/useSetting';
+import { MobileFallback } from './MobileFallback';
 
 export function ContentEditor({
   file,
@@ -28,9 +26,6 @@ export function ContentEditor({
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
-
-  const [isPreview, setIsPreview] = useState(isMobile);
-
   const autofocus = file.name === filename;
 
   const lines = value.split('\n').length;
@@ -40,21 +35,8 @@ export function ContentEditor({
     'markdown';
 
   if (isMobile) {
-    return isPreview && language === 'markdown' ? (
-      <div className="markdown-preview" onClick={() => setIsPreview(false)}>
-        <MarkdownPreview
-          className="markdown-preview--renderer"
-          source={value}
-        />
-      </div>
-    ) : (
-      <textarea
-        className="mobile-fallback"
-        defaultValue={value}
-        readOnly={readonly}
-        autoFocus={autofocus}
-        onChange={e => onChange(e.target.value)}
-      ></textarea>
+    return (
+      <MobileFallback {...{ language, value, readonly, autofocus, onChange }} />
     );
   }
 
