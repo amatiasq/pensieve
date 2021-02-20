@@ -17,7 +17,7 @@ export function BackButton() {
       name="back"
       icon="chevron-left"
       disabled={isHome}
-      onClick={() => history.goBack()}
+      onClick={() => history.push('/')} //{() => history.goBack()}
       square
     />
   );
