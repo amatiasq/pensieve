@@ -39,6 +39,7 @@ export function MobileFallback({
         defaultValue={value}
         readOnly={readonly}
         autoFocus={autofocus}
+        autoComplete=""
         onChange={e => onChange(e.target.value)}
       ></textarea>
     );
