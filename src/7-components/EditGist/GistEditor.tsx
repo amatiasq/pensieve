@@ -28,19 +28,13 @@ export function GistEditor({
   const [saved, addSaved] = useStack<string>(5, file.content);
   const [value, setValue] = useState<string>(file.content);
 
-  registerCommand('saveCurrentFile', save);
+  registerCommand('saveCurrentFile', () => saveFile(file, value));
 
   const scheduler = useScheduler(autosave * 1000, () => {
-    if (autosave !== 0) {
-      save();
-    }
-  });
-
-  function save() {
-    if (file.content !== value) {
+    if (autosave !== 0 && file.content !== value) {
       saveFile(file, value);
     }
-  }
+  });
 
   useEffect(() => {
     if (file) {
@@ -93,12 +87,7 @@ export function GistEditor({
   }
 
   function saveFile(file: GistFile, value: string | null) {
-    if (saved) {
-      return Promise.resolve(file);
-    }
-
     scheduler.stop();
-
     const content = value || DEFAULT_FILE_CONTENT;
     addSaved(content);
     return file.setContent(content);
