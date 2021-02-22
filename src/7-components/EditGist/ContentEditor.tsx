@@ -26,11 +26,13 @@ export function ContentEditor({
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
+  const [defaultFileExtension] = useSetting('defaultFileExtension');
   const autofocus = file.name === filename;
 
   const lines = value.split('\n').length;
   const language =
     getLanguageFor(file.name) ||
+    getLanguageFor(defaultFileExtension) ||
     file.language?.toLocaleLowerCase() ||
     'markdown';
 

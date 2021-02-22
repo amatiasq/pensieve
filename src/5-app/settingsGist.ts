@@ -10,6 +10,7 @@ import { GistId } from '../2-github/type-aliases';
 import { getGist } from '../3-gist/getGist';
 import { Gist } from '../3-gist/Gist';
 import { tooltip } from '../4-dom/tooltip';
+import { asyncBlocker } from '../util/asyncBlocker';
 import { removeIndexFomArray } from '../util/removeIndexFromArray';
 import { getSetting, Memory, Settings } from './settings';
 
@@ -27,6 +28,8 @@ export function settingsGist(
   memory: ClientStorage<Partial<Memory>>,
   onChange: () => void,
 ) {
+  const blockGistAccess = asyncBlocker('Settings Gist');
+
   onGistChanged(raw => {
     if (raw.id !== id.cache) return;
 
@@ -51,24 +54,28 @@ export function settingsGist(
     const index = list.findIndex(isSettingsGist);
     const found = index === -1 ? null : list.find(isSettingsGist);
 
-    if (found) {
-      if (found.id !== id.cache) {
-        id.set(found.id);
-      }
-
-      recreateIfNecessary(found, list.indexOf(found));
-    } else if (id.cache) {
-      getGist(id.cache).then(gist => {
-        if (!gist) {
-          id.set(null);
-          throw new Error('Settings file is missing');
+    blockGistAccess(() => {
+      if (found) {
+        if (found.id !== id.cache) {
+          id.set(found.id);
         }
 
-        recreateIfNecessary(gist);
-      });
-    } else {
-      create();
-    }
+        return recreateIfNecessary(found, list.indexOf(found));
+      }
+
+      if (id.cache) {
+        return getGist(id.cache).then(gist => {
+          if (!gist) {
+            id.set(null);
+            throw new Error('Settings file is missing');
+          }
+
+          return recreateIfNecessary(gist);
+        });
+      }
+
+      return create();
+    });
 
     return index === -1 ? list : removeIndexFomArray(list, index);
   }
@@ -94,7 +101,7 @@ export function settingsGist(
     if (!gist) return;
 
     if (gistNeedsUpdate(gist)) {
-      return write();
+      blockGistAccess(write);
     }
   }
 

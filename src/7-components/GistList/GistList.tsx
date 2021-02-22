@@ -46,7 +46,7 @@ export function GistList() {
   ) : filter ? (
     <li>No Results</li>
   ) : (
-    <li>Loading...</li>
+    <li>No gists</li>
   );
 
   return (
