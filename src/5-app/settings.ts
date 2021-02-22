@@ -8,6 +8,7 @@ import { DEFAULT_SHORTCUTS } from './shortcuts';
 
 const DEFAULT_SETTINGS = {
   autosave: 5,
+  defaultFileExtension: '.md',
   reloadIfAwayForSeconds: 5,
   renderIndentGuides: false,
   rulers: [],

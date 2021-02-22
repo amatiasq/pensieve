@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function useStack<T>(length: number, initialEntry?: T) {
   const [stack] = useState<T[]>([]);
 
-  if (initialEntry !== undefined) {
-    stack.push(initialEntry);
-  }
+  useEffect(() => {
+    if (initialEntry !== undefined) {
+      stack.push(initialEntry);
+    }
+  }, []);
 
   return [stack, push] as const;
 
