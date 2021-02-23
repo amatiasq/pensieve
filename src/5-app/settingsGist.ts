@@ -171,8 +171,12 @@ function serialize<T>(value: T) {
 }
 
 function deserialize<T>(content: string) {
+  const clean = content
+    .replace(/^\s*\/\/.+$/gm, '')
+    .replace(/,(\s|\n)+\}/g, '}');
+
   try {
-    return JSON.parse(content) as T;
+    return JSON.parse(clean) as T;
   } catch (error) {
     console.error(`Invalid settings JSON:`, content);
     tooltip(`Error in settings gist: ${error.message}`);
