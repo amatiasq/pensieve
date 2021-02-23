@@ -7,7 +7,7 @@ import { UpdateGistRequest } from './UpdateGistRequest';
 
 export const GH_API = 'https://api.github.com';
 
-export const DEFAULT_FILE_CONTENT = 'Empty!\n';
+export const DEFAULT_FILE_CONTENT = '-\n';
 
 const DEFAULT_GIST_CONTENT = {
   public: false,
