@@ -15,6 +15,10 @@ aside {
 
   --padding: 16px;
   --files-padding: 16px;
+
+  &--empty {
+    padding-left: var(--padding);
+  }
 }
 
 .filter {

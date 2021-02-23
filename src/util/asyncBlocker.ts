@@ -1,11 +1,7 @@
-class AsynchronousTaskBlocked extends Error {}
+import { unhandledErrorAsWarning } from './unhandledErrorAsWarning';
 
-window.addEventListener('unhandledrejection', event => {
-  if (event.reason instanceof AsynchronousTaskBlocked) {
-    event.preventDefault();
-    console.warn(event.reason.message);
-  }
-});
+@unhandledErrorAsWarning
+class AsynchronousTaskBlocked extends Error {}
 
 export function asyncBlocker(name: string) {
   let isOperating = false;
