@@ -1,5 +1,6 @@
 import { CommandName, getCommand } from '../1-core/commands';
 import { onShortcut } from '../1-core/keyboard';
+import { tooltip } from '../4-dom/tooltip';
 import { getSetting, onSettingsChanged } from './settings';
 
 export const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
@@ -55,6 +56,7 @@ export function initShorcuts() {
       });
 
       if (typeof command === 'function') {
+        tooltip(keys.replace('META', 'CMD'));
         event.preventDefault();
         command();
       }

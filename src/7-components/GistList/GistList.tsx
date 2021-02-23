@@ -44,9 +44,9 @@ export function GistList() {
   const content = filtered.length ? (
     filtered.map(gist => <GistItem key={gist.id} gist={gist} />)
   ) : filter ? (
-    <li>No Results</li>
+    <li className="gist-list--empty">No Results</li>
   ) : (
-    <li>No gists</li>
+    <li className="gist-list--empty">No gists</li>
   );
 
   return (

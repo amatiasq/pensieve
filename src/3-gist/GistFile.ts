@@ -1,5 +1,9 @@
 import { RawGistFileDetails, RawGistFileItem } from '../2-github/RawGistFile';
+import { unhandledErrorAsWarning } from '../util/unhandledErrorAsWarning';
 import { Gist } from './Gist';
+
+@unhandledErrorAsWarning
+class UnmodifiedFileError extends Error {}
 
 export class GistFile {
   get name() {
@@ -38,8 +42,7 @@ export class GistFile {
 
   async rename(newName: string) {
     if (this.name === newName) {
-      console.log('File name is already:', { name: this.name, newName });
-      return Promise.reject(`File name is already "${newName}"`);
+      throw new UnmodifiedFileError(`File name is already "${newName}"`);
     }
 
     const newGist = await this.gist.renameFile(this, newName);
@@ -48,12 +51,7 @@ export class GistFile {
 
   async setContent(content: string) {
     if (this.content === content) {
-      console.log('File content is already: ', {
-        content: this.content,
-        newContent: content,
-      });
-
-      return Promise.reject(
+      throw new UnmodifiedFileError(
         `File content is already "${content.slice(0, 100)}..."`,
       );
     }

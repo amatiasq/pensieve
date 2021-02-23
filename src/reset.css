@@ -128,6 +128,12 @@ table {
   border-spacing: 0;
 }
 
+body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
 #app-container {
   background-color: black;
   color: white;

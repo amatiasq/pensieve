@@ -12,7 +12,7 @@ export function useStack<T>(length: number, initialEntry?: T) {
   return [stack, push] as const;
 
   function push(value: T) {
-    stack.push(value);
+    stack.unshift(value);
 
     if (stack.length > length) {
       stack.length = length;
