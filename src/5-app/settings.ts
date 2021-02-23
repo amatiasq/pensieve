@@ -75,19 +75,22 @@ export function saveToMemory<Key extends keyof Memory>(
   notifySettingsChanged();
 }
 
-export function getSetting<Key extends keyof Settings>(key: Key) {
-  const val = settings.cache[key];
+export function getSetting<Key extends keyof Settings>(
+  key: Key,
+): Settings[Key] {
   const def = DEFAULT_SETTINGS[key];
 
-  if (val == null) {
+  if (!(key in settings.cache)) {
     return def;
   }
+
+  const val = settings.cache[key];
 
   if (isPlainObject(val) && isPlainObject(def)) {
     return { ...(def as any), ...(val as any) } as Settings[Key];
   }
 
-  return (val || def) as Settings[Key];
+  return val as Settings[Key];
 }
 
 export function setSetting<Key extends keyof Settings>(
