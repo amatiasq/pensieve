@@ -3,8 +3,8 @@ import { ClientStorage } from '@amatiasq/client-storage';
 
 import { messageBus } from '../1-core/messageBus';
 import { GistId, UserName } from '../2-github/type-aliases';
+import { DEFAULT_SHORTCUTS } from './DEFAULT_SHORTCUTS';
 import { settingsGist } from './settingsGist';
-import { DEFAULT_SHORTCUTS } from './shortcuts';
 
 const DEFAULT_SETTINGS = {
   autosave: 5,
