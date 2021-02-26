@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { registerCommand } from '../../1-core/commands';
+import { isMobile } from '../../1-core/isMobile';
 import { createAndNavigateToGist } from '../../3-gist/createAndNavigateToGist';
 import { Gist } from '../../3-gist/Gist';
 import { useGistList } from '../../6-hooks/useGistList';
@@ -50,7 +51,9 @@ export function GistList() {
   );
 
   return (
-    <aside style={{ width: size, display: isVisible ? '' : 'none' }}>
+    <aside
+      style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}
+    >
       <ul className="gist-list" onScroll={onScroll}>
         <li className="filter">
           <FilterBox onChange={setFilter} />
