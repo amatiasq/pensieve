@@ -30,7 +30,10 @@ export function initShorcuts() {
       });
 
       if (typeof command === 'function') {
-        tooltip(keys.replace('META', 'CMD'));
+        if (getSetting('displayShortcutsAsTooltip')) {
+          tooltip(keys.replace('META', 'CMD'));
+        }
+
         event.preventDefault();
         command();
       }
