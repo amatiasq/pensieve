@@ -4,6 +4,7 @@ import { DEFAULT_SHORTCUTS } from './DEFAULT_SHORTCUTS';
 export const DEFAULT_SETTINGS = {
   autosave: 5,
   defaultFileExtension: '.md',
+  displayShortcutsAsTooltip: true,
   reloadIfAwayForSeconds: 5,
   renderIndentGuides: false,
   rulers: [],
