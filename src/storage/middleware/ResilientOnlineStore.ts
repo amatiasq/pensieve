@@ -1,6 +1,6 @@
 import { Scheduler } from '@amatiasq/scheduler';
 
-import { AsyncStore } from './AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 
 interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   method: T;

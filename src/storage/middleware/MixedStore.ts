@@ -1,4 +1,4 @@
-import { AsyncStore } from './AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 import { ResilientOnlineStore } from './ResilientOnlineStore';
 
 export class MixedStore implements AsyncStore {
