@@ -1,30 +1,40 @@
-import localforage from 'localforage';
+import { GithubRepository } from './gh/GithubRepository';
 
-import { onVirtualKeyboardDisplayChange } from './4-dom/virtualKeyboardDetector';
-import { renderApp } from './5-app/App';
-import { initShorcuts } from './5-app/shortcuts';
+const repo = new GithubRepository(
+  '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',
+  'amatiasq',
+  'takenote-data',
+);
 
-window.addEventListener('load', () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js');
-  }
-});
+repo.readJsonFile('notes.json').then(x => console.log(x));
 
-const container = document.getElementById('app-container');
+// import localforage from 'localforage';
 
-if (!container) {
-  throw new Error('Missing container element');
-}
+// import { onVirtualKeyboardDisplayChange } from './4-dom/virtualKeyboardDetector';
+// import { renderApp } from './5-app/App';
+// import { initShorcuts } from './5-app/shortcuts';
 
-renderApp(container);
-initShorcuts();
+// window.addEventListener('load', () => {
+//   if ('serviceWorker' in navigator) {
+//     navigator.serviceWorker.register('./service-worker.js');
+//   }
+// });
 
-onVirtualKeyboardDisplayChange(isVisible => {
-  if (isVisible) {
-    container.classList.add('is-virtual-keyboard-open');
-  } else {
-    container.classList.remove('is-virtual-keyboard-open');
-  }
-});
+// const container = document.getElementById('app-container');
 
-Object.assign(window, { localforage });
+// if (!container) {
+//   throw new Error('Missing container element');
+// }
+
+// renderApp(container);
+// initShorcuts();
+
+// onVirtualKeyboardDisplayChange(isVisible => {
+//   if (isVisible) {
+//     container.classList.add('is-virtual-keyboard-open');
+//   } else {
+//     container.classList.remove('is-virtual-keyboard-open');
+//   }
+// });
+
+// Object.assign(window, { localforage });
