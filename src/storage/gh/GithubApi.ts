@@ -5,25 +5,25 @@ export const GH_API = 'https://api.github.com';
 export type GithubToken = '[string GithubToken]';
 
 export abstract class GithubApi {
-  constructor(private readonly token: GithubToken) {}
+  constructor(public token: GithubToken) {}
 
-  GET<T>(path: string) {
+  protected GET<T>(path: string) {
     return GET<T>(url(path), this.withAuth());
   }
 
-  DELETE<T>(path: string) {
+  protected DELETE<T>(path: string) {
     return DELETE<T>(url(path), this.withAuth());
   }
 
-  PUT<T>(path: string, body: RequestBody) {
+  protected PUT<T>(path: string, body: RequestBody) {
     return PUT<T>(url(path), body, this.withAuth());
   }
 
-  POST<T>(path: string, body: RequestBody) {
+  protected POST<T>(path: string, body: RequestBody) {
     return POST<T>(url(path), body, this.withAuth());
   }
 
-  PATCH<T>(path: string, body: RequestBody) {
+  protected PATCH<T>(path: string, body: RequestBody) {
     return PATCH<T>(url(path), body, this.withAuth());
   }
 
