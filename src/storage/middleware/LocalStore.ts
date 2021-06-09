@@ -1,4 +1,4 @@
-import { AsyncStore } from './AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 
 export class LocalStore implements AsyncStore {
   constructor(readonly prefix: string) {}

@@ -1,4 +1,4 @@
-import { AsyncStore } from './AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 
 class MemoryCache<T> {
   private readonly data = new Map<string, unknown>();

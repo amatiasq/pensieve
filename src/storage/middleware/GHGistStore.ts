@@ -1,6 +1,6 @@
 // THIS IS JUST PLACEHOLDER
 
-import { AsyncStore } from './AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type GithubGists = any;

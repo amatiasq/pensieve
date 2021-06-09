@@ -1,7 +1,7 @@
 import { Scheduler } from '@amatiasq/scheduler';
 
-import { AsyncStore } from './AsyncStore';
-import { GHRepositoryApi, StagedFiles } from './gh/GHRepositoryApi';
+import { AsyncStore } from '../AsyncStore';
+import { GHRepositoryApi, StagedFiles } from '../gh/GHRepositoryApi';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
 

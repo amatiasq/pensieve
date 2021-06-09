@@ -1,4 +1,4 @@
-import { AsyncStore } from './AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 
 export class ForageStore implements AsyncStore {
   constructor(private readonly forage: LocalForage) {}

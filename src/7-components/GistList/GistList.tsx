@@ -7,9 +7,7 @@ import { registerCommand } from '../../1-core/commands';
 import { isMobile } from '../../1-core/isMobile';
 import { createAndNavigateToGist } from '../../3-gist/createAndNavigateToGist';
 import { Gist } from '../../3-gist/Gist';
-import { useGistList } from '../../6-hooks/useGistList';
 import { useSetting } from '../../6-hooks/useSetting';
-import { useStarredGists } from '../../6-hooks/useStarredGists';
 import StringComparer from '../../util/StringComparer';
 import { Action } from '../atoms/Action';
 import { Resizer } from '../atoms/Resizer';
@@ -28,10 +26,7 @@ export function GistList() {
   const gists = useGistList(loadMore);
 
   const starredIds = starred.map(x => x.id);
-  const allGists = [
-    ...starred,
-    ...gists.filter(x => !starredIds.includes(x.id)),
-  ];
+  const allGists = [...starred, ...gists.filter(x => !starredIds.includes(x.id))];
   const filtered = filter ? applyFilter(allGists, filter) : allGists;
 
   registerCommand('createGist', () => createAndNavigateToGist(history));
@@ -51,17 +46,11 @@ export function GistList() {
   );
 
   return (
-    <aside
-      style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}
-    >
+    <aside style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}>
       <ul className="gist-list" onScroll={onScroll}>
         <li className="filter">
           <FilterBox onChange={setFilter} />
-          <Action
-            name="add-gist"
-            icon="plus"
-            onClick={() => createAndNavigateToGist(history)}
-          />
+          <Action name="add-gist" icon="plus" onClick={() => createAndNavigateToGist(history)} />
         </li>
 
         {content}
@@ -73,14 +62,9 @@ export function GistList() {
   function onScroll(event: React.UIEvent<HTMLElement, UIEvent>) {
     const SCROLL_OFFSET = 50;
 
-    const {
-      scrollTop,
-      scrollHeight,
-      clientHeight,
-    } = event.target as HTMLElement;
+    const { scrollTop, scrollHeight, clientHeight } = event.target as HTMLElement;
 
-    const isNearBottom =
-      clientHeight + scrollTop + SCROLL_OFFSET > scrollHeight;
+    const isNearBottom = clientHeight + scrollTop + SCROLL_OFFSET > scrollHeight;
 
     if (isNearBottom) {
       setLoadMore(true);
@@ -90,9 +74,6 @@ export function GistList() {
 
 function applyFilter(list: Gist[], comparer: StringComparer) {
   return list.filter(gist => {
-    return (
-      comparer.matches(gist.description || '') ||
-      gist.files.some(x => comparer.matches(x.name))
-    );
+    return comparer.matches(gist.description || '') || gist.files.some(x => comparer.matches(x.name));
   });
 }
