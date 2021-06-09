@@ -1,5 +1,5 @@
 export type NoteId = '[string NoteId]';
-export type NoteContent = '[string NoteContent]';
+export type NoteContent = string;
 
 export interface Note {
   readonly id: NoteId;
