@@ -1,15 +1,12 @@
 type Executor = () => void;
 
 export type CommandName =
-  | 'createFile'
-  | 'createGist'
+  | 'newNote'
   | 'goBack'
   | 'goForward'
   | 'goHome'
   | 'hideSidebar'
-  | 'nextFile'
-  | 'prevFile'
-  | 'saveCurrentFile'
+  | 'save'
   | 'settings'
   | 'toggleWordWrap';
 

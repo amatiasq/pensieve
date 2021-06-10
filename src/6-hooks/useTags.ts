@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState } from 'react';
 
 import { AppStorageContext } from '../5-app/contexts';
-import { Note } from '../entities/Note';
+import { Tag } from '../entities/Tag';
 
-export function useNotesList() {
+export function useTags() {
   const store = useContext(AppStorageContext);
-  const [list, setList] = useState<Note[]>([]);
+  const [list, setList] = useState<Tag[]>([]);
 
   useEffect(() => {
-    store.fetchNotes().then(setList);
-    return store.onNotesChange(setList);
+    store.fetchTags().then(setList);
+    return store.onTagsChange(setList);
   });
 
   return list;

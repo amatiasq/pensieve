@@ -2,21 +2,19 @@ import './Placeholder.scss';
 
 import React from 'react';
 
-import { useGist } from '../6-hooks/useGist';
-import { useSetting } from '../6-hooks/useSetting';
-import { GistEditor } from './EditGist/GistEditor';
-
 export function Placeholder() {
-  const [welcomeGist] = useSetting('welcomeGist');
-  const gist = useGist(welcomeGist);
+  return <p>Placeholder</p>;
 
-  if (!gist) {
-    return <p>Loading...</p>;
-  }
+  // const [welcomeGist] = useSetting('welcomeGist');
+  // const note = useNote(welcomeGist);
 
-  return (
-    <main className="placeholder">
-      <GistEditor gist={gist} file={gist.defaultFile} readonly />
-    </main>
-  );
+  // if (!note) {
+  //   return <p>Loading...</p>;
+  // }
+
+  // return (
+  //   <main className="placeholder">
+  //     <GistEditor gist={note} file={note.defaultFile} readonly />
+  //   </main>
+  // );
 }

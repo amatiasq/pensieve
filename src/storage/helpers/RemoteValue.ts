@@ -1,5 +1,5 @@
 import { messageBus } from '../../1-core/messageBus';
-import { AsyncStore } from '../../storage/AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 
 type Listener<T> = (listener: (data: T) => void) => () => void;
 

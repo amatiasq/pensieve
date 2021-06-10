@@ -1,4 +1,4 @@
-import { AsyncStore } from '../../storage/AsyncStore';
+import { AsyncStore } from '../AsyncStore';
 import { RemoteValue } from './RemoteValue';
 
 export class RemoteCollection<T extends { id: U }, U> extends RemoteValue<T[]> {
