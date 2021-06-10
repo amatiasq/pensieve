@@ -2,19 +2,18 @@ import { ClientStorage } from '@amatiasq/client-storage';
 
 import { POST } from '../1-core/http';
 import { parseParams, withParams } from '../1-core/url';
+import { GithubToken } from '../storage/gh/GithubApi';
 
 const isLocalHost = location.hostname === 'localhost';
 const CLIENT_ID = isLocalHost ? '3e0c6862be8f7272c3d4' : '120875b87556e8c052e4';
 
-const redirect_uri = isLocalHost
-  ? location.origin
-  : 'https://gist.amatiasq.com/';
+const redirect_uri = isLocalHost ? location.origin : 'https://gist.amatiasq.com/';
 
 const AUTH_ROOT = 'https://github.com/login/oauth';
 const AUTH_ENDPOINT = 'https://gist.amatiasq.com/auth';
 
 const requestState = new ClientStorage<string | null>('bg.gh-state', {});
-const auth = new ClientStorage<string | null>('bg.gh-token', {});
+const auth = new ClientStorage<GithubToken | null>('bg.gh-token', {});
 
 export function getGithubAccessToken() {
   return auth.cache;
@@ -41,9 +40,7 @@ export function requestGithubAuthorization() {
 
 export async function processGithubAuthCode(code: string, state: string) {
   if (state && state !== requestState.cache) {
-    throw new Error(
-      `Request state do not match: "${state}" - "${requestState.cache}`,
-    );
+    throw new Error(`Request state do not match: "${state}" - "${requestState.cache}`);
   }
 
   if (code) {
@@ -52,7 +49,7 @@ export async function processGithubAuthCode(code: string, state: string) {
   }
 
   const { result } = await requestAccessToken(code, state);
-  const { access_token } = parseParams(`/?${result}`);
+  const { access_token } = parseParams(`/?${result}`) as { access_token: GithubToken };
   auth.set(access_token);
   return access_token;
 }

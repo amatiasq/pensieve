@@ -6,9 +6,10 @@ import {
   processGithubAuthCode,
   requestGithubAuthorization
 } from '../2-github/github_auth';
+import { GithubToken } from '../storage/gh/GithubApi';
 
 export function useGithubAuth() {
-  const [token, setToken] = useState<string | null>(getGithubAccessToken());
+  const [token, setToken] = useState<GithubToken | null>(getGithubAccessToken());
 
   const { code, state } = parseParams(location.toString());
 

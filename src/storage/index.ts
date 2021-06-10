@@ -1,5 +1,6 @@
 import localforage from 'localforage';
 
+import { AppStorage } from './AppStorage';
 import { GHRepositoryApi } from './gh/GHRepositoryApi';
 import { GithubToken } from './gh/GithubApi';
 import { CachedStore } from './middleware/CachedStore';
@@ -21,5 +22,5 @@ export function createStore(token: GithubToken, username: string, repoName: stri
   const notes = new MixedStore(local, resilient);
   const store = new CachedStore(notes);
 
-  return store;
+  return new AppStorage(store);
 }

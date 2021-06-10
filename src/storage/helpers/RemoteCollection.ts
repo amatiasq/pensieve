@@ -6,6 +6,11 @@ export class RemoteCollection<T extends { id: U }, U> extends RemoteValue<T[]> {
     super(store, key, []);
   }
 
+  async item(id: U) {
+    const list = await this.get();
+    return list.find(x => x.id === id) || null;
+  }
+
   async add(item: T) {
     const list = await this.get();
     list.unshift(item);
