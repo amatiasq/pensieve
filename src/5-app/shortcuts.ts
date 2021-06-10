@@ -1,16 +1,13 @@
 import { getCommand } from '../1-core/commands';
 import { onShortcut } from '../1-core/keyboard';
-import { tooltip } from '../4-dom/tooltip';
 import { DEFAULT_SHORTCUTS } from './DEFAULT_SHORTCUTS';
-import { getSetting, onSettingsChanged } from './settings';
 
-const normalizeKeys = (x: string) =>
-  x.toUpperCase().replace(/CMD|WINDOWS|WIN/, 'META');
+const normalizeKeys = (x: string) => x.toUpperCase().replace(/CMD|WINDOWS|WIN/, 'META');
 
 export function initShorcuts() {
-  let shortcuts = getShortcuts();
+  // let shortcuts = getShortcuts();
 
-  onSettingsChanged(() => (shortcuts = getShortcuts()));
+  // onSettingsChanged(() => (shortcuts = getShortcuts()));
 
   onShortcut(event => {
     const keys = event.keys.join('+').toUpperCase();
@@ -30,9 +27,9 @@ export function initShorcuts() {
       });
 
       if (typeof command === 'function') {
-        if (getSetting('displayShortcutsAsTooltip')) {
-          tooltip(keys.replace('META', 'CMD'));
-        }
+        // if (getSetting('displayShortcutsAsTooltip')) {
+        //   tooltip(keys.replace('META', 'CMD'));
+        // }
 
         event.preventDefault();
         command();
@@ -41,10 +38,8 @@ export function initShorcuts() {
   });
 
   function getShortcuts() {
-    const value = getSetting('shortcuts') || DEFAULT_SHORTCUTS;
+    const value = /*getSetting('shortcuts') ||*/ DEFAULT_SHORTCUTS;
 
-    return Object.fromEntries(
-      Object.entries(value).map(([key, value]) => [normalizeKeys(key), value]),
-    );
+    return Object.fromEntries(Object.entries(value).map(([key, value]) => [normalizeKeys(key), value]));
   }
 }

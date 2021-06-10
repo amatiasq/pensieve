@@ -1,16 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
-
-import { AppStorageContext } from '../5-app/contexts';
 import { Tag } from '../entities/Tag';
+import { hookStore } from './helpers/hookStore';
 
-export function useTags() {
-  const store = useContext(AppStorageContext);
-  const [list, setList] = useState<Tag[]>([]);
-
-  useEffect(() => {
-    store.fetchTags().then(setList);
-    return store.onTagsChange(setList);
-  });
-
-  return list;
-}
+export const useTags = hookStore<Tag[], []>([], () => (store, setValue) => {
+  store.getTags().then(setValue);
+  return store.onTagsChange(setValue);
+});

@@ -67,6 +67,6 @@ export function NoteEditor({ note, content }: { note: Note; content: NoteContent
     scheduler.stop();
     const content = value || DEFAULT_FILE_CONTENT;
     addSaved(content);
-    return store.writeNoteContent(note.id, content);
+    return store.setNoteContent(note.id, content);
   }
 }

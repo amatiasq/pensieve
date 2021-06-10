@@ -18,7 +18,7 @@ export function NoteItem({ note }: { note: Note }) {
         <Action
           name="gist-item--star"
           icon={note.favorite ? 'star' : 'far star'}
-          onClick={() => store.setFavorite(note.id, !note.favorite)}
+          onClick={() => store.toggleFavorite(note.id)}
         />
       </div>
 
