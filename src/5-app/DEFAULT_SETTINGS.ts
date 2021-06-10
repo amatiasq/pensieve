@@ -14,6 +14,6 @@ export const DEFAULT_SETTINGS = {
   sidebarWidth: 400,
   starNewGists: false,
   tabSize: 2,
-  welcomeGist: 'd195304f7bb1b8d5f3e76392c4a6cd01' as GistId,
+  //welcomeGist: 'd195304f7bb1b8d5f3e76392c4a6cd01' as NoteId,
   wordWrap: true,
 };

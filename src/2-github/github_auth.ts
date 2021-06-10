@@ -29,7 +29,7 @@ export function requestGithubAuthorization() {
 
   const url = withParams(`${AUTH_ROOT}/authorize`, {
     client_id: CLIENT_ID,
-    scope: 'gist',
+    scope: 'repo gist',
     redirect_uri,
     state,
   });

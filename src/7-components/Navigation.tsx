@@ -1,20 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { Tag } from '../entities/Tag';
+import { useTags } from '../6-hooks/useTags';
 
-export function Navigation({ tags }: { tags: Tag[] }) {
+export function Navigation() {
+  const tags = useTags();
+
   return (
     <nav>
+      <Link to="/new">➕</Link>
       <Link to="/sketch">📝</Link>
       <Link to="/all-notes">*️⃣</Link>
       <Link to="/favorites">⭐️</Link>
       <Link to="/trash">🗑</Link>
       <Link to="/settings">⚙️</Link>
 
-      <desc>
+      <details open>
         <summary>
           <h3>Tags</h3>
+          <button onClick={createCategory}>➕</button>
         </summary>
         <ul>
           {tags.map(x => (
@@ -23,7 +27,11 @@ export function Navigation({ tags }: { tags: Tag[] }) {
             </li>
           ))}
         </ul>
-      </desc>
+      </details>
     </nav>
   );
+
+  function createCategory() {
+    alert(prompt('Category name'));
+  }
 }

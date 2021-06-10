@@ -7,7 +7,9 @@ import { BrowserRouter, Route, useLocation } from 'react-router-dom';
 
 // Only exception to layer hierarchy
 import { EditGistFromUrl } from '../7-components/EditGist/EditGistFromUrl';
-import { GistList } from '../7-components/GistList/GistList';
+import { Navigation } from '../7-components/Navigation';
+import { EditNoteFromUrl } from '../7-components/NoteEditor/EditNoteFromUrl';
+import { NotesList } from '../7-components/NotesList/NotesList';
 import { Placeholder } from '../7-components/Placeholder';
 import { createStore } from '../storage';
 import { AppStorage } from '../storage/AppStorage';
@@ -25,16 +27,18 @@ function App() {
   }
 
   if (!store) {
-    setStore(createStore(token, 'amatiasq', 'app-notes'));
+    setStore(createStore(token, 'amatiasq', 'takenote-data'));
     return null;
   }
 
   return (
     <AppStorageContext.Provider value={store}>
       <div className={`app page-${page}`}>
-        <GistList />
-        <Route path="/" component={Placeholder} exact />
-        <Route path="/gist/:gistId/:filename" component={EditGistFromUrl}></Route>
+        <Navigation />
+        <NotesList />
+        {/* <Route path="/" component={Placeholder} exact /> */}
+        <Route path="/note/:gistId" component={EditNoteFromUrl}></Route>
+        {/* <Route path="/gist/:gistId/:filename" component={EditGistFromUrl}></Route> */}
       </div>
     </AppStorageContext.Provider>
   );
