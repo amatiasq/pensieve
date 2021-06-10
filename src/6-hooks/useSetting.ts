@@ -1,43 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
-import {
-  getSetting,
-  onSettingsChanged,
-  setSetting,
-  Settings
-} from '../5-app/settings';
+import { AppStorageContext } from '../5-app/contexts';
+import { DEFAULT_SETTINGS } from '../5-app/DEFAULT_SETTINGS';
+import { Settings } from '../5-app/settings';
+import { hookStore } from './helpers/hookStore';
 
 const serialize = JSON.stringify;
 
-export function useSetting<Key extends keyof Settings>(key: Key) {
-  const value = getSetting(key);
-  const [, setValue] = useState(value);
+const useSettings = hookStore<Settings, []>(DEFAULT_SETTINGS, () => (store, setValue) => {
+  store.getSettings().then(setValue);
+  return store.onSettingsChange(setValue);
+});
 
-  let isEditing = false;
+export function useSetting<Key extends keyof Settings>(key: Key) {
+  const store = useContext(AppStorageContext);
+  const settings = useSettings();
+  const value = settings[key];
+  const [, setValue] = useState(value);
 
   // Connect `value` to react rendering loop with `setValue`
   useEffect(() => setValue(value), [serialize(value)]);
 
-  useEffect(() =>
-    onSettingsChanged(() => {
-      const incoming = getSetting(key);
-
-      if (!isEditing && serialize(incoming) !== serialize(value)) {
-        setValue(incoming);
-      }
-    }),
-  );
-
   return [value, set] as const;
 
   function set(newValue: Settings[Key]) {
-    if (serialize(value) === serialize(newValue)) {
-      return;
+    if (serialize(value) !== serialize(newValue)) {
+      store.setSettings({ ...settings, [key]: value });
     }
-
-    isEditing = true;
-    setSetting(key, newValue);
-    setValue(newValue);
-    isEditing = false;
   }
 }

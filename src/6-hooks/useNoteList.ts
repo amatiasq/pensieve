@@ -1,16 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
-
-import { AppStorageContext } from '../5-app/contexts';
 import { Note } from '../entities/Note';
+import { hookStore } from './helpers/hookStore';
 
-export function useNotesList() {
-  const store = useContext(AppStorageContext);
-  const [list, setList] = useState<Note[]>([]);
-
-  useEffect(() => {
-    store.fetchNotes().then(setList);
-    return store.onNotesChange(setList);
-  });
-
-  return list;
-}
+export const useNotesList = hookStore<Note[], []>([], () => (store, setValue) => {
+  store.getNotes().then(setValue);
+  return store.onNotesChange(setValue);
+});

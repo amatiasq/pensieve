@@ -1,16 +1,47 @@
-import { useContext, useEffect, useState } from 'react';
+import { NoteContent, NoteId } from '../entities/Note';
+import { hookStore } from './helpers/hookStore';
 
-import { AppStorageContext } from '../5-app/contexts';
-import { NoteId } from '../entities/Note';
+export const useNoteContent = hookStore<NoteContent, [NoteId]>('', id => (store, setValue) => {
+  store.getNoteContent(id).then(setValue);
+  return store.onNoteContentChanged(id, setValue);
+});
 
-export function useNoteContent(id: NoteId) {
-  const store = useContext(AppStorageContext);
-  const [value, setValue] = useState('');
+// export function useNoteContent(id: NoteId) {
+//   const store = useContext(AppStorageContext);
+//   const [value, setValue] = useState('');
+//   const [reloadAfterSeconds] = useSetting('reloadIfAwayForSeconds');
 
-  useEffect(() => {
-    store.fetchNoteContent(id).then(setValue);
-    return store.onNoteContentChanged(id, x => setValue(x.content)) as () => void;
-  }, [id]);
+//   useEffect(() => {
+//     store.getNoteContent(id).then(setValue);
+//     return store.onNoteContentChanged(id, setValue) as () => void;
+//   }, [id]);
 
-  return value;
-}
+//   useEffect(() =>
+//     whenBackAfterSeconds(reloadAfterSeconds, async () => {
+//       const content = await store.getNoteContent(id);
+
+//       if (content !== value) {
+//         setValue(content);
+//       }
+//     }),
+//   );
+
+//   return value;
+// }
+
+// const away = new Stopwatch();
+
+// function whenBackAfterSeconds(seconds: number, listener: () => void) {
+//   return onPageVisibilityChange(isVisible => {
+//     if (!isVisible) {
+//       away.start();
+//       return;
+//     }
+
+//     if (seconds && away.seconds > seconds) {
+//       listener();
+//     }
+
+//     away.stop();
+//   });
+// }

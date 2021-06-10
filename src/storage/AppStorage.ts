@@ -14,23 +14,21 @@ export class AppStorage {
   private readonly settings = new RemoteValue<Settings>(this.store, 'settings.json', DEFAULT_SETTINGS);
   private readonly notes = new RemoteCollection<Note, NoteId>(this.store, 'notes.json');
   private readonly tags = new RemoteCollection<Tag, TagId>(this.store, 'tags.json');
-  private readonly noteCreated = emitter<Note>();
   private readonly noteChanged = emitterWithChannels<string, Note | null>();
-  private readonly noteContentChanged = emitterWithChannels<string, { note: Note; content: NoteContent }>();
+  private readonly noteContentChanged = emitterWithChannels<string, NoteContent>();
 
   constructor(private readonly store: AsyncStore) {}
 
-  fetchNotes = this.notes.get;
+  getNotes = this.notes.get;
   onNotesChange = this.notes.onChange;
 
-  fetchTags = this.tags.get;
+  getTags = this.tags.get;
   onTagsChange = this.tags.onChange;
 
-  fetchSettings = this.settings.get;
+  getSettings = this.settings.get;
   setSettings = this.settings.set;
   onSettingsChange = this.settings.onChange;
 
-  onNoteCreated = this.noteCreated.subscribe;
   onNoteChanged = this.noteChanged.subscribe;
   onNoteContentChanged = this.noteContentChanged.subscribe;
 
@@ -41,7 +39,6 @@ export class AppStorage {
   async createNote(content?: NoteContent) {
     const note = createNote(content || ('' as NoteContent));
     await this.notes.add(note);
-    this.noteCreated(note);
     return note;
   }
 
@@ -50,12 +47,12 @@ export class AppStorage {
     this.noteChanged(id, null);
   }
 
-  async fetchNoteContent(id: NoteId) {
+  async getNoteContent(id: NoteId) {
     const result = await this.store.readText(getFilePath(id));
     return result || '';
   }
 
-  async writeNoteContent(id: NoteId, content: NoteContent) {
+  async setNoteContent(id: NoteId, content: NoteContent) {
     const title = getTitleFromContent(content);
 
     const [note] = await Promise.all([
@@ -63,12 +60,12 @@ export class AppStorage {
       this.store.writeText(getFilePath(id), content),
     ]);
 
-    this.noteContentChanged(id, { note, content });
+    this.noteContentChanged(id, content);
     return note;
   }
 
-  async setFavorite(id: NoteId, isFavorite: boolean) {
-    const note = await this.notes.edit(id, x => ({ ...x, favorite: isFavorite }));
+  async toggleFavorite(id: NoteId) {
+    const note = await this.notes.edit(id, x => ({ ...x, favorite: !x.favorite }));
     this.noteChanged(note.id, note);
     return note;
   }
@@ -105,7 +102,7 @@ export class AppStorage {
     return this.tags.edit(id, x => ({ ...x, name }));
   }
 
-  editTagNotes(id: TagId, notes: NoteId[]) {
+  setTagNotes(id: TagId, notes: NoteId[]) {
     return this.tags.edit(id, x => ({ ...x, notes }));
   }
 
