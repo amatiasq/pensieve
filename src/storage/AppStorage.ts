@@ -1,5 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
+import { emitter, emitterWithChannels } from '@amatiasq/emitter';
+
 import { DEFAULT_SETTINGS } from '../5-app/DEFAULT_SETTINGS';
 import { Settings } from '../5-app/settings';
 import { Note, NoteContent, NoteId } from '../entities/Note';
@@ -8,27 +10,44 @@ import { AsyncStore } from '../storage/AsyncStore';
 import { RemoteCollection } from '../storage/helpers/RemoteCollection';
 import { RemoteValue } from '../storage/helpers/RemoteValue';
 
-export class Storage {
-  private settings = new RemoteValue<Settings>(this.store, 'settings.json', DEFAULT_SETTINGS);
-  private notes = new RemoteCollection<Note, NoteId>(this.store, 'notes.json');
-  private tags = new RemoteCollection<Tag, TagId>(this.store, 'tags.json');
+export class AppStorage {
+  private readonly settings = new RemoteValue<Settings>(this.store, 'settings.json', DEFAULT_SETTINGS);
+  private readonly notes = new RemoteCollection<Note, NoteId>(this.store, 'notes.json');
+  private readonly tags = new RemoteCollection<Tag, TagId>(this.store, 'tags.json');
+  private readonly noteCreated = emitter<Note>();
+  private readonly noteChanged = emitterWithChannels<string, Note | null>();
+  private readonly noteContentChanged = emitterWithChannels<string, { note: Note; content: NoteContent }>();
 
   constructor(private readonly store: AsyncStore) {}
 
-  fetchSettings = () => this.settings.get();
-  fetchNotes = () => this.notes.get();
-  fetchTags = () => this.tags.get();
+  fetchNotes = this.notes.get;
+  onNotesChange = this.notes.onChange;
 
-  setSettings = (value: Settings) => this.settings.set(value);
+  fetchTags = this.tags.get;
+  onTagsChange = this.tags.onChange;
+
+  fetchSettings = this.settings.get;
+  setSettings = this.settings.set;
+  onSettingsChange = this.settings.onChange;
+
+  onNoteCreated = this.noteCreated.subscribe;
+  onNoteChanged = this.noteChanged.subscribe;
+  onNoteContentChanged = this.noteContentChanged.subscribe;
+
+  getNote(id: NoteId) {
+    return this.notes.item(id);
+  }
 
   async createNote(content?: NoteContent) {
     const note = createNote(content || ('' as NoteContent));
     await this.notes.add(note);
+    this.noteCreated(note);
     return note;
   }
 
   deleteNote(id: NoteId) {
-    return this.notes.remove(id);
+    this.notes.remove(id);
+    this.noteChanged(id, null);
   }
 
   async fetchNoteContent(id: NoteId) {
@@ -44,11 +63,14 @@ export class Storage {
       this.store.writeText(getFilePath(id), content),
     ]);
 
+    this.noteContentChanged(id, { note, content });
     return note;
   }
 
-  setFavorite(id: NoteId, isFavorite: boolean) {
-    return this.notes.edit(id, x => ({ ...x, favorite: isFavorite }));
+  async setFavorite(id: NoteId, isFavorite: boolean) {
+    const note = await this.notes.edit(id, x => ({ ...x, favorite: isFavorite }));
+    this.noteChanged(note.id, note);
+    return note;
   }
 
   async setGroup(group: string | null, ids: NoteId[]) {
@@ -64,6 +86,11 @@ export class Storage {
     });
 
     await this.notes.set(notes);
+
+    for (const note of updated) {
+      this.noteChanged(note.id, note);
+    }
+
     return updated;
   }
 
