@@ -3,12 +3,11 @@ import './NoteEditor.scss';
 import React, { useContext, useEffect, useState } from 'react';
 
 import { registerCommand } from '../../1-core/commands';
-import { DEFAULT_FILE_CONTENT } from '../../2-github/github_api';
+import { Note, NoteContent } from '../../2-entities/Note';
 import { AppStorageContext } from '../../5-app/contexts';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useStack } from '../../6-hooks/useStack';
-import { Note, NoteContent } from '../../entities/Note';
 import { BusinessIndicator } from '../atoms/BusinessIndicator';
 import { ContentEditor } from './ContentEditor';
 
@@ -63,10 +62,9 @@ export function NoteEditor({ note, content }: { note: Note; content: NoteContent
     scheduler.restart();
   }
 
-  function save(value: string | null) {
+  function save(value: string) {
     scheduler.stop();
-    const content = value || DEFAULT_FILE_CONTENT;
-    addSaved(content);
-    return store.setNoteContent(note.id, content);
+    addSaved(value);
+    return store.setNoteContent(note.id, value);
   }
 }

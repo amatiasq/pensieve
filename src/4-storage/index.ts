@@ -1,8 +1,8 @@
 import localforage from 'localforage';
 
+import { GHRepositoryApi } from '../3-github/GHRepositoryApi';
+import { GithubToken } from '../3-github/GithubAuth';
 import { AppStorage } from './AppStorage';
-import { GHRepositoryApi } from './gh/GHRepositoryApi';
-import { GithubToken } from './gh/GithubApi';
 import { CachedStore } from './middleware/CachedStore';
 import { ForageStore } from './middleware/ForageStore';
 import { GHRepoStore } from './middleware/GHRepoStore';
@@ -12,8 +12,10 @@ import { ResilientOnlineStore } from './middleware/ResilientOnlineStore';
 
 Object.assign(window, { localforage });
 
-export function createStore(token: GithubToken, username: string, repoName: string) {
+export async function createStore(token: GithubToken, username: string, repoName: string) {
   const repo = new GHRepositoryApi(token, username, repoName);
+
+  await repo.createIfNecessary('Database for notes', true);
 
   // const local = new LocalStore(repoName);
   const local = new ForageStore(localforage.createInstance({ name: repoName }));

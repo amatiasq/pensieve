@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
+import { NoteId } from '../../2-entities/Note';
 import { useNote } from '../../6-hooks/useNote';
 import { useNoteContent } from '../../6-hooks/useNoteContent';
-import { NoteId } from '../../entities/Note';
 import { NoteEditor } from './NoteEditor';
 
 export function EditNoteFromUrl() {

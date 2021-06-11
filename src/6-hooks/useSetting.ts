@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 
+import { Settings } from '../2-entities/Settings';
 import { AppStorageContext } from '../5-app/contexts';
 import { DEFAULT_SETTINGS } from '../5-app/DEFAULT_SETTINGS';
-import { Settings } from '../5-app/settings';
 import { hookStore } from './helpers/hookStore';
 
 const serialize = JSON.stringify;

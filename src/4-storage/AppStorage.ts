@@ -1,14 +1,14 @@
 import { v4 as uuid } from 'uuid';
 
-import { emitter, emitterWithChannels } from '@amatiasq/emitter';
+import { emitterWithChannels } from '@amatiasq/emitter';
 
+import { Note, NoteContent, NoteId } from '../2-entities/Note';
+import { Settings } from '../2-entities/Settings';
+import { Tag, TagId } from '../2-entities/Tag';
 import { DEFAULT_SETTINGS } from '../5-app/DEFAULT_SETTINGS';
-import { Settings } from '../5-app/settings';
-import { Note, NoteContent, NoteId } from '../entities/Note';
-import { Tag, TagId } from '../entities/Tag';
-import { AsyncStore } from '../storage/AsyncStore';
-import { RemoteCollection } from '../storage/helpers/RemoteCollection';
-import { RemoteValue } from '../storage/helpers/RemoteValue';
+import { AsyncStore } from './AsyncStore';
+import { RemoteCollection } from './helpers/RemoteCollection';
+import { RemoteValue } from './helpers/RemoteValue';
 
 export class AppStorage {
   private readonly settings = new RemoteValue<Settings>(this.store, 'settings.json', DEFAULT_SETTINGS);

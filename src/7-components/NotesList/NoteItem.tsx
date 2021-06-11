@@ -2,9 +2,9 @@ import './NoteItem.scss';
 
 import React, { useContext } from 'react';
 
+import { Note } from '../../2-entities/Note';
 import { AppStorageContext } from '../../5-app/contexts';
 import { useTags } from '../../6-hooks/useTags';
-import { Note } from '../../entities/Note';
 import { Action } from '../atoms/Action';
 
 export function NoteItem({ note }: { note: Note }) {

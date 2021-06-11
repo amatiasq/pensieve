@@ -1,4 +1,3 @@
-import { GistId } from '../2-github/type-aliases';
 import { DEFAULT_SHORTCUTS } from './DEFAULT_SHORTCUTS';
 
 export const DEFAULT_SETTINGS = {

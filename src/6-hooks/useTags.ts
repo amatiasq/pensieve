@@ -1,4 +1,4 @@
-import { Tag } from '../entities/Tag';
+import { Tag } from '../2-entities/Tag';
 import { hookStore } from './helpers/hookStore';
 
 export const useTags = hookStore<Tag[], []>([], () => (store, setValue) => {

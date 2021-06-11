@@ -1,18 +1,18 @@
 import './App.scss';
 import './shortcuts';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter, Route, useLocation } from 'react-router-dom';
 
+// import { Placeholder } from '../7-components/Placeholder';
+import { createStore } from '../4-storage';
+import { AppStorage } from '../4-storage/AppStorage';
 // Only exception to layer hierarchy
-import { EditGistFromUrl } from '../7-components/EditGist/EditGistFromUrl';
+// import { EditGistFromUrl } from '../7-components/EditGist/EditGistFromUrl';
 import { Navigation } from '../7-components/Navigation';
 import { EditNoteFromUrl } from '../7-components/NoteEditor/EditNoteFromUrl';
 import { NotesList } from '../7-components/NotesList/NotesList';
-import { Placeholder } from '../7-components/Placeholder';
-import { createStore } from '../storage';
-import { AppStorage } from '../storage/AppStorage';
 import { AppStorageContext } from './contexts';
 import { useGithubAuth } from './useGithubAuth';
 
@@ -22,13 +22,13 @@ function App() {
   const [store, setStore] = useState<AppStorage>(null!);
   const token = useGithubAuth();
 
-  if (!token) {
-    return <p>Loading...</p>;
-  }
+  useEffect(() => {
+    if (!token) return;
+    createStore(token, 'amatiasq', 'pensieve-data').then(setStore);
+  }, [token]);
 
   if (!store) {
-    setStore(createStore(token, 'amatiasq', 'takenote-data'));
-    return null;
+    return <p>Loading...</p>;
   }
 
   return (

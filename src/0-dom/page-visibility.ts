@@ -5,9 +5,7 @@ import { emitter } from '@amatiasq/emitter';
 const { isHidden, eventName } = getKeyNames();
 const emitVisibilityChange = emitter<boolean>();
 
-type VisibilityChangeListener = Parameters<
-  typeof emitVisibilityChange.subscribe
->[0];
+type VisibilityChangeListener = Parameters<typeof emitVisibilityChange.subscribe>[0];
 
 document.addEventListener(
   eventName,

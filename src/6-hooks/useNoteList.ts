@@ -1,4 +1,4 @@
-import { Note } from '../entities/Note';
+import { Note } from '../2-entities/Note';
 import { hookStore } from './helpers/hookStore';
 
 export const useNotesList = hookStore<Note[], []>([], () => (store, setValue) => {

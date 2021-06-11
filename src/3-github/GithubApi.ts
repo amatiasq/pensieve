@@ -1,8 +1,7 @@
-import { DELETE, GET, PATCH, POST, PUT, RequestBody } from '../../core/http';
+import { DELETE, GET, PATCH, POST, PUT, RequestBody } from '../1-core/http';
+import { GithubToken } from './GithubAuth';
 
 export const GH_API = 'https://api.github.com';
-
-export type GithubToken = '[string GithubToken]';
 
 export abstract class GithubApi {
   constructor(public token: GithubToken) {}

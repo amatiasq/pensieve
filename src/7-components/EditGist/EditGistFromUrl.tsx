@@ -1,9 +1,9 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 
+import { NoteId } from '../../2-entities/Note';
 import { useMemory } from '../../6-hooks/useMemory';
 import { useNote } from '../../6-hooks/useNote';
-import { NoteId } from '../../entities/Note';
 import { GistEditor } from './GistEditor';
 
 export function EditGistFromUrl() {
@@ -16,7 +16,5 @@ export function EditGistFromUrl() {
     return <p>Loading...</p>;
   }
 
-  return (
-    <GistEditor gist={gist} file={file} readonly={!gist.isOwner(username)} />
-  );
+  return <GistEditor gist={gist} file={file} readonly={!gist.isOwner(username)} />;
 }

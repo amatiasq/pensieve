@@ -3,8 +3,8 @@ import './Action.scss';
 import React, { PropsWithChildren } from 'react';
 import { Link } from 'react-router-dom';
 
-import { copyToClipboard } from '../../4-dom/copyToClipboard';
-import { tooltip } from '../../4-dom/tooltip';
+import { copyToClipboard } from '../../0-dom/copyToClipboard';
+import { tooltip } from '../../0-dom/tooltip';
 import { useLongPress } from '../../6-hooks/useLongPress';
 import { Icon } from './Icon';
 
@@ -32,18 +32,13 @@ interface RouterActionProps extends BaseActionProps {
   navigate: string;
 }
 
-export type ActionProps =
-  | InteractiveActionProps
-  | LinkActionProps
-  | RouterActionProps;
+export type ActionProps = InteractiveActionProps | LinkActionProps | RouterActionProps;
 
 export function Action(props: PropsWithChildren<ActionProps>) {
   const { name, square, disabled, onLongPress } = props;
   const title = name.split('--').pop();
 
-  const icon = props.icon ? (
-    <Icon name={props.icon} className="action--icon" />
-  ) : null;
+  const icon = props.icon ? <Icon name={props.icon} className="action--icon" /> : null;
 
   const longPress = useLongPress(() => {
     share();
@@ -71,11 +66,7 @@ export function Action(props: PropsWithChildren<ActionProps>) {
   );
 
   function share() {
-    const url = isLinkAction(props)
-      ? props.href
-      : isRouterAction(props)
-      ? `${location.origin}${props.navigate}`
-      : null;
+    const url = isLinkAction(props) ? props.href : isRouterAction(props) ? `${location.origin}${props.navigate}` : null;
 
     if (!url) return;
 
@@ -101,12 +92,7 @@ export function Action(props: PropsWithChildren<ActionProps>) {
 
     if (isLinkAction(props)) {
       return (
-        <a
-          className={cn}
-          target={props.target}
-          href={props.href}
-          onClick={onClick}
-        >
+        <a className={cn} target={props.target} href={props.href} onClick={onClick}>
           {icon}
           {props.children}
         </a>

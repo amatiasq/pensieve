@@ -8,7 +8,7 @@
 
 // repo.readJsonFile('notes.json').then(x => console.log(x));
 
-import { onVirtualKeyboardDisplayChange } from './4-dom/virtualKeyboardDetector';
+import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector';
 import { renderApp } from './5-app/App';
 import { initShorcuts } from './5-app/shortcuts';
 
