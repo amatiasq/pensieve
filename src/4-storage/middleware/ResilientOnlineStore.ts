@@ -18,9 +18,12 @@ export class ResilientOnlineStore implements AsyncStore {
   constructor(private readonly remote: AsyncStore) {
     window.addEventListener('online', () => this.executePending());
   }
-
   keys() {
     return this.rejectIfOffline() || this.remote.keys();
+  }
+
+  has(key: string) {
+    return this.rejectIfOffline() || this.remote.has(key);
   }
 
   readText(key: string): Promise<string | null> {
@@ -49,7 +52,10 @@ export class ResilientOnlineStore implements AsyncStore {
     }
   }
 
-  private command<Method extends keyof AsyncStore>(method: Method, params: Parameters<AsyncStore[Method]>) {
+  private command<Method extends keyof AsyncStore>(
+    method: Method,
+    params: Parameters<AsyncStore[Method]>,
+  ) {
     if (this.isOffline) {
       this.pending.push({ method, params });
       return Promise.reject('OFFLINE');

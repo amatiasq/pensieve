@@ -1,1 +1,1 @@
-Typescript web project template.
+- Save on refresh

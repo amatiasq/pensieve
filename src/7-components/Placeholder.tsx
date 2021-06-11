@@ -9,7 +9,7 @@ export function Placeholder() {
   // const note = useNote(welcomeGist);
 
   // if (!note) {
-  //   return <p>Loading...</p>;
+  //   return <Loader />;
   // }
 
   // return (

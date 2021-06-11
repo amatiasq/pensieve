@@ -9,7 +9,10 @@ export type RequestOptions = Omit<FetchOptions, 'body'> & {
 };
 
 function request<T>(url: string, extras: RequestOptions = {}) {
-  const body = 'body' in extras && typeof extras.body !== 'string' ? JSON.stringify(extras.body) : extras.body;
+  const body =
+    'body' in extras && typeof extras.body !== 'string'
+      ? JSON.stringify(extras.body)
+      : extras.body;
 
   const options = {
     ...extras,
@@ -21,21 +24,33 @@ function request<T>(url: string, extras: RequestOptions = {}) {
       .then(x => Promise.all([x, x.text()]))
       .then(([response, body]) => {
         handleHttpErrors(response.status, url, body);
-        return isJsonResponse(response) ? (JSON.parse(body) as Promise<T>) : (body as unknown as Promise<T>);
+        return isJsonResponse(response)
+          ? (JSON.parse(body) as Promise<T>)
+          : (body as unknown as Promise<T>);
       }),
   );
 }
 
-export const GET = <T>(url: string, options: RequestOptions = {}) => request<T>(url, options);
+export const GET = <T>(url: string, options: RequestOptions = {}) =>
+  request<T>(url, options);
 
-export const POST = <T>(url: string, body: RequestBody = null, options: RequestOptions = {}) =>
-  request<T>(url, { method: 'POST', body, ...options });
+export const POST = <T>(
+  url: string,
+  body: RequestBody = null,
+  options: RequestOptions = {},
+) => request<T>(url, { method: 'POST', body, ...options });
 
-export const PUT = <T>(url: string, body: RequestBody = null, options: RequestOptions = {}) =>
-  request<T>(url, { method: 'PUT', body, ...options });
+export const PUT = <T>(
+  url: string,
+  body: RequestBody = null,
+  options: RequestOptions = {},
+) => request<T>(url, { method: 'PUT', body, ...options });
 
-export const PATCH = <T>(url: string, body: RequestBody = null, options: RequestOptions = {}) =>
-  request<T>(url, { method: 'PATCH', body, ...options });
+export const PATCH = <T>(
+  url: string,
+  body: RequestBody = null,
+  options: RequestOptions = {},
+) => request<T>(url, { method: 'PATCH', body, ...options });
 
 export const DELETE = <T>(url: string, options: RequestOptions = {}) =>
   request<T>(url, { method: 'DELETE', ...options });
@@ -45,7 +60,7 @@ function isJsonResponse(response: Response) {
   return type ? type.toLowerCase().includes('application/json') : false;
 }
 
-class HttpError extends Error {
+export class HttpError extends Error {
   constructor(readonly status: number, message: string, readonly body: string) {
     super(`${status}: ${message}`);
   }

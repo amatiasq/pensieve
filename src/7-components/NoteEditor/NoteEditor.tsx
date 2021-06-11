@@ -1,5 +1,3 @@
-import './NoteEditor.scss';
-
 import React, { useContext, useEffect, useState } from 'react';
 
 import { registerCommand } from '../../1-core/commands';
@@ -9,12 +7,19 @@ import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useStack } from '../../6-hooks/useStack';
 import { BusinessIndicator } from '../atoms/BusinessIndicator';
+import { Loader } from '../atoms/Loader';
 import { ContentEditor } from './ContentEditor';
 
-export function NoteEditor({ note, content }: { note: Note; content: NoteContent }) {
+export function NoteEditor({
+  note,
+  content,
+}: {
+  note: Note;
+  content: NoteContent;
+}) {
   const store = useContext(AppStorageContext);
   const autosave = useSetting('autosave')[0] || 0;
-  const [saved, addSaved] = useStack<string>(5, content);
+  // const [saved, addSaved] = useStack<string>(5, content);
   const [value, setValue] = useState<string>(content);
 
   registerCommand('save', () => save(value));
@@ -31,7 +36,8 @@ export function NoteEditor({ note, content }: { note: Note; content: NoteContent
   }, [note.title]);
 
   useEffect(() => {
-    if (value !== content && !saved.includes(content)) {
+    if (value !== content) {
+      // && !saved.includes(content)) {
       setValue(content);
     }
   }, [content]);
@@ -48,7 +54,7 @@ export function NoteEditor({ note, content }: { note: Note; content: NoteContent
   //   }
   // }));
 
-  if (value == null) return <p>Loading...</p>;
+  if (value == null) return <Loader />;
 
   return (
     <main className="note-editor">
@@ -64,7 +70,7 @@ export function NoteEditor({ note, content }: { note: Note; content: NoteContent
 
   function save(value: string) {
     scheduler.stop();
-    addSaved(value);
+    // addSaved(value);
     return store.setNoteContent(note.id, value);
   }
 }

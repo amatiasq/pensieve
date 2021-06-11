@@ -11,11 +11,22 @@ import { RemoteCollection } from './helpers/RemoteCollection';
 import { RemoteValue } from './helpers/RemoteValue';
 
 export class AppStorage {
-  private readonly settings = new RemoteValue<Settings>(this.store, 'settings.json', DEFAULT_SETTINGS);
-  private readonly notes = new RemoteCollection<Note, NoteId>(this.store, 'notes.json');
-  private readonly tags = new RemoteCollection<Tag, TagId>(this.store, 'tags.json');
+  private readonly settings = new RemoteValue<Settings>(
+    this.store,
+    'settings.json',
+    DEFAULT_SETTINGS,
+  );
+  private readonly notes = new RemoteCollection<Note, NoteId>(
+    this.store,
+    'notes.json',
+  );
+  private readonly tags = new RemoteCollection<Tag, TagId>(
+    this.store,
+    'tags.json',
+  );
   private readonly noteChanged = emitterWithChannels<string, Note | null>();
-  private readonly noteContentChanged = emitterWithChannels<string, NoteContent>();
+  private readonly noteContentChanged =
+    emitterWithChannels<string, NoteContent>();
 
   constructor(private readonly store: AsyncStore) {}
 
@@ -42,8 +53,15 @@ export class AppStorage {
     return note;
   }
 
-  deleteNote(id: NoteId) {
-    this.notes.remove(id);
+  async deleteNote(id: NoteId) {
+    const contentFile = getFilePath(id);
+    const hasContent = await this.store.has(contentFile);
+
+    await Promise.all([
+      this.notes.remove(id),
+      hasContent ? this.store.delete(contentFile) : null,
+    ]);
+
     this.noteChanged(id, null);
   }
 
@@ -65,7 +83,10 @@ export class AppStorage {
   }
 
   async toggleFavorite(id: NoteId) {
-    const note = await this.notes.edit(id, x => ({ ...x, favorite: !x.favorite }));
+    const note = await this.notes.edit(id, x => ({
+      ...x,
+      favorite: !x.favorite,
+    }));
     this.noteChanged(note.id, note);
     return note;
   }
@@ -127,5 +148,5 @@ function getTitleFromContent(content: NoteContent) {
 }
 
 function getFilePath(id: NoteId) {
-  return `notes/${id}.md`;
+  return id.includes('.') ? `notes/${id}` : `notes/${id}.md`;
 }

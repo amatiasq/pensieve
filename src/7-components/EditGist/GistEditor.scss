@@ -1,8 +1,0 @@
-@import '../atoms/Action.scss';
-
-.gist-editor.readonly {
-  .file-tab--remove,
-  .editor-tabs--new-file {
-    @include disable-action();
-  }
-}

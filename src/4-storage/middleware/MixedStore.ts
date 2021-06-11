@@ -2,10 +2,17 @@ import { AsyncStore } from '../AsyncStore';
 import { ResilientOnlineStore } from './ResilientOnlineStore';
 
 export class MixedStore implements AsyncStore {
-  constructor(private readonly offline: AsyncStore, private readonly remote: ResilientOnlineStore) {}
+  constructor(
+    private readonly offline: AsyncStore,
+    private readonly remote: ResilientOnlineStore,
+  ) {}
 
   keys() {
     return this.remote.keys().catch(() => this.offline.keys());
+  }
+
+  has(key: string): Promise<boolean> {
+    return this.remote.has(key).catch(() => this.offline.has(key));
   }
 
   readText(key: string) {
@@ -17,11 +24,17 @@ export class MixedStore implements AsyncStore {
   }
 
   async writeText(key: string, value: string): Promise<void> {
-    await Promise.race([this.offline.writeText(key, value), this.remote.writeText(key, value)]);
+    await Promise.race([
+      this.offline.writeText(key, value),
+      this.remote.writeText(key, value),
+    ]);
   }
 
   async write<T>(key: string, value: T): Promise<void> {
-    await Promise.race([this.offline.write<T>(key, value), this.remote.write<T>(key, value)]);
+    await Promise.race([
+      this.offline.write<T>(key, value),
+      this.remote.write<T>(key, value),
+    ]);
   }
 
   async delete(key: string): Promise<void> {

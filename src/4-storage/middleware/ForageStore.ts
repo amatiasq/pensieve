@@ -7,6 +7,11 @@ export class ForageStore implements AsyncStore {
     return this.forage.keys();
   }
 
+  async has(key: string) {
+    const keys = await this.forage.keys();
+    return keys.includes(key);
+  }
+
   readText(key: string) {
     return this.forage.getItem<string>(key);
   }

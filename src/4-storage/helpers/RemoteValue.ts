@@ -21,7 +21,6 @@ export class RemoteValue<T> {
       const result = await this.store.read<T>(this.key);
       return result || this.defaultValue;
     } catch (error) {
-      alert(JSON.stringify(error, null, 2));
       return this.defaultValue;
     }
   }

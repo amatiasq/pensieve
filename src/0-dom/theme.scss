@@ -1,0 +1,7 @@
+@mixin dark {
+  @content;
+}
+
+@mixin light {
+  @content;
+}
