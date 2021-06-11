@@ -6,22 +6,20 @@ export const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
 
   'ALT+N': 'toggleWordWrap',
 
-  'CMD+S': 'saveCurrentFile',
+  'CMD+S': 'save',
   'CMD+,': 'settings',
   'CMD+B': 'hideSidebar',
   'CMD+W': 'goHome',
-  'CMD+N': 'createGist',
-  'CMD+T': 'createFile',
+  'CMD+N': 'newNote',
 
   // 'CMD+ArrowRight': 'nextFile',
   // 'CMD+ArrowLeft': 'prevFile',
 
-  'CTRL+S': 'saveCurrentFile',
+  'CTRL+S': 'save',
   'CTRl+,': 'settings',
   'CTRL+B': 'hideSidebar',
   'CTRL+W': 'goHome',
-  'CTRL+N': 'createGist',
-  'CTRL+T': 'createFile',
+  'CTRL+N': 'newNote',
 
   // 'ALT+CTRL+META+SHIFT+Space': () =>
   // 'ALT+CMD+CTRL+SHIFT+Space': () =>

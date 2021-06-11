@@ -3,11 +3,11 @@ import './NotesList.scss';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { isMobile } from '../../0-dom/isMobile';
 import { registerCommand } from '../../1-core/commands';
-import { isMobile } from '../../1-core/isMobile';
+import { Note } from '../../2-entities/Note';
 import { useNotesList } from '../../6-hooks/useNoteList';
 import { useSetting } from '../../6-hooks/useSetting';
-import { Note } from '../../entities/Note';
 import StringComparer from '../../util/StringComparer';
 import { Action } from '../atoms/Action';
 import { Resizer } from '../atoms/Resizer';
@@ -26,8 +26,6 @@ export function NotesList() {
 
   registerCommand('newNote', () => history.push('/new'));
   registerCommand('hideSidebar', () => setIsVisible(!isVisible));
-
-  // const content = ;
 
   return (
     <aside style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}>

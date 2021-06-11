@@ -1,4 +1,4 @@
-import { NoteContent, NoteId } from '../entities/Note';
+import { NoteContent, NoteId } from '../2-entities/Note';
 import { hookStore } from './helpers/hookStore';
 
 export const useNoteContent = hookStore<NoteContent, [NoteId]>('', id => (store, setValue) => {

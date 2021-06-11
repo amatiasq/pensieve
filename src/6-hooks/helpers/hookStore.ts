@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
+import { AppStorage } from '../../4-storage/AppStorage';
 import { AppStorageContext } from '../../5-app/contexts';
-import { AppStorage } from '../../storage/AppStorage';
 
 export function hookStore<Item, Args extends unknown[]>(
   defaultValue: Item,

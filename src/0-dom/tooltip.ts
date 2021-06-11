@@ -3,10 +3,7 @@ import './tooltip.scss';
 import { getMousePosition } from '../1-core/mouse';
 import { escapeHtml } from './escapeHtml';
 
-export function tooltip(
-  text: string,
-  position: 'top' | 'left' | 'right' | 'bottom' = 'bottom',
-) {
+export function tooltip(text: string, position: 'top' | 'left' | 'right' | 'bottom' = 'bottom') {
   const el = render(`
     <div role="tooltip" class="tooltip ${position}">
       ${escapeHtml(text)}

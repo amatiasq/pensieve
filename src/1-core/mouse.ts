@@ -7,8 +7,7 @@ interface MouseMoveEvent {
 
 let pos: Position = { x: 0, y: 0 };
 
-const update = (event: MouseEvent) =>
-  (pos = { x: event.clientX, y: event.clientY });
+const update = (event: MouseEvent) => (pos = { x: event.clientX, y: event.clientY });
 
 document.addEventListener('mousedown', update);
 document.addEventListener('mouseup', update);

@@ -1,6 +1,6 @@
 import { emitter } from '@amatiasq/emitter';
 
-import { isMobile } from './isMobile';
+import { isMobile } from '../0-dom/isMobile';
 
 const CONTROL_KEYS = {
   Meta: 'META',
@@ -49,7 +49,5 @@ function onKeyDown(event: KeyboardEvent) {
 }
 
 function getKey(key: string) {
-  return key in KEY_ALIASES
-    ? KEY_ALIASES[key as keyof typeof KEY_ALIASES]
-    : key;
+  return key in KEY_ALIASES ? KEY_ALIASES[key as keyof typeof KEY_ALIASES] : key;
 }

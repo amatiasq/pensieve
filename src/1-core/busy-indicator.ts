@@ -20,8 +20,7 @@ function addBusinessIndicator() {
 
 export function busyWhile<T>(promise: Promise<T>) {
   const finish = addBusinessIndicator();
-  promise.finally(finish);
-  return promise;
+  return promise.finally(finish);
 }
 
 // export function busyCall<Args extends any[], Result>(

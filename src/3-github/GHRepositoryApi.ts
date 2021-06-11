@@ -1,4 +1,5 @@
-import { GithubApi, GithubToken } from './GithubApi';
+import { GithubApi } from './GithubApi';
+import { GithubToken } from './GithubAuth';
 import { GHApiCommit } from './models/GHApiCommit';
 import { GHApiRef } from './models/GHApiRef';
 import {
@@ -7,6 +8,19 @@ import {
   GHRepoNodeType
 } from './models/GHApiRepositoryNode';
 import { GHApiTree } from './models/GHApiTree';
+
+const CREATE_REPO_CONFIG = {
+  has_issues: false,
+  has_projects: false,
+  has_wiki: false,
+  auto_init: true,
+  allow_merge_commit: true,
+  allow_squash_merge: false,
+  allow_rebase_merge: false,
+  delete_branch_on_merge: false,
+  has_downloads: false,
+  is_template: false,
+};
 
 // This is necessary because of https://github.com/microsoft/TypeScript/issues/14174#issuecomment-856812565
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,6 +48,38 @@ export class GHRepositoryApi extends GithubApi {
 
   constructor(token: GithubToken, readonly username: string, readonly name: string) {
     super(token);
+  }
+
+  exists() {
+    return this.GET(this.url).then(
+      () => true,
+      () => false,
+    );
+  }
+
+  async create(description: string, isPrivate: boolean) {
+    try {
+      await this.POST('/user/repos', {
+        name: this.name,
+        description,
+        homepage: '',
+        // private: isPrivate,
+        visibility: isPrivate ? 'private' : 'public',
+        ...CREATE_REPO_CONFIG,
+      });
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async createIfNecessary(description: string, isPrivate: boolean) {
+    if (await this.exists()) {
+      return false;
+    }
+
+    await this.create(description, isPrivate);
+    return true;
   }
 
   async fetchStructure() {
@@ -106,10 +152,6 @@ export class GHRepositoryApi extends GithubApi {
     });
   }
 }
-
-// interface ShaResponse {
-//   sha: GithubSha;
-// }
 
 function simplifyNode({ type, size, path, sha }: Pick<GHApiRepositoryNode, 'type' | 'size' | 'path' | 'sha'>) {
   return { type, size, path, sha } as GHRepoNode;

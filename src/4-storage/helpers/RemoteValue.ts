@@ -17,7 +17,13 @@ export class RemoteValue<T> {
   }
 
   async get() {
-    return (await this.store.read<T>(this.key)) || this.defaultValue;
+    try {
+      const result = await this.store.read<T>(this.key);
+      return result || this.defaultValue;
+    } catch (error) {
+      alert(JSON.stringify(error, null, 2));
+      return this.defaultValue;
+    }
   }
 
   set(value: T) {

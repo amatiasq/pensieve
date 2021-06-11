@@ -22,13 +22,8 @@ export function messageBus<Data = undefined>(key: string) {
 
   return [
     notify as RemoveUndefinedArguments<typeof notify>,
-    emit.subscribe as (
-      listener: RemoveUndefinedArguments<(data: Data) => void>,
-    ) => () => void,
+    emit.subscribe as (listener: RemoveUndefinedArguments<(data: Data) => void>) => () => void,
   ] as const;
 }
 
-type RemoveUndefinedArguments<
-  T extends (x: any) => U,
-  U = ReturnType<T>
-> = T extends (x: undefined) => U ? () => U : T;
+type RemoveUndefinedArguments<T extends (x: any) => U, U = ReturnType<T>> = T extends (x: undefined) => U ? () => U : T;

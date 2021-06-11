@@ -1,9 +1,9 @@
 import { editor } from 'monaco-editor';
 import React from 'react';
 
-import Editor, { useMonaco } from '@monaco-editor/react';
+import Editor from '@monaco-editor/react';
 
-import { isMobile } from '../../1-core/isMobile';
+import { isMobile } from '../../0-dom/isMobile';
 import { useSetting } from '../../6-hooks/useSetting';
 import { MobileFallback } from './MobileFallback';
 
@@ -19,7 +19,7 @@ export function ContentEditor({
   readonly?: boolean;
   onChange: (newValue: string | undefined) => void;
 }) {
-  const monaco = useMonaco();
+  // const monaco = useMonaco();
 
   const [rulers] = useSetting('rulers');
   const [tabSize] = useSetting('tabSize');

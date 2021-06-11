@@ -4,7 +4,7 @@ import { DEFAULT_SHORTCUTS } from './DEFAULT_SHORTCUTS';
 
 const normalizeKeys = (x: string) => x.toUpperCase().replace(/CMD|WINDOWS|WIN/, 'META');
 
-export function initShorcuts() {
+export async function initShorcuts() {
   // let shortcuts = getShortcuts();
 
   // onSettingsChanged(() => (shortcuts = getShortcuts()));
@@ -16,25 +16,25 @@ export function initShorcuts() {
       console.log(keys);
     }
 
-    if (keys in shortcuts) {
-      const commandName = shortcuts[keys];
-      const command = getCommand(commandName);
+    // if (keys in shortcuts) {
+    //   const commandName = shortcuts[keys];
+    //   const command = getCommand(commandName);
 
-      console.log('Shortcut received', {
-        keys,
-        commandName,
-        command,
-      });
+    //   console.log('Shortcut received', {
+    //     keys,
+    //     commandName,
+    //     command,
+    //   });
 
-      if (typeof command === 'function') {
-        // if (getSetting('displayShortcutsAsTooltip')) {
-        //   tooltip(keys.replace('META', 'CMD'));
-        // }
+    //   if (typeof command === 'function') {
+    //     // if (getSetting('displayShortcutsAsTooltip')) {
+    //     //   tooltip(keys.replace('META', 'CMD'));
+    //     // }
 
-        event.preventDefault();
-        command();
-      }
-    }
+    //     event.preventDefault();
+    //     command();
+    //   }
+    // }
   });
 
   function getShortcuts() {

@@ -2,7 +2,7 @@ import './InputField.scss';
 
 import React, { createRef, useEffect, useState } from 'react';
 
-import { selectElementContents } from '../../4-dom/selectElementContents';
+import { selectElementContents } from '../../0-dom/selectElementContents';
 
 export function InputField({
   className,
