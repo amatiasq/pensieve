@@ -3,24 +3,24 @@ import './shortcuts';
 
 import React, { useEffect, useState } from 'react';
 import { render } from 'react-dom';
-import { BrowserRouter, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route } from 'react-router-dom';
 
 // import { Placeholder } from '../7-components/Placeholder';
 import { createStore } from '../4-storage';
 import { AppStorage } from '../4-storage/AppStorage';
+import { useNavigator } from '../6-hooks/useNavigator';
+import { Loader } from '../7-components/atoms/Loader';
 // Only exception to layer hierarchy
 // import { EditGistFromUrl } from '../7-components/EditGist/EditGistFromUrl';
-import { Navigation } from '../7-components/Navigation';
 import { EditNoteFromUrl } from '../7-components/NoteEditor/EditNoteFromUrl';
 import { NotesList } from '../7-components/NotesList/NotesList';
 import { AppStorageContext } from './contexts';
 import { useGithubAuth } from './useGithubAuth';
 
 function App() {
-  const location = useLocation();
-  const page = getPageFromPath(location.pathname);
   const [store, setStore] = useState<AppStorage>(null!);
   const token = useGithubAuth();
+  const navigator = useNavigator();
 
   useEffect(() => {
     if (!token) return;
@@ -28,16 +28,17 @@ function App() {
   }, [token]);
 
   if (!store) {
-    return <p>Loading...</p>;
+    return <Loader />;
   }
 
   return (
     <AppStorageContext.Provider value={store}>
-      <div className={`app page-${page}`}>
-        <Navigation />
+      <div className={`app page-${navigator.getPageName()}`}>
         <NotesList />
         {/* <Route path="/" component={Placeholder} exact /> */}
-        <Route path="/note/:gistId" component={EditNoteFromUrl}></Route>
+        {/* <Route path="/sketch" component={SketchPad} /> */}
+        {/* <Route path="/settings" component={EditSettings} /> */}
+        <Route path={navigator.note} component={EditNoteFromUrl}></Route>
         {/* <Route path="/gist/:gistId/:filename" component={EditGistFromUrl}></Route> */}
       </div>
     </AppStorageContext.Provider>
@@ -51,10 +52,4 @@ export function renderApp(container: HTMLElement): void {
     </BrowserRouter>,
     container,
   );
-}
-
-function getPageFromPath(path: string) {
-  if (path === '/') return 'home';
-  const [, start] = path.split('/');
-  return start;
 }

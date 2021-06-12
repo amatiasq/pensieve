@@ -1,3 +1,4 @@
+import { HttpError } from '../1-core/http';
 import { GithubApi } from './GithubApi';
 import { GithubToken } from './GithubAuth';
 import { GHApiCommit } from './models/GHApiCommit';
@@ -40,13 +41,17 @@ export interface GHRepoFile extends GHRepoNode {
 }
 
 export class GHRepositoryApi extends GithubApi {
-  branch = 'master';
+  branch = 'main';
 
   get url() {
     return `/repos/${this.username}/${this.name}`;
   }
 
-  constructor(token: GithubToken, readonly username: string, readonly name: string) {
+  constructor(
+    token: GithubToken,
+    readonly username: string,
+    readonly name: string,
+  ) {
     super(token);
   }
 
@@ -83,19 +88,44 @@ export class GHRepositoryApi extends GithubApi {
   }
 
   async fetchStructure() {
-    const ref = await this.GET<GHApiRef>(`${this.url}/git/refs/heads/${this.branch}`);
-    const commit = await this.GET<GHApiCommit>(`${this.url}/git/commits/${ref.object.sha}`);
-    const tree = await this.GET<GHApiTree>(`${this.url}/git/trees/${commit.tree.sha}?recursive=1`);
+    const ref = await this.GET<GHApiRef>(
+      `${this.url}/git/refs/heads/${this.branch}`,
+    );
+    const commit = await this.GET<GHApiCommit>(
+      `${this.url}/git/commits/${ref.object.sha}`,
+    );
+    const tree = await this.GET<GHApiTree>(
+      `${this.url}/git/trees/${commit.tree.sha}?recursive=1`,
+    );
     return tree.tree.map(simplifyNode);
   }
 
   async readDir(path: string) {
-    const content = await this.GET<GHApiRepositoryNode[]>(`${this.url}/contents/${path}`);
+    const content = await this.GET<GHApiRepositoryNode[]>(
+      `${this.url}/contents/${path}`,
+    );
     return content.map(simplifyNode);
   }
 
+  async hasFile(path: string) {
+    const url = `${this.url}/contents/${path}`;
+
+    try {
+      await this.GET<GHApiRepositoryNode>(url);
+      return true;
+    } catch (error) {
+      if (error instanceof HttpError && error.status === 404) {
+        return false;
+      }
+
+      throw error;
+    }
+  }
+
   async readFile(path: string): Promise<GHRepoFile> {
-    const file = await this.GET<GHApiRepositoryNode>(`${this.url}/contents/${path}`);
+    const file = await this.GET<GHApiRepositoryNode>(
+      `${this.url}/contents/${path}`,
+    );
 
     if (Array.isArray(file)) {
       throw new Error(`${this.url}/${path} is a directory`);
@@ -112,7 +142,9 @@ export class GHRepositoryApi extends GithubApi {
   async commit(message: string, files: StagedFiles) {
     // Get a reference
     // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#update-a-reference
-    const ref = await this.GET<GHApiRef>(`${this.url}/git/refs/heads/${this.branch}`);
+    const ref = await this.GET<GHApiRef>(
+      `${this.url}/git/refs/heads/${this.branch}`,
+    );
 
     const items = Object.entries(files)
       .map(([path, content]) => {
@@ -153,6 +185,11 @@ export class GHRepositoryApi extends GithubApi {
   }
 }
 
-function simplifyNode({ type, size, path, sha }: Pick<GHApiRepositoryNode, 'type' | 'size' | 'path' | 'sha'>) {
+function simplifyNode({
+  type,
+  size,
+  path,
+  sha,
+}: Pick<GHApiRepositoryNode, 'type' | 'size' | 'path' | 'sha'>) {
   return { type, size, path, sha } as GHRepoNode;
 }

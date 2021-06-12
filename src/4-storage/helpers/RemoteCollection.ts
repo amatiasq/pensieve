@@ -13,7 +13,6 @@ export class RemoteCollection<T extends { id: U }, U> extends RemoteValue<T[]> {
 
   async add(item: T) {
     const list = await this.get();
-    list.unshift(item);
     this.set([item, ...list]);
   }
 

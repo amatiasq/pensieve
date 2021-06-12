@@ -1,52 +1,93 @@
 import './NotesList.scss';
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { isMobile } from '../../0-dom/isMobile';
 import { registerCommand } from '../../1-core/commands';
 import { Note } from '../../2-entities/Note';
+import { AppStorageContext } from '../../5-app/contexts';
+import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNotesList } from '../../6-hooks/useNoteList';
 import { useSetting } from '../../6-hooks/useSetting';
 import StringComparer from '../../util/StringComparer';
-import { Action } from '../atoms/Action';
+import { IconButton } from '../atoms/IconButton';
 import { Resizer } from '../atoms/Resizer';
 import { FilterBox } from './FilterBox';
 import { NoteItem } from './NoteItem';
 
 export function NotesList() {
+  const navigator = useNavigator();
+  const history = useHistory();
+  const list = useNotesList();
+
+  const store = useContext(AppStorageContext);
   const [filter, setFilter] = useState<StringComparer | null>(null);
 
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
   const [size, setSize] = useSetting('sidebarWidth');
 
-  const history = useHistory();
-  const list = useNotesList();
   const filtered = filter ? applyFilter(list, filter) : list;
+  const notes = [
+    ...filtered.filter(x => x.favorite),
+    ...filtered.filter(x => !x.favorite),
+  ];
 
   registerCommand('newNote', () => history.push('/new'));
   registerCommand('hideSidebar', () => setIsVisible(!isVisible));
 
+  const groups = new Map<string, Note[]>();
+  const asdf = notes
+    .map(x => {
+      const { group } = x;
+      if (!group) return x;
+
+      if (groups.has(group)) {
+        groups.get(group)?.push(x);
+        return null;
+      }
+
+      const list = [x];
+      groups.set(group, list);
+      return group;
+    })
+    .filter(Boolean) as Array<string | Note>;
+
   return (
-    <aside style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}>
+    <aside
+      style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}
+    >
       <h4 className="filter">
         <FilterBox onChange={setFilter} />
-        <Action name="new-note" icon="plus" navigate="/new" />
+        <IconButton icon="plus" onClick={createNote} />
       </h4>
 
       <ul className="notes-list">
-        {filtered.length ? (
-          filtered.map(note => <NoteItem key={note.id} note={note} />)
-        ) : filter ? (
-          <li className="notes-list--empty">No Results</li>
-        ) : (
-          <li className="notes-list--empty">No notes</li>
-        )}
+        {asdf.map(note => {
+          if (typeof note !== 'string') {
+            return <NoteItem key={note.id} note={note} />;
+          }
+
+          const list = groups.get(note);
+          return (
+            <>
+              <h2>{note}</h2>
+              {list?.map(x => (
+                <NoteItem key={x.id} note={x} />
+              ))}
+            </>
+          );
+        })}
       </ul>
 
       <Resizer size={size} onChange={setSize} />
     </aside>
   );
+
+  async function createNote() {
+    const note = await store.createNote();
+    return navigator.goNote(note);
+  }
 }
 
 function applyFilter(list: Note[], comparer: StringComparer) {

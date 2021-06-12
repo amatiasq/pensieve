@@ -1,0 +1,54 @@
+@import '../../0-dom/ellipsis.scss';
+@import '../../0-dom/fit-parent.scss';
+@import '../../0-dom/theme.scss';
+
+.note-item {
+  display: flex;
+  cursor: pointer;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  font-weight: 500;
+  font-size: 0.85rem;
+  line-height: 1.3;
+
+  line-height: calc(var(--gist-item-height) - 2px);
+  --border-radius: 3px;
+
+  @include light {
+    color: #404040;
+    border-bottom: 1px solid #d1d1d1;
+
+    &:hover {
+      background: #d8d8d8;
+    }
+  }
+
+  @include dark {
+    color: #b7b7b7;
+    border-bottom: 1px solid #1a1a1a;
+
+    &:hover {
+      background: #333;
+    }
+  }
+
+  &.active {
+    background: #5183f5;
+    color: #fff;
+    border-bottom: 1px solid #3972f4;
+  }
+
+  &:not(:hover):not(.favorite) .star-part {
+    visibility: hidden;
+  }
+
+  &:not(:hover) .actions-part {
+    display: none;
+  }
+
+  .title-part {
+    flex: 1;
+    color: inherit;
+    text-decoration: none;
+  }
+}

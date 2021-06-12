@@ -12,6 +12,10 @@ export class GHGistStore implements AsyncStore {
     return this.gists.listAll();
   }
 
+  has(key: string): Promise<boolean> {
+    return this.gists.exists(key);
+  }
+
   async readText(key: string) {
     const file = await this.gists.read(key);
     return file.content;

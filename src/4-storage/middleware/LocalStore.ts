@@ -1,9 +1,7 @@
 import { AsyncStore } from '../AsyncStore';
 
 export class LocalStore implements AsyncStore {
-  constructor(readonly prefix: string) {}
-
-  keys() {
+  private get storedKeys() {
     const keys = [];
     const prefix = `${this.prefix}:`;
 
@@ -14,7 +12,17 @@ export class LocalStore implements AsyncStore {
       }
     }
 
-    return Promise.resolve(keys);
+    return keys;
+  }
+
+  constructor(readonly prefix: string) {}
+
+  keys() {
+    return Promise.resolve(this.storedKeys);
+  }
+
+  has(key: string) {
+    return Promise.resolve(key in this.storedKeys);
   }
 
   readText(key: string) {

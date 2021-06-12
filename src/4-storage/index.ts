@@ -12,10 +12,12 @@ import { ResilientOnlineStore } from './middleware/ResilientOnlineStore';
 
 Object.assign(window, { localforage });
 
-export async function createStore(token: GithubToken, username: string, repoName: string) {
+export async function createStore(
+  token: GithubToken,
+  username: string,
+  repoName: string,
+) {
   const repo = new GHRepositoryApi(token, username, repoName);
-
-  await repo.createIfNecessary('Database for notes', true);
 
   // const local = new LocalStore(repoName);
   const local = new ForageStore(localforage.createInstance({ name: repoName }));
@@ -24,5 +26,11 @@ export async function createStore(token: GithubToken, username: string, repoName
   const notes = new MixedStore(local, resilient);
   const store = new CachedStore(notes);
 
-  return new AppStorage(store);
+  const storage = new AppStorage(store);
+
+  if (await repo.createIfNecessary('Database for notes', true)) {
+    // repo.commit('Initial commit', storage.getInitialData());
+  }
+
+  return storage;
 }

@@ -20,7 +20,13 @@ export class GHRepoStore implements AsyncStore {
 
   async keys() {
     const files = await this.repo.fetchStructure();
-    return files.filter(x => x.type === 'blob' || x.type === 'file').map(x => x.path);
+    return files
+      .filter(x => x.type === 'blob' || x.type === 'file')
+      .map(x => x.path);
+  }
+
+  has(key: string) {
+    return this.repo.hasFile(key);
   }
 
   async readText(key: string) {
@@ -48,6 +54,10 @@ export class GHRepoStore implements AsyncStore {
   }
 
   private commit(message: string, files: StagedFiles) {
+    if (!Object.keys(files).length) {
+      throw new Error('NO FILES TO COMMIT');
+    }
+
     return new Promise<void>((resolve, reject) => {
       this.pending.push({ message, files, resolve, reject });
       this.scheduler.restart();
@@ -60,9 +70,15 @@ export class GHRepoStore implements AsyncStore {
     const copy = [...this.pending];
     this.pending.length = 0;
 
-    const staged = copy.reduce((all, current) => ({ ...all, ...current }));
+    const staged = copy.reduce(
+      (all, current) => ({ ...all, ...current.files }),
+      {},
+    );
     const messages = uniq(copy.map(x => x.message));
-    const message = messages.length > 1 ? `Multiple:\n- ${messages.join('\n- ')}` : messages[0];
+    const message =
+      messages.length > 1
+        ? `Multiple:\n- ${messages.join('\n- ')}`
+        : messages[0];
 
     this.repo.commit(message, staged).then(
       () => copy.forEach(x => x.resolve()),

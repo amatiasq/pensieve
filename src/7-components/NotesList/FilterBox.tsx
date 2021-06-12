@@ -2,7 +2,7 @@ import React, { createRef, useState } from 'react';
 
 import { useScheduler } from '../../6-hooks/useScheduler';
 import StringComparer from '../../util/StringComparer';
-import { Action } from '../atoms/Action';
+import { IconButton } from '../atoms/IconButton';
 
 export function FilterBox({
   onChange,
@@ -25,9 +25,7 @@ export function FilterBox({
         onChange={e => process(e.target.value)}
       />
 
-      {term ? (
-        <Action name="clear" icon="times" onClick={() => process('')} />
-      ) : null}
+      {term ? <IconButton icon="times" onClick={() => process('')} /> : null}
     </>
   );
 

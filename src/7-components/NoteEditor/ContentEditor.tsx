@@ -1,3 +1,5 @@
+import './ContentEditor.scss';
+
 import { editor } from 'monaco-editor';
 import React from 'react';
 
@@ -19,13 +21,10 @@ export function ContentEditor({
   readonly?: boolean;
   onChange: (newValue: string | undefined) => void;
 }) {
-  // const monaco = useMonaco();
-
   const [rulers] = useSetting('rulers');
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
-  // const [defaultFileExtension] = useSetting('defaultFileExtension');
 
   const lines = value.split('\n').length;
   const language =
@@ -35,12 +34,15 @@ export function ContentEditor({
     'markdown';
 
   if (isMobile) {
-    return <MobileFallback {...{ language, value, readonly, onChange }} autofocus />;
+    return (
+      <MobileFallback {...{ language, value, readonly, onChange }} autofocus />
+    );
   }
 
   return (
     <Editor
-      height="calc(100vh - 42px)"
+      className="editor"
+      height="100vh"
       theme="vs-dark"
       language={language}
       value={value}

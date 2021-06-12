@@ -44,6 +44,10 @@ export class CachedStore implements AsyncStore {
     return this.fetch<string[]>('keys', '__KEYS_KEY__');
   }
 
+  has(key: string) {
+    return this.store.has(key);
+  }
+
   readText(key: string): Promise<string | null> {
     return this.fetch<string>('readText', key);
   }
@@ -67,7 +71,7 @@ export class CachedStore implements AsyncStore {
     return this.store.delete(key);
   }
 
-  private fetch<T>(method: 'keys' | 'readText' | 'read', key: string) {
+  private fetch<T>(method: 'keys' | 'has' | 'readText' | 'read', key: string) {
     if (this.cache.has(key)) {
       return this.cache.get(key);
     }
