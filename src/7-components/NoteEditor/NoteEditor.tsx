@@ -42,7 +42,7 @@ export function NoteEditor({
 
   useEffect(() => {
     // eslint-disable-next-line no-irregular-whitespace
-    document.title = `${note.title}  ✏️  Gists`;
+    document.title = `${note.title}  ✏️  Notes`;
   }, [note.title]);
 
   useEffect(() => {

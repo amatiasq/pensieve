@@ -1,7 +1,15 @@
 @mixin dark {
-  @content;
+  body:not(.force-light-scheme) & {
+    @content;
+  }
 }
 
 @mixin light {
-  @content;
+  body.force-light-scheme & {
+    @content;
+  }
+
+  @media (prefers-color-scheme: light) {
+    @content;
+  }
 }

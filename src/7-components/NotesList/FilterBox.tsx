@@ -19,6 +19,7 @@ export function FilterBox({
     <>
       <input
         ref={ref}
+        className="filter-box"
         type="text"
         placeholder="Filter..."
         defaultValue={term}

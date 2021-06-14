@@ -3,18 +3,30 @@
 
 #app-container {
   color: var(--fg-color);
-  background-color: #1e2021;
+  background-color: var(--bg-color);
 
   &.is-virtual-keyboard-open .mobile-fallback {
     height: 50%;
   }
 
   @include light {
-    --fg-color: #404040;
+    // --fg-color: #404040;
+    --fg-color: red;
+    --bg-color: red;
+    --bg-color-sidebar: red;
   }
 
   @include dark {
-    --fg-color: #b7b7b7;
+    --fg-color: #c4c4c4;
+    --fg-color-active: white;
+    --bg-color: #1c1c1c;
+    --bg-color-sidebar: #212122;
+    --bg-color-control: #181a1b;
+    --bg-color-hover: #333;
+    --bg-color-active: #3659aa;
+    --border-color: #343637;
+    --border-color-active: #204aac;
+    --group-color: #282829;
   }
 }
 
