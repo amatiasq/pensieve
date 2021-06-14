@@ -3,9 +3,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { registerCommand } from '../../1-core/commands';
 import { Note, NoteContent } from '../../2-entities/Note';
 import { AppStorageContext } from '../../5-app/contexts';
+import { useNavigator } from '../../6-hooks/useNavigator';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
-import { useStack } from '../../6-hooks/useStack';
+// import { useStack } from '../../6-hooks/useStack';
 import { BusinessIndicator } from '../atoms/BusinessIndicator';
 import { Loader } from '../atoms/Loader';
 import { ContentEditor } from './ContentEditor';
@@ -19,6 +20,7 @@ export function NoteEditor({
 }) {
   const store = useContext(AppStorageContext);
   const autosave = useSetting('autosave')[0] || 0;
+  const navigator = useNavigator();
   // const [saved, addSaved] = useStack<string>(5, content);
   const [value, setValue] = useState<string>(content);
 
@@ -29,6 +31,14 @@ export function NoteEditor({
       save(value);
     }
   });
+
+  useEffect(() =>
+    navigator.onNavigate(next => {
+      if (!next.isNote(note)) {
+        save(value);
+      }
+    }),
+  );
 
   useEffect(() => {
     // eslint-disable-next-line no-irregular-whitespace

@@ -29,9 +29,8 @@ export class GHRepoStore implements AsyncStore {
     return this.repo.hasFile(key);
   }
 
-  async readText(key: string) {
-    const file = await this.repo.readFile(key);
-    return file.content;
+  readText(key: string) {
+    return this.repo.readFile(key);
   }
 
   async read<T>(key: string) {
@@ -41,7 +40,7 @@ export class GHRepoStore implements AsyncStore {
         ? await this.repo.getReadme()
         : await this.repo.readFile(key);
 
-    const value = JSON.parse(file.content);
+    const value = JSON.parse(file);
     return value as T;
   }
 
@@ -72,6 +71,11 @@ export class GHRepoStore implements AsyncStore {
   }
 
   private push() {
+    if (this.repo.isCommiting) {
+      this.scheduler.restart();
+      return;
+    }
+
     if (!this.pending.length) return;
 
     const copy = [...this.pending];
