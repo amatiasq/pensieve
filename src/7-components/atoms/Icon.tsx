@@ -6,7 +6,7 @@ export function Icon({
   className,
 }: {
   name: string;
-  prefix?: 'fab' | 'fac' | 'fas';
+  prefix?: 'fab' | 'fac' | 'fas' | 'fa-solid';
   className?: string;
 }) {
   const [fas, icon] = name.includes(' ') ? name.split(' ') : [prefix, name];

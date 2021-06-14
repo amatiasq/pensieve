@@ -6,8 +6,7 @@ import { render } from 'react-dom';
 import { BrowserRouter, Route } from 'react-router-dom';
 
 // import { Placeholder } from '../7-components/Placeholder';
-import { createStore } from '../4-storage';
-import { AppStorage } from '../4-storage/AppStorage';
+import { createStore, TypedStorage } from '../4-storage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
 // Only exception to layer hierarchy
@@ -18,14 +17,19 @@ import { AppStorageContext } from './contexts';
 import { useGithubAuth } from './useGithubAuth';
 
 function App() {
-  const [store, setStore] = useState<AppStorage>(null!);
+  const [store, setStore] = useState<TypedStorage>(null!);
   const token = useGithubAuth();
   const navigator = useNavigator();
+  const [pageName, setPageName] = useState(navigator.getPageName());
 
   useEffect(() => {
     if (!token) return;
     createStore(token, 'amatiasq', 'pensieve-data').then(setStore);
   }, [token]);
+
+  useEffect(() =>
+    navigator.onNavigate(next => setPageName(next.getPageName())),
+  );
 
   if (!store) {
     return <Loader />;
@@ -33,7 +37,7 @@ function App() {
 
   return (
     <AppStorageContext.Provider value={store}>
-      <div className={`app page-${navigator.getPageName()}`}>
+      <div className={`app page-${pageName}`}>
         <NotesList />
         {/* <Route path="/" component={Placeholder} exact /> */}
         {/* <Route path="/sketch" component={SketchPad} /> */}

@@ -14,6 +14,7 @@ import StringComparer from '../../util/StringComparer';
 import { IconButton } from '../atoms/IconButton';
 import { Resizer } from '../atoms/Resizer';
 import { FilterBox } from './FilterBox';
+import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
 
 export function NotesList() {
@@ -52,27 +53,6 @@ export function NotesList() {
     })
     .filter(Boolean) as Array<string | Note>;
 
-  const content = finalList.map(note => {
-    if (typeof note !== 'string') {
-      return [<NoteItem key={note.id} note={note} />];
-    }
-
-    const list = groups.get(note)!;
-
-    return (
-      <li key={`group/${note}`} className="group">
-        <details>
-          <summary className="group-title">{note}</summary>
-          <ul className="group-content">
-            {list?.map(x => (
-              <NoteItem key={x.id} note={x} />
-            ))}
-          </ul>
-        </details>
-      </li>
-    );
-  });
-
   return (
     <aside
       style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}
@@ -82,7 +62,19 @@ export function NotesList() {
         <IconButton icon="plus" onClick={createNote} />
       </h4>
 
-      <ul className="notes-list">{content}</ul>
+      <ul className="notes-list">
+        {finalList.map(note => {
+          if (typeof note !== 'string') {
+            return <NoteItem key={note.id} note={note} />;
+          }
+
+          const group = note;
+          const list = groups.get(group)!;
+          return (
+            <NoteGroup key={`group/${group}`} group={group} notes={list} />
+          );
+        })}
+      </ul>
 
       <Resizer size={size} onChange={setSize} />
     </aside>
