@@ -37,7 +37,7 @@ export function NotesList() {
   registerCommand('hideSidebar', () => setIsVisible(!isVisible));
 
   const groups = new Map<string, Note[]>();
-  const asdf = notes
+  const finalList = notes
     .map(x => {
       const { group } = x;
       if (!group) return x;
@@ -47,8 +47,7 @@ export function NotesList() {
         return null;
       }
 
-      const list = [x];
-      groups.set(group, list);
+      groups.set(group, [x]);
       return group;
     })
     .filter(Boolean) as Array<string | Note>;
@@ -63,7 +62,7 @@ export function NotesList() {
       </h4>
 
       <ul className="notes-list">
-        {asdf.map(note => {
+        {finalList.map(note => {
           if (typeof note !== 'string') {
             return <NoteItem key={note.id} note={note} />;
           }
@@ -71,7 +70,7 @@ export function NotesList() {
           const list = groups.get(note);
           return (
             <>
-              <h2>{note}</h2>
+              <h3 className="group-title">{note}</h3>
               {list?.map(x => (
                 <NoteItem key={x.id} note={x} />
               ))}
