@@ -3,11 +3,21 @@ import { GithubToken } from './GithubAuth';
 
 export const GH_API = 'https://api.github.com';
 
+export enum MediaType {
+  Json = 'application/vnd.github.v3+json',
+  Raw = 'application/vnd.github.v3.raw',
+  Html = 'application/vnd.github.v3.html',
+}
+
+interface GHRequestOptions {
+  mediaType?: MediaType;
+}
+
 export abstract class GithubApi {
   constructor(public token: GithubToken) {}
 
-  protected GET<T>(path: string) {
-    return GET<T>(url(path), this.withAuth());
+  protected GET<T>(path: string, options?: GHRequestOptions) {
+    return GET<T>(url(path), this.withAuth(options));
   }
 
   protected DELETE<T>(path: string) {
@@ -26,12 +36,13 @@ export abstract class GithubApi {
     return PATCH<T>(url(path), body, this.withAuth());
   }
 
-  private withAuth() {
-    const headers = {
-      Authorization: `token ${this.token}`,
-      Accept: 'application/vnd.github.v3+json',
+  private withAuth({ mediaType = MediaType.Json }: GHRequestOptions = {}) {
+    return {
+      headers: {
+        Authorization: `token ${this.token}`,
+        Accept: mediaType,
+      },
     };
-    return { headers };
   }
 }
 

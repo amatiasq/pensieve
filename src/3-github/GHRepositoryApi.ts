@@ -1,5 +1,5 @@
 import { HttpError } from '../1-core/http';
-import { GithubApi } from './GithubApi';
+import { GithubApi, MediaType } from './GithubApi';
 import { GithubToken } from './GithubAuth';
 import { GHApiCommit } from './models/GHApiCommit';
 import { GHApiRef } from './models/GHApiRef';
@@ -41,10 +41,15 @@ export interface GHRepoFile extends GHRepoNode {
 }
 
 export class GHRepositoryApi extends GithubApi {
+  private commiting = false;
   branch = 'main';
 
   get url() {
     return `/repos/${this.username}/${this.name}`;
+  }
+
+  get isCommiting() {
+    return this.commiting;
   }
 
   constructor(
@@ -123,27 +128,31 @@ export class GHRepositoryApi extends GithubApi {
   }
 
   async getReadme() {
-    return this.GET<GHApiRepositoryNode>(`${this.url}/readme`);
+    return this.GET<string>(`${this.url}/readme`, { mediaType: MediaType.Raw });
   }
 
-  async readFile(path: string): Promise<GHRepoFile> {
-    const file = await this.GET<GHApiRepositoryNode>(
+  async readFile(path: string): Promise<string> {
+    const file = await this.GET<string | GHApiRepositoryNode[]>(
       `${this.url}/contents/${path}`,
+      { mediaType: MediaType.Raw },
     );
 
     if (Array.isArray(file)) {
       throw new Error(`${this.url}/${path} is a directory`);
     }
 
-    if (file.type !== 'file') {
-      throw new Error(`${this.url}/${path} is not a file: ${file.type}`);
-    }
+    // if (file.type !== 'file') {
+    //   throw new Error(`${this.url}/${path} is not a file: ${file.type}`);
+    // }
 
-    const content = atob(file.content);
-    return { ...simplifyNode(file), type: 'file', content };
+    // const content = atob(file.content);
+    // return { ...simplifyNode(file), type: 'file', content };
+    return file;
   }
 
   async commit(message: string, files: StagedFiles) {
+    this.commiting = true;
+
     // Get a reference
     // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#update-a-reference
     const ref = await this.GET<GHApiRef>(
@@ -186,6 +195,8 @@ export class GHRepositoryApi extends GithubApi {
       sha: commit.sha,
       force: true,
     });
+
+    this.commiting = false;
   }
 }
 
