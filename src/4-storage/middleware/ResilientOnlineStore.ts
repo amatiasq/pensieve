@@ -7,7 +7,9 @@ interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   params: Parameters<AsyncStore[T]>;
 }
 
-export class ResilientOnlineStore implements AsyncStore {
+export class ResilientOnlineStore<ReadOptions, WriteOptions>
+  implements AsyncStore<ReadOptions, WriteOptions>
+{
   private readonly pending: Command[] = [];
   private readonly reconnect = new Scheduler(1000, () => this.executePending());
 
@@ -15,7 +17,7 @@ export class ResilientOnlineStore implements AsyncStore {
     return !navigator.onLine;
   }
 
-  constructor(private readonly remote: AsyncStore) {
+  constructor(private readonly remote: AsyncStore<ReadOptions, WriteOptions>) {
     window.addEventListener('online', () => this.executePending());
   }
   keys() {
@@ -26,20 +28,16 @@ export class ResilientOnlineStore implements AsyncStore {
     return this.rejectIfOffline() || this.remote.has(key);
   }
 
-  readText(key: string): Promise<string | null> {
-    return this.rejectIfOffline() || this.remote.readText(key);
+  read(key: string, options?: ReadOptions): Promise<string | null> {
+    return this.rejectIfOffline() || this.remote.read(key, options);
   }
 
-  read<T>(key: string): Promise<T | null> {
-    return this.rejectIfOffline() || this.remote.read<T>(key);
-  }
-
-  writeText(key: string, value: string): Promise<void> {
-    return this.command('writeText', [key, value]);
-  }
-
-  write<T>(key: string, value: T): Promise<void> {
-    return this.command('write', [key, value]);
+  write(key: string, value: string, options?: WriteOptions): Promise<void> {
+    return this.command('write', [
+      key,
+      value,
+      options as Record<string, never>,
+    ]);
   }
 
   delete(key: string): Promise<void> {

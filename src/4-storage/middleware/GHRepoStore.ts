@@ -1,7 +1,7 @@
 import { Scheduler } from '@amatiasq/scheduler';
 
 import { GHRepositoryApi, StagedFiles } from '../../3-github/GHRepositoryApi';
-import { AsyncStore } from '../AsyncStore';
+import { AsyncStore, NoOptions } from '../AsyncStore';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
 
@@ -12,7 +12,11 @@ interface PendingCommit {
   reject(reason: Error): void;
 }
 
-export class GHRepoStore implements AsyncStore {
+interface Urgenteable {
+  urgent?: boolean;
+}
+
+export class GHRepoStore implements AsyncStore<NoOptions, Urgenteable> {
   private readonly scheduler = new Scheduler(100, () => this.push());
   private readonly pending: PendingCommit[] = [];
 
@@ -29,30 +33,19 @@ export class GHRepoStore implements AsyncStore {
     return this.repo.hasFile(key);
   }
 
-  readText(key: string) {
-    return this.repo.readFile(key);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  read(key: string, options?: NoOptions) {
+    return key === 'README.md'
+      ? this.repo.getReadme()
+      : this.repo.readFile(key);
   }
 
-  async read<T>(key: string) {
-    // FIXME: regular files have a 1mb limit
-    const file =
-      key === 'notes.json'
-        ? await this.repo.getReadme()
-        : await this.repo.readFile(key);
+  write(key: string, value: string, { urgent }: Urgenteable = {}) {
+    if (urgent) {
+      return this.repo.writeFile(key, value, `Urgently write: ${key}`);
+    }
 
-    const value = JSON.parse(file);
-    return value as T;
-  }
-
-  writeText(key: string, value: string) {
     return this.commit(`Update ${key}`, { [key]: value });
-  }
-
-  write<T>(key: string, value: T) {
-    const json = JSON.stringify(value, null, 2);
-    // FIXME: regular files have a 1mb limit
-    const filename = key === 'notes.json' ? 'README.md' : key;
-    return this.commit(`Update ${key}`, { [filename]: json });
   }
 
   async delete(key: string) {

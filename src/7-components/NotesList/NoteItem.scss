@@ -36,20 +36,16 @@
     border-bottom: 1px solid #3972f4;
   }
 
+  &:last-child {
+    border-bottom-width: 0;
+  }
+
   &:not(:hover):not(.favorite) .star-part {
     visibility: hidden;
   }
 
   &:not(:hover) .actions-part {
     display: none;
-  }
-
-  &[data-group] {
-    border-left: 5px solid #3e4245;
-
-    &.active {
-      border-left-color: #7b9ef1;
-    }
   }
 
   .title-part {

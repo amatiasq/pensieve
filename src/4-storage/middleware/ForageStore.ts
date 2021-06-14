@@ -1,4 +1,4 @@
-import { AsyncStore } from '../AsyncStore';
+import { AsyncStore, NoOptions } from '../AsyncStore';
 
 export class ForageStore implements AsyncStore {
   constructor(private readonly forage: LocalForage) {}
@@ -12,19 +12,13 @@ export class ForageStore implements AsyncStore {
     return keys.includes(key);
   }
 
-  readText(key: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  read(key: string, options?: NoOptions) {
     return this.forage.getItem<string>(key);
   }
 
-  read<T>(key: string) {
-    return this.forage.getItem<T>(key);
-  }
-
-  async writeText(key: string, value: string) {
-    await this.forage.setItem(key, value);
-  }
-
-  async write<T>(key: string, value: T) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async write(key: string, value: string, options?: NoOptions) {
     await this.forage.setItem(key, value);
   }
 

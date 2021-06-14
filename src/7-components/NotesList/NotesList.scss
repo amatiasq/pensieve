@@ -43,17 +43,24 @@ aside {
     border: 1px solid red;
   }
 
-  .group-title {
-    padding: 1rem;
-    text-align: center;
-    background-color: #3e4245;
+  .group {
+    border-bottom: 1px solid #1a1a1a;
 
-    @include light {
-      border-bottom: 1px solid #d1d1d1;
+    .group-content {
+      border-bottom: 5px solid #3e4245;
+      border-left: 5px solid #3e4245;
     }
 
-    @include dark {
-      border-bottom: 1px solid #1a1a1a;
+    .group-title {
+      padding: 1rem;
+      text-align: center;
+      background-color: #3e4245;
+
+      &::-webkit-details-marker,
+      &::marker {
+        display: none;
+        content: '';
+      }
     }
   }
 }

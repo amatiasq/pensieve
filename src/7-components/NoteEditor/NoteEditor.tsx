@@ -34,7 +34,7 @@ export function NoteEditor({
 
   useEffect(() =>
     navigator.onNavigate(next => {
-      if (!next.isNote(note)) {
+      if (!next.isNote(note) && content !== value) {
         save(value);
       }
     }),
@@ -53,16 +53,10 @@ export function NoteEditor({
   }, [content]);
 
   useEffect(() => {
-    const handler = () => save(value);
+    const handler = () => save(value, true);
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   });
-
-  // useEffect(() => history.listen(x => {
-  //   if (x.pathname !== file.path) {
-  //     save(value);
-  //   }
-  // }));
 
   if (value == null) return <Loader />;
 
@@ -78,9 +72,9 @@ export function NoteEditor({
     scheduler.restart();
   }
 
-  function save(value: string) {
+  function save(value: string, urgent = false) {
     scheduler.stop();
     // addSaved(value);
-    return store.setNoteContent(note.id, value);
+    return store.setNoteContent(note.id, value, { urgent });
   }
 }

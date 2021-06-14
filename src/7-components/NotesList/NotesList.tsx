@@ -52,6 +52,27 @@ export function NotesList() {
     })
     .filter(Boolean) as Array<string | Note>;
 
+  const content = finalList.map(note => {
+    if (typeof note !== 'string') {
+      return [<NoteItem key={note.id} note={note} />];
+    }
+
+    const list = groups.get(note)!;
+
+    return (
+      <li key={`group/${note}`} className="group">
+        <details>
+          <summary className="group-title">{note}</summary>
+          <ul className="group-content">
+            {list?.map(x => (
+              <NoteItem key={x.id} note={x} />
+            ))}
+          </ul>
+        </details>
+      </li>
+    );
+  });
+
   return (
     <aside
       style={{ width: size, display: isMobile || isVisible ? '' : 'none' }}
@@ -61,23 +82,7 @@ export function NotesList() {
         <IconButton icon="plus" onClick={createNote} />
       </h4>
 
-      <ul className="notes-list">
-        {finalList.map(note => {
-          if (typeof note !== 'string') {
-            return <NoteItem key={note.id} note={note} />;
-          }
-
-          const list = groups.get(note);
-          return (
-            <>
-              <h3 className="group-title">{note}</h3>
-              {list?.map(x => (
-                <NoteItem key={x.id} note={x} />
-              ))}
-            </>
-          );
-        })}
-      </ul>
+      <ul className="notes-list">{content}</ul>
 
       <Resizer size={size} onChange={setSize} />
     </aside>

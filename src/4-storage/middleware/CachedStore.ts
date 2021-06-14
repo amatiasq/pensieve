@@ -34,11 +34,13 @@ class MemoryCache<T> {
   }
 }
 
-export class CachedStore implements AsyncStore {
+export class CachedStore<ReadOptions, WriteOptions>
+  implements AsyncStore<ReadOptions, WriteOptions>
+{
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly cache = new MemoryCache<Promise<any>>(30);
 
-  constructor(private readonly store: AsyncStore) {}
+  constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
 
   keys() {
     return this.fetch<string[]>('keys', '__KEYS_KEY__');
@@ -48,22 +50,13 @@ export class CachedStore implements AsyncStore {
     return this.store.has(key);
   }
 
-  readText(key: string): Promise<string | null> {
-    return this.fetch<string>('readText', key);
+  read(key: string, options?: ReadOptions): Promise<string | null> {
+    return this.fetch<string>('read', key, options);
   }
 
-  read<T>(key: string): Promise<T | null> {
-    return this.fetch<T>('read', key);
-  }
-
-  writeText(key: string, value: string): Promise<void> {
+  write(key: string, value: string, options?: WriteOptions): Promise<void> {
     this.cache.set(key, Promise.resolve(value));
-    return this.store.writeText(key, value);
-  }
-
-  write<T>(key: string, value: T): Promise<void> {
-    this.cache.set(key, Promise.resolve(value));
-    return this.store.write<T>(key, value);
+    return this.store.write(key, value, options);
   }
 
   delete(key: string): Promise<void> {
@@ -71,13 +64,17 @@ export class CachedStore implements AsyncStore {
     return this.store.delete(key);
   }
 
-  private fetch<T>(method: 'keys' | 'has' | 'readText' | 'read', key: string) {
+  private fetch<T>(
+    method: 'keys' | 'has' | 'read',
+    key: string,
+    options?: ReadOptions | undefined,
+  ) {
     if (this.cache.has(key)) {
       return this.cache.get(key);
     }
 
-    const promise = this.store[method](key);
+    const promise = this.store[method](key, options);
     this.cache.set(key, promise);
-    return promise as Promise<T>;
+    return promise as unknown as Promise<T>;
   }
 }

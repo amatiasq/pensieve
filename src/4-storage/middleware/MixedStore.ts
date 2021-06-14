@@ -1,10 +1,12 @@
 import { AsyncStore } from '../AsyncStore';
 import { ResilientOnlineStore } from './ResilientOnlineStore';
 
-export class MixedStore implements AsyncStore {
+export class MixedStore<RO1, WO1, RO2, WO2>
+  implements AsyncStore<RO1 & RO2, WO1 & WO2>
+{
   constructor(
-    private readonly offline: AsyncStore,
-    private readonly remote: ResilientOnlineStore,
+    private readonly offline: AsyncStore<RO1, WO1>,
+    private readonly remote: ResilientOnlineStore<RO2, WO2>,
   ) {}
 
   keys() {
@@ -15,25 +17,16 @@ export class MixedStore implements AsyncStore {
     return this.remote.has(key).catch(() => this.offline.has(key));
   }
 
-  readText(key: string) {
-    return this.remote.readText(key).catch(() => this.offline.readText(key));
+  read(key: string, options?: RO1 & RO2) {
+    return this.remote
+      .read(key, options as RO2)
+      .catch(() => this.offline.read(key));
   }
 
-  read<T>(key: string): Promise<T | null> {
-    return this.remote.read<T>(key).catch(() => this.offline.read<T>(key));
-  }
-
-  async writeText(key: string, value: string): Promise<void> {
+  async write(key: string, value: string, options?: WO1 & WO2): Promise<void> {
     await Promise.race([
-      this.offline.writeText(key, value),
-      this.remote.writeText(key, value),
-    ]);
-  }
-
-  async write<T>(key: string, value: T): Promise<void> {
-    await Promise.race([
-      this.offline.write<T>(key, value),
-      this.remote.write<T>(key, value),
+      this.offline.write(key, value, options),
+      this.remote.write(key, value, options),
     ]);
   }
 
