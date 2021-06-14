@@ -150,6 +150,10 @@ export class GHRepositoryApi extends GithubApi {
     return file;
   }
 
+  async writeFile(path: string, content: string, message: string) {
+    await this.PUT(`${this.url}/contents/${path}`, { message, content });
+  }
+
   async commit(message: string, files: StagedFiles) {
     this.commiting = true;
 

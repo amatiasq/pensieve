@@ -12,6 +12,10 @@ import { ResilientOnlineStore } from './middleware/ResilientOnlineStore';
 
 Object.assign(window, { localforage });
 
+type UnPromisify<T> = T extends Promise<infer U> ? U : T;
+
+export type TypedStorage = UnPromisify<ReturnType<typeof createStore>>;
+
 export async function createStore(
   token: GithubToken,
   username: string,

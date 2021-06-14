@@ -10,25 +10,30 @@ import { AsyncStore } from './AsyncStore';
 import { RemoteCollection } from './helpers/RemoteCollection';
 import { RemoteValue } from './helpers/RemoteValue';
 
-export class AppStorage {
-  private readonly settings = new RemoteValue<Settings>(
+export class AppStorage<ReadOptions, WriteOptions> {
+  private readonly settings = new RemoteValue(
     this.store,
     'settings.json',
-    DEFAULT_SETTINGS,
+    DEFAULT_SETTINGS as Settings,
   );
-  private readonly notes = new RemoteCollection<Note, NoteId>(
-    this.store,
-    'notes.json',
-  );
-  private readonly tags = new RemoteCollection<Tag, TagId>(
-    this.store,
-    'tags.json',
-  );
+  private readonly notes = new RemoteCollection<
+    Note,
+    NoteId,
+    ReadOptions,
+    WriteOptions
+  >(this.store, 'README.md');
+  private readonly tags = new RemoteCollection<
+    Tag,
+    TagId,
+    ReadOptions,
+    WriteOptions
+  >(this.store, 'tags.json');
+
   private readonly noteChanged = emitterWithChannels<string, Note | null>();
   private readonly noteContentChanged =
     emitterWithChannels<string, NoteContent>();
 
-  constructor(private readonly store: AsyncStore) {}
+  constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
 
   getNotes = this.notes.get;
   onNotesChange = this.notes.onChange;
@@ -66,16 +71,20 @@ export class AppStorage {
   }
 
   async getNoteContent(id: NoteId) {
-    const result = await this.store.readText(getFilePath(id));
+    const result = await this.store.read(getFilePath(id));
     return result || '';
   }
 
-  async setNoteContent(id: NoteId, content: NoteContent) {
+  async setNoteContent(
+    id: NoteId,
+    content: NoteContent,
+    options?: WriteOptions,
+  ) {
     const { title, group } = getMetadataFromContent(content);
 
     const [note] = await Promise.all([
       this.notes.edit(id, x => ({ ...x, title, group, modified: new Date() })),
-      this.store.writeText(getFilePath(id), content),
+      this.store.write(getFilePath(id), content, options),
     ]);
 
     this.noteContentChanged(id, content);

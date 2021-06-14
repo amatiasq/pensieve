@@ -1,22 +1,27 @@
 import { AsyncStore } from '../AsyncStore';
 import { RemoteValue } from './RemoteValue';
 
-export class RemoteCollection<T extends { id: U }, U> extends RemoteValue<T[]> {
-  constructor(store: AsyncStore, key: string) {
+export class RemoteCollection<
+  Type extends { id: Id },
+  Id,
+  ReadOptions,
+  WriteOptions,
+> extends RemoteValue<Type[], ReadOptions, WriteOptions> {
+  constructor(store: AsyncStore<ReadOptions, WriteOptions>, key: string) {
     super(store, key, []);
   }
 
-  async item(id: U) {
+  async item(id: Id) {
     const list = await this.get();
     return list.find(x => x.id === id) || null;
   }
 
-  async add(item: T) {
+  async add(item: Type) {
     const list = await this.get();
     this.set([item, ...list]);
   }
 
-  async edit(id: U, editor: (item: T) => T) {
+  async edit(id: Id, editor: (item: Type) => Type) {
     const list = await this.get();
     const index = list.findIndex(x => x.id === id);
     const item = list[index];
@@ -26,7 +31,7 @@ export class RemoteCollection<T extends { id: U }, U> extends RemoteValue<T[]> {
     return newItem;
   }
 
-  async remove(id: U) {
+  async remove(id: Id) {
     const list = await this.get();
     const index = list.findIndex(x => x.id === id);
     if (index === -1) return null;

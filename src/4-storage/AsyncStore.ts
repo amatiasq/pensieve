@@ -1,9 +1,9 @@
-export interface AsyncStore {
+export type NoOptions = Record<string, unknown>;
+
+export interface AsyncStore<ReadOptions = NoOptions, WriteOptions = NoOptions> {
   keys(): Promise<string[]>;
   has(key: string): Promise<boolean>;
-  readText(key: string): Promise<string | null>;
-  read<T>(key: string): Promise<T | null>;
-  writeText(key: string, value: string): Promise<void>;
-  write<T>(key: string, value: T): Promise<void>;
+  read(key: string, options?: ReadOptions): Promise<string | null>;
+  write(key: string, value: string, options?: WriteOptions): Promise<void>;
   delete(key: string): Promise<void>;
 }
