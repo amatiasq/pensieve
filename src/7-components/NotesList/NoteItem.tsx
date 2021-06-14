@@ -31,8 +31,10 @@ export function NoteItem({ note }: { note: Note }) {
     }),
   );
 
+  const extraProps = note.group ? { 'data-group': note.group } : {};
+
   return (
-    <li className={cn.join(' ')}>
+    <li className={cn.join(' ')} {...extraProps}>
       <div className="star-part">
         <IconButton
           icon={note.favorite ? 'star' : 'far star'}

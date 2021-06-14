@@ -122,6 +122,10 @@ export class GHRepositoryApi extends GithubApi {
     }
   }
 
+  async getReadme() {
+    return this.GET<GHApiRepositoryNode>(`${this.url}/readme`);
+  }
+
   async readFile(path: string): Promise<GHRepoFile> {
     const file = await this.GET<GHApiRepositoryNode>(
       `${this.url}/contents/${path}`,

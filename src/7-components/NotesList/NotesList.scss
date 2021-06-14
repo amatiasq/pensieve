@@ -42,4 +42,18 @@ aside {
   &:empty {
     border: 1px solid red;
   }
+
+  .group-title {
+    padding: 1rem;
+    text-align: center;
+    background-color: #3e4245;
+
+    @include light {
+      border-bottom: 1px solid #d1d1d1;
+    }
+
+    @include dark {
+      border-bottom: 1px solid #1a1a1a;
+    }
+  }
 }

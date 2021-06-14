@@ -35,7 +35,12 @@ export class GHRepoStore implements AsyncStore {
   }
 
   async read<T>(key: string) {
-    const file = await this.repo.readFile(key);
+    // FIXME: regular files have a 1mb limit
+    const file =
+      key === 'notes.json'
+        ? await this.repo.getReadme()
+        : await this.repo.readFile(key);
+
     const value = JSON.parse(file.content);
     return value as T;
   }
@@ -46,7 +51,9 @@ export class GHRepoStore implements AsyncStore {
 
   write<T>(key: string, value: T) {
     const json = JSON.stringify(value, null, 2);
-    return this.commit(`Update ${key}`, { [key]: json });
+    // FIXME: regular files have a 1mb limit
+    const filename = key === 'notes.json' ? 'README.md' : key;
+    return this.commit(`Update ${key}`, { [filename]: json });
   }
 
   async delete(key: string) {

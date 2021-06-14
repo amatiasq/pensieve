@@ -71,10 +71,10 @@ export class AppStorage {
   }
 
   async setNoteContent(id: NoteId, content: NoteContent) {
-    const title = getTitleFromContent(content);
+    const { title, group } = getMetadataFromContent(content);
 
     const [note] = await Promise.all([
-      this.notes.edit(id, x => ({ ...x, title, modified: new Date() })),
+      this.notes.edit(id, x => ({ ...x, title, group, modified: new Date() })),
       this.store.writeText(getFilePath(id), content),
     ]);
 
@@ -87,6 +87,7 @@ export class AppStorage {
       ...x,
       favorite: !x.favorite,
     }));
+
     this.noteChanged(note.id, note);
     return note;
   }
@@ -133,20 +134,56 @@ export class AppStorage {
 }
 
 function createNote(content: NoteContent): Note {
+  const { title } = getMetadataFromContent(content);
+
   return {
     id: uuid() as NoteId,
-    title: getTitleFromContent(content),
-    favorite: false,
+    title,
+    favorite: true,
     group: null,
     created: new Date(),
     modified: new Date(),
   };
 }
 
-function getTitleFromContent(content: NoteContent) {
-  return content.split('\n')[0].substr(0, 100) || 'Top Secret';
+function getFilePath(id: NoteId) {
+  return /(\.\w+)+$/.test(id) ? `notes/${id}` : `notes/${id}.md`;
 }
 
-function getFilePath(id: NoteId) {
-  return id.includes('.') ? `notes/${id}` : `notes/${id}.md`;
+function getMetadataFromContent(content: NoteContent) {
+  const [rawTitle, rawGroup] = content.split('\n');
+  // const rawTitle = getTitleFromContent(content);
+  const extension = getExtensionFromTitle(rawTitle);
+  const comment = getCommentFromExtension(extension);
+  const title = clean(rawTitle, `${comment}+`) || 'Top Secret';
+  const group = clean(rawGroup, `${comment} group:`) || null;
+
+  return { title, group, extension, content };
+
+  function clean(text = '', startsWith: string) {
+    return text
+      .trim()
+      .replace(new RegExp(`^${startsWith}`), '')
+      .trim()
+      .substr(0, 100);
+  }
+
+  function getExtensionFromTitle(title: string) {
+    const match = title.match(/(\.\w+)+$/);
+    return match ? match[0] : '.md';
+  }
+
+  function getCommentFromExtension(extension: string) {
+    const comments: Record<string, string> = {
+      '.sql': '--',
+      '.md': '#',
+      '.sh': '#',
+      '.js': '//',
+      '.ts': '//',
+      '.cs': '//',
+      '.fs': '//',
+    };
+
+    return comments[extension] || '//';
+  }
 }
