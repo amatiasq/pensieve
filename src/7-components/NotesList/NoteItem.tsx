@@ -6,13 +6,11 @@ import { Link } from 'react-router-dom';
 import { Note } from '../../2-entities/Note';
 import { AppStorageContext } from '../../5-app/contexts';
 import { useNavigator } from '../../6-hooks/useNavigator';
-import { useTags } from '../../6-hooks/useTags';
 import { IconButton } from '../atoms/IconButton';
 
 export function NoteItem({ note }: { note: Note }) {
   const navigator = useNavigator();
   const store = useContext(AppStorageContext);
-  const tags = useTags().filter(x => x.notes.includes(note.id));
   const [active, setActive] = useState(navigator.isNote(note));
 
   const cn = [
@@ -42,10 +40,7 @@ export function NoteItem({ note }: { note: Note }) {
         />
       </div>
 
-      <div className="title-part">
-        <h5>{note.title}</h5>
-        <h6>{tags.map(x => x.name)}</h6>
-      </div>
+      <h5 className="title-part">{note.title}</h5>
 
       <div className="actions-part">
         <IconButton icon="trash" onClick={() => store.deleteNote(note.id)} />

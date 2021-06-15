@@ -73,7 +73,7 @@ export class GHRepositoryApi extends GithubApi {
         name: this.name,
         description,
         homepage: '',
-        // private: isPrivate,
+        private: isPrivate,
         visibility: isPrivate ? 'private' : 'public',
         ...CREATE_REPO_CONFIG,
       });

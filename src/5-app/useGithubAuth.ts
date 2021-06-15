@@ -1,7 +1,11 @@
 import { useState } from 'react';
 
+import { ClientStorage } from '@amatiasq/client-storage';
+
 import { parseParams } from '../1-core/url';
 import { GithubAuth, GithubToken } from '../3-github/GithubAuth';
+import { GithubUsers } from '../3-github/GithubUsers';
+import { GithubUsername } from '../3-github/models/GHApiUser';
 
 const isLocalHost = location.hostname === 'localhost';
 
@@ -12,19 +16,40 @@ const auth = new GithubAuth({
   redirectUri: isLocalHost ? location.origin : 'https://gist.amatiasq.com/',
 });
 
-export function useGithubAuth() {
-  const [token, setToken] = useState<GithubToken | null>(auth.token);
+const user = new ClientStorage<GithubUsername | null>('notes.gh-user', {
+  default: null,
+  version: 1,
+});
+
+export interface GithubAuthData {
+  token: GithubToken;
+  username: GithubUsername;
+}
+
+export function useGithubAuth(): Record<string, never> | GithubAuthData {
   const { code, state } = parseParams(location.toString());
+  const [data, setData] = useState<GithubAuthData | null>(
+    auth.token && user.cache
+      ? { token: auth.token, username: user.cache }
+      : null,
+  );
 
   if (code) {
-    auth.processGithubAuthCode(code, state).then(setToken);
-    return null;
+    requestTokenAndUsername(code, state).then(setData);
+    return {};
   }
 
-  if (token) {
-    return token;
+  if (data) {
+    return data;
   }
 
   auth.requestGithubAuthorization();
-  return null;
+  return {};
+}
+
+async function requestTokenAndUsername(code: string, state: string) {
+  const token = await auth.processGithubAuthCode(code, state);
+  const requester = new GithubUsers(token);
+  const username = await requester.fetchCurrentUsername();
+  return { token, username };
 }

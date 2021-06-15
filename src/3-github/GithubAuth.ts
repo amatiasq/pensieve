@@ -8,8 +8,15 @@ const AUTH_ROOT = 'https://github.com/login/oauth';
 export type GithubToken = '[string GithubToken]';
 
 export class GithubAuth {
-  private readonly requestState = new ClientStorage<string>('notes.gh-state', { default: 'init', version: 1 });
-  private readonly auth = new ClientStorage<GithubToken | null>('notes.gh-token', { default: null, version: 1 });
+  private readonly requestState = new ClientStorage<string>('notes.gh-state', {
+    default: 'init',
+    version: 1,
+  });
+  private readonly auth = new ClientStorage<GithubToken | null>(
+    'notes.gh-token',
+    { default: null, version: 1 },
+  );
+
   private readonly clientId: string;
   private readonly scope: string;
   private readonly redirectUri: string;
@@ -30,7 +37,12 @@ export class GithubAuth {
     return this.requestState.cache;
   }
 
-  constructor(params: { clientId: string; scope: string; redirectUri: string; endpoint: string }) {
+  constructor(params: {
+    clientId: string;
+    scope: string;
+    redirectUri: string;
+    endpoint: string;
+  }) {
     this.clientId = params.clientId;
     this.scope = params.scope;
     this.redirectUri = params.redirectUri;
@@ -53,7 +65,9 @@ export class GithubAuth {
 
   async processGithubAuthCode(code: string, state: string) {
     if (state && state !== this.state) {
-      throw new Error(`Request state do not match: "${state}" - "${this.state}`);
+      throw new Error(
+        `Request state do not match: "${state}" - "${this.state}`,
+      );
     }
 
     if (code) {
@@ -62,7 +76,9 @@ export class GithubAuth {
     }
 
     const { result } = await this.requestAccessToken(code, state);
-    const { access_token } = parseParams(`/?${result}`) as { access_token: GithubToken };
+    const { access_token } = parseParams(`/?${result}`) as {
+      access_token: GithubToken;
+    };
 
     this.auth.set(access_token);
     return access_token;
