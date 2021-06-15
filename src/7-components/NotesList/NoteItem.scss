@@ -6,14 +6,16 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  gap: 0.5rem;
-  padding: 0.5rem;
+  gap: var(--sidebar-gap);
+  padding: var(--sidebar-gap);
   font-weight: 500;
   line-height: calc(var(--gist-item-height) - 2px);
   border-left: var(--status-line-width) solid var(--status-line-color);
   border-bottom: 1px solid transparent;
   background-color: var(--note-item-color);
   user-select: none;
+  color: var(--fg-color);
+  text-decoration: none;
 
   &:hover {
     background-color: var(--bg-color-hover);
@@ -22,12 +24,16 @@
   &.active {
     color: var(--fg-color-active);
     background-color: var(--bg-color-active);
-    border-bottom-color: var(--border-color-active);
+    // border-bottom-color: var(--border-color-active);
   }
 
   // &:last-child {
   //   border-bottom-width: 0;
   // }
+
+  .star-part .icon-button {
+    color: var(--favorite-color);
+  }
 
   &:not(:hover):not(.favorite) .star-part {
     visibility: hidden;

@@ -34,7 +34,7 @@ export function NoteItem({ note }: { note: Note }) {
   const extraProps = note.group ? { 'data-group': note.group } : {};
 
   return (
-    <li className={cn.join(' ')} {...extraProps}>
+    <Link className={cn.join(' ')} {...extraProps} to={navigator.toNote(note)}>
       <div className="star-part">
         <IconButton
           icon={note.favorite ? 'star' : 'far star'}
@@ -42,14 +42,14 @@ export function NoteItem({ note }: { note: Note }) {
         />
       </div>
 
-      <Link className="title-part" to={navigator.toNote(note)}>
+      <div className="title-part">
         <h5>{note.title}</h5>
         <h6>{tags.map(x => x.name)}</h6>
-      </Link>
+      </div>
 
       <div className="actions-part">
         <IconButton icon="trash" onClick={() => store.deleteNote(note.id)} />
       </div>
-    </li>
+    </Link>
   );
 }

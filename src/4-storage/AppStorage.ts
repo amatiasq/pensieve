@@ -2,7 +2,12 @@ import { v4 as uuid } from 'uuid';
 
 import { emitterWithChannels } from '@amatiasq/emitter';
 
-import { Note, NoteContent, NoteId } from '../2-entities/Note';
+import {
+  getMetadataFromContent,
+  Note,
+  NoteContent,
+  NoteId
+} from '../2-entities/Note';
 import { Settings } from '../2-entities/Settings';
 import { Tag, TagId } from '../2-entities/Tag';
 import { DEFAULT_SETTINGS } from '../5-app/DEFAULT_SETTINGS';
@@ -157,42 +162,4 @@ function createNote(content: NoteContent): Note {
 
 function getFilePath(id: NoteId) {
   return /(\.\w+)+$/.test(id) ? `notes/${id}` : `notes/${id}.md`;
-}
-
-function getMetadataFromContent(content: NoteContent) {
-  const [rawTitle, rawGroup] = content.split('\n');
-  // const rawTitle = getTitleFromContent(content);
-  const extension = getExtensionFromTitle(rawTitle);
-  const comment = getCommentFromExtension(extension);
-  const title = clean(rawTitle, `${comment}+`) || 'Top Secret';
-  const group = clean(rawGroup, `${comment} group:`) || null;
-
-  return { title, group, extension, content };
-
-  function clean(text = '', startsWith: string) {
-    return text
-      .trim()
-      .replace(new RegExp(`^${startsWith}`), '')
-      .trim()
-      .substr(0, 100);
-  }
-
-  function getExtensionFromTitle(title: string) {
-    const match = title.match(/(\.\w+)+$/);
-    return match ? match[0] : '.md';
-  }
-
-  function getCommentFromExtension(extension: string) {
-    const comments: Record<string, string> = {
-      '.sql': '--',
-      '.md': '#',
-      '.sh': '#',
-      '.js': '//',
-      '.ts': '//',
-      '.cs': '//',
-      '.fs': '//',
-    };
-
-    return comments[extension] || '//';
-  }
 }
