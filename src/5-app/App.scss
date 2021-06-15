@@ -5,6 +5,8 @@
 #app-container {
   color: var(--fg-color);
   background-color: var(--bg-color);
+  width: 100vw;
+  height: 100vh;
 
   &.is-virtual-keyboard-open .mobile-fallback {
     height: 50%;
@@ -14,8 +16,6 @@
   --group-border-width: 2px;
   --status-line-width: var(--group-border-width);
   --status-line-color: transparent;
-  --sidebar-font-size: 0.85rem;
-  --sidebar-gap: 0.4rem;
 
   @include mobile {
     --sidebar-font-size: 1rem;
@@ -93,5 +93,8 @@
   }
 
   @include desktop {
+    &.page-note > aside.hidden {
+      display: none;
+    }
   }
 }

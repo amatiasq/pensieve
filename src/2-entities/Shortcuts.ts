@@ -1,6 +1,4 @@
-import { CommandName } from '../1-core/commands';
-
-export const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
+export const DEFAULT_SHORTCUTS: Shortcuts = {
   'CTRL+TAB': 'goBack',
   'CTRL+SHIFT+TAB': 'goForward',
 
@@ -24,3 +22,15 @@ export const DEFAULT_SHORTCUTS: Record<string, CommandName> = {
   // 'ALT+CTRL+META+SHIFT+Space': () =>
   // 'ALT+CMD+CTRL+SHIFT+Space': () =>
 };
+
+export type ShortcutCommand =
+  | 'newNote'
+  | 'goBack'
+  | 'goForward'
+  | 'goHome'
+  | 'hideSidebar'
+  | 'save'
+  | 'settings'
+  | 'toggleWordWrap';
+
+export type Shortcuts = Record<string, ShortcutCommand>;

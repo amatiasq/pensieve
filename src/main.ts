@@ -1,16 +1,5 @@
-// import { GithubRepository } from './gh/GithubRepository';
-
-// const repo = new GithubRepository(
-//   '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',
-//   'amatiasq',
-//   'takenote-data',
-// );
-
-// repo.readJsonFile('notes.json').then(x => console.log(x));
-
 import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector';
 import { renderApp } from './5-app/App';
-import { initShorcuts } from './5-app/shortcuts';
 
 window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) {
@@ -25,7 +14,6 @@ if (!container) {
 }
 
 renderApp(container);
-initShorcuts();
 
 onVirtualKeyboardDisplayChange(isVisible => {
   if (isVisible) {
