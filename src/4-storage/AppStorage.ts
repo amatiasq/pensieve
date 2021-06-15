@@ -9,7 +9,6 @@ import {
   NoteId
 } from '../2-entities/Note';
 import { Settings } from '../2-entities/Settings';
-import { Tag, TagId } from '../2-entities/Tag';
 import { DEFAULT_SETTINGS } from '../5-app/DEFAULT_SETTINGS';
 import { AsyncStore } from './AsyncStore';
 import { RemoteCollection } from './helpers/RemoteCollection';
@@ -27,12 +26,6 @@ export class AppStorage<ReadOptions, WriteOptions> {
     ReadOptions,
     WriteOptions
   >(this.store, 'README.md');
-  private readonly tags = new RemoteCollection<
-    Tag,
-    TagId,
-    ReadOptions,
-    WriteOptions
-  >(this.store, 'tags.json');
 
   private readonly noteChanged = emitterWithChannels<string, Note | null>();
   private readonly noteContentChanged =
@@ -42,9 +35,6 @@ export class AppStorage<ReadOptions, WriteOptions> {
 
   getNotes = this.notes.get;
   onNotesChange = this.notes.onChange;
-
-  getTags = this.tags.get;
-  onTagsChange = this.tags.onChange;
 
   getSettings = this.settings.get;
   setSettings = this.settings.set;
@@ -125,25 +115,6 @@ export class AppStorage<ReadOptions, WriteOptions> {
     }
 
     return updated;
-  }
-
-  async createTag(name: string, notes: NoteId[] = []) {
-    const id = uuid() as TagId;
-    const tag: Tag = { id, name, notes };
-    await this.tags.add(tag);
-    return tag;
-  }
-
-  setTagName(id: TagId, name: string) {
-    return this.tags.edit(id, x => ({ ...x, name }));
-  }
-
-  setTagNotes(id: TagId, notes: NoteId[]) {
-    return this.tags.edit(id, x => ({ ...x, notes }));
-  }
-
-  removeTag(id: TagId) {
-    return this.tags.remove(id);
   }
 }
 

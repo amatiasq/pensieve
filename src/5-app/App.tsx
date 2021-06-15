@@ -18,13 +18,13 @@ import { useGithubAuth } from './useGithubAuth';
 
 function App() {
   const [store, setStore] = useState<TypedStorage>(null!);
-  const token = useGithubAuth();
+  const { token, username } = useGithubAuth();
   const navigator = useNavigator();
   const [pageName, setPageName] = useState(navigator.getPageName());
 
   useEffect(() => {
-    if (!token) return;
-    createStore(token, 'amatiasq', 'pensieve-data').then(setStore);
+    if (!token || !username) return;
+    createStore(token, username, 'pensieve-data').then(setStore);
   }, [token]);
 
   useEffect(() =>
