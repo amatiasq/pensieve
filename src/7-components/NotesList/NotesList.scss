@@ -4,7 +4,7 @@
 aside {
   display: flex;
   flex-direction: column;
-  background-color: #212122;
+  background-color: var(--bg-color-sidebar);
   transition: width 0.5s ease-in-out;
   max-height: 100%;
 }

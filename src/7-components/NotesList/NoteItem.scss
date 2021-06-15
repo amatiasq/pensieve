@@ -12,6 +12,8 @@
   line-height: calc(var(--gist-item-height) - 2px);
   border-left: var(--status-line-width) solid var(--status-line-color);
   border-bottom: 1px solid transparent;
+  background-color: var(--note-item-color);
+  user-select: none;
 
   &:hover {
     background-color: var(--bg-color-hover);

@@ -1,1 +1,4 @@
 - Save on refresh
+- Add language support
+- Animate folders
+- Improve metadata edition
