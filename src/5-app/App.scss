@@ -9,6 +9,8 @@
     height: 50%;
   }
 
+  --animation-speed: 0.25s;
+
   @include light {
     // --fg-color: #404040;
     --fg-color: red;
@@ -20,13 +22,15 @@
     --fg-color: #c4c4c4;
     --fg-color-active: white;
     --bg-color: #1c1c1c;
-    --bg-color-sidebar: #212122;
+    --bg-color-sidebar: #212121;
     --bg-color-control: #181a1b;
     --bg-color-hover: #333;
-    --bg-color-active: #3659aa;
+    --bg-color-active: #123483;
     --border-color: #343637;
-    --border-color-active: #204aac;
-    --group-color: #282829;
+    --border-color-active: #0f3eaa;
+    --note-item-color: #182031;
+    --group-color: var(--bg-color-sidebar);
+    --group-end-color: #1b306e;
   }
 }
 

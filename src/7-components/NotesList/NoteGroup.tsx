@@ -23,8 +23,7 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
         onClick={onGroupClicked as any}
       >
         <summary className="group-title">
-          <Icon name="angle-up" className="icon-button" />
-          <Icon name="angle-down" className="icon-button" />
+          <Icon name="angle-right" className="icon-button group-caret" />
           <span className="group-name">{group}</span>
           <i className="counter">{notes.length}</i>
         </summary>
