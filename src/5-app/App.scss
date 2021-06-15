@@ -1,5 +1,6 @@
+@import '../0-dom/color-scheme.scss';
 @import '../0-dom/fit-parent.scss';
-@import '../0-dom/theme.scss';
+@import '../0-dom/responsive.scss';
 
 #app-container {
   color: var(--fg-color);
@@ -15,6 +16,16 @@
   --status-line-color: transparent;
   --sidebar-font-size: 0.85rem;
   --sidebar-gap: 0.4rem;
+
+  @include mobile {
+    --sidebar-font-size: 1rem;
+    --sidebar-gap: 0.5rem;
+  }
+
+  @include desktop {
+    --sidebar-font-size: 0.8rem;
+    --sidebar-gap: 0.4rem;
+  }
 
   @include light {
     // --fg-color: #404040;
@@ -69,15 +80,18 @@
   > main {
     @include fit-parent();
   }
-}
 
-@media (max-width: 850px) {
-  .app.page-home > main,
-  .app.page-note > aside {
-    display: none;
+  @include mobile {
+    &.page-home > main,
+    &.page-note > aside {
+      display: none;
+    }
+
+    &.page-home > aside {
+      width: 100% !important;
+    }
   }
 
-  .app.page-home > aside {
-    width: 100% !important;
+  @include desktop {
   }
 }
