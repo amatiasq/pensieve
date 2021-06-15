@@ -10,7 +10,7 @@ aside {
 }
 
 .filter {
-  --spacing: 0.6rem;
+  --spacing: calc(var(--sidebar-gap) * 1.5);
 
   display: flex;
   align-items: center;
@@ -24,8 +24,6 @@ aside {
     border: 1px solid var(--border-color);
     color: var(--fg-color);
     padding: var(--spacing);
-    font-size: 1.1rem;
-    // border-radius: 0.3rem;
 
     &:focus {
       border-color: var(--border-color-active);
@@ -36,11 +34,9 @@ aside {
 .notes-list {
   @include hide-scrollbar();
 
-  --status-line-width: 5px;
-  --status-line-color: transparent;
-
   flex: 1;
   overflow-y: auto;
+  font-size: var(--sidebar-font-size);
 
   &:empty {
     position: relative;
@@ -56,10 +52,3 @@ aside {
     }
   }
 }
-
-// .note-item,
-// .group {
-//   & + & {
-//     border-top: 1px solid var(--border-color);
-//   }
-// }

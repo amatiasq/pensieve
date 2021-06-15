@@ -10,6 +10,11 @@
   }
 
   --animation-speed: 0.25s;
+  --group-border-width: 2px;
+  --status-line-width: var(--group-border-width);
+  --status-line-color: transparent;
+  --sidebar-font-size: 0.85rem;
+  --sidebar-gap: 0.4rem;
 
   @include light {
     // --fg-color: #404040;
@@ -19,18 +24,32 @@
   }
 
   @include dark {
-    --fg-color: #c4c4c4;
-    --fg-color-active: white;
-    --bg-color: #1c1c1c;
-    --bg-color-sidebar: #212121;
-    --bg-color-control: #181a1b;
-    --bg-color-hover: #333;
-    --bg-color-active: #123483;
-    --border-color: #343637;
-    --border-color-active: #0f3eaa;
-    --note-item-color: #182031;
+    $fg: #c4c4c4;
+    $bg: #1c1c1c;
+    $border: #343637;
+    $primary: #669bd1;
+    $secondary: #f2f230;
+    // $secondary: #d16014;
+    // $secondary: #c9866e;
+
+    --fg-color: #{$fg};
+    --fg-color-active: #{adjust-color($fg, $lightness: 100%)};
+
+    --bg-color: #{$bg};
+    --bg-color-sidebar: #{adjust-color($bg, $lightness: 2%)};
+    --bg-color-control: #{adjust-color($bg, $lightness: -2%)};
+    --bg-color-hover: #{adjust-color($bg, $lightness: 10%)};
+    --border-color: #{$border};
+
+    --bg-color-active: #{adjust-color($primary, $lightness: -20%)};
+    --border-color-active: #{adjust-color($primary, $lightness: 0%)};
+
+    --note-item-color: #{adjust-color($bg, $lightness: 2%)};
+    --favorite-color: #{$secondary};
+
     --group-color: var(--bg-color-sidebar);
-    --group-end-color: #1b306e;
+    --group-active-color: #{adjust-color($primary, $lightness: -30%)};
+    --group-border-color: #{adjust-color($secondary, $lightness: -30%)};
   }
 }
 

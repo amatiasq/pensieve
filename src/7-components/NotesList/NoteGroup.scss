@@ -1,16 +1,24 @@
 .group {
   --status-line-color: var(--group-color);
 
+  &:hover .group-title {
+    background-color: var(--bg-color-hover);
+  }
+
+  &.active .group-title {
+    background-color: var(--group-active-color);
+  }
+
   .group-title {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem;
-    padding-right: 1rem;
+    gap: var(--sidebar-gap);
+    padding: var(--sidebar-gap);
+    padding-right: calc(var(--sidebar-gap) * 2);
     cursor: default;
     background-color: var(--group-color);
-    border-left: var(--status-line-width) solid transparent;
-    border-top: var(--status-line-width) solid transparent;
+    border-left: var(--group-border-width) solid transparent;
+    border-top: var(--group-border-width) solid transparent;
 
     .group-name {
       flex: 1;
@@ -35,7 +43,7 @@
 
   &[open] {
     .group-title {
-      border-color: var(--group-end-color);
+      border-color: var(--group-border-color);
     }
 
     .group-caret {
@@ -55,16 +63,24 @@
   }
 
   .group-content {
-    border-left: var(--status-line-width) solid var(--group-end-color);
-    border-bottom: var(--status-line-width) solid var(--group-end-color);
+    border-left: var(--group-border-width) solid var(--group-border-color);
+    border-bottom: var(--group-border-width) solid var(--group-border-color);
   }
 
   .note-item {
-    margin-left: calc(var(--status-line-width) * -1);
-    --status-line-color: var(--group-end-color);
+    &:not(.active) {
+      --status-line-width: 0;
+    }
 
     &.active {
+      margin-left: calc(var(--status-line-width) * -1);
       --status-line-color: var(--border-color-active);
+    }
+  }
+
+  &[open] {
+    & + & .group-title {
+      border-top-width: 0;
     }
   }
 }

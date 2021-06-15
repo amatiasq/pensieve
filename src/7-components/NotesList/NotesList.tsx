@@ -62,7 +62,7 @@ export function NotesList() {
         <IconButton icon="plus" onClick={createNote} />
       </h4>
 
-      <ul className="notes-list">
+      <div className="notes-list">
         {finalList.map(note => {
           if (typeof note !== 'string') {
             return <NoteItem key={note.id} note={note} />;
@@ -74,7 +74,7 @@ export function NotesList() {
             <NoteGroup key={`group/${group}`} group={group} notes={list} />
           );
         })}
-      </ul>
+      </div>
 
       <Resizer size={size} onChange={setSize} />
     </aside>
@@ -87,5 +87,7 @@ export function NotesList() {
 }
 
 function applyFilter(list: Note[], comparer: StringComparer) {
-  return list.filter(gist => comparer.matches(gist.title || ''));
+  return list.filter(gist =>
+    comparer.matchesAny([gist.id, gist.title, gist.group]),
+  );
 }

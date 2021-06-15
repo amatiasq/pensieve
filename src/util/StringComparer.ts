@@ -18,6 +18,11 @@ export default class StringComparer {
 
     return cleanString(target).includes(this.clean);
   }
+
+  matchesAny(list: (string | null | undefined)[]) {
+    const clean = list.filter(Boolean) as string[];
+    return clean.some(x => this.matches(x));
+  }
 }
 
 function cleanString(value: string) {
