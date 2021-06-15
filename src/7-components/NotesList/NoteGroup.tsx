@@ -30,9 +30,15 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
     }),
   );
 
+  const cn = [
+    'group',
+    containsActiveNote ? 'has-active' : '',
+    notes.some(x => x.favorite) ? 'has-favorite' : '',
+  ];
+
   return (
     <details
-      className={`group ${containsActiveNote ? 'active' : ''}`}
+      className={cn.join(' ')}
       data-group={group}
       open={isOpen}
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
