@@ -1,10 +1,13 @@
 import { NoteContent, NoteId } from '../2-entities/Note';
 import { hookStore } from './helpers/hookStore';
 
-export const useNoteContent = hookStore<NoteContent, [NoteId]>('', id => (store, setValue) => {
-  store.getNoteContent(id).then(setValue);
-  return store.onNoteContentChanged(id, setValue);
-});
+export const useNoteContent = hookStore<NoteContent, [NoteId]>(
+  '',
+  id => (store, setValue) => {
+    store.getNoteContent(id).then(setValue);
+    return store.onNoteContentChanged(id, setValue);
+  },
+);
 
 // export function useNoteContent(id: NoteId) {
 //   const store = useContext(AppStorageContext);

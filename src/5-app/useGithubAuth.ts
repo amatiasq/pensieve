@@ -35,6 +35,7 @@ export function useGithubAuth(): Record<string, never> | GithubAuthData {
   );
 
   if (code) {
+    history.replaceState(null, document.title, location.pathname);
     requestTokenAndUsername(code, state).then(setData);
     return {};
   }
@@ -51,5 +52,6 @@ async function requestTokenAndUsername(code: string, state: string) {
   const token = await auth.processGithubAuthCode(code, state);
   const requester = new GithubUsers(token);
   const username = await requester.fetchCurrentUsername();
+  user.set(username);
   return { token, username };
 }

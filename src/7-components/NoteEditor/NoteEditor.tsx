@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { registerCommand } from '../../1-core/commands';
 import { Note, NoteContent } from '../../2-entities/Note';
 import { AppStorageContext } from '../../5-app/contexts';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
+import { useShortcut } from '../../6-hooks/useShortcut';
 // import { useStack } from '../../6-hooks/useStack';
 import { BusinessIndicator } from '../atoms/BusinessIndicator';
 import { Loader } from '../atoms/Loader';
@@ -24,13 +24,13 @@ export function NoteEditor({
   // const [saved, addSaved] = useStack<string>(5, content);
   const [value, setValue] = useState<string>(content);
 
-  registerCommand('save', () => save(value));
-
   const scheduler = useScheduler(autosave * 1000, () => {
     if (autosave !== 0 && content !== value) {
       save(value);
     }
   });
+
+  useShortcut('save', () => save(value));
 
   useEffect(() =>
     navigator.onNavigate(next => {

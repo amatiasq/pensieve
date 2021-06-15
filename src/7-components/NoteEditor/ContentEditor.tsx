@@ -27,13 +27,13 @@ export function ContentEditor({
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
+  // const [defaultFileExtension] = useSetting('defaultFileExtension');
 
   const lines = value.split('\n').length;
   const { extension } = getMetadataFromContent(value);
   const language =
     getLanguageFor(extension) ||
     // getLanguageFor(defaultFileExtension) ||
-    // file.language?.toLocaleLowerCase() ||
     'markdown';
 
   if (isMobile) {

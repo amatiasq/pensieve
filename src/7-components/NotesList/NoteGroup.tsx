@@ -8,7 +8,7 @@ import { Icon } from '../atoms/Icon';
 import { NoteItem } from './NoteItem';
 
 const getGroupOpenId = (group: string) => `group-open:${group}`;
-const isGroupOpen = (group: string) =>
+export const isGroupOpen = (group: string) =>
   Boolean(localStorage[getGroupOpenId(group)]);
 
 export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
@@ -37,14 +37,9 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
   ];
 
   return (
-    <details
-      className={cn.join(' ')}
-      data-group={group}
-      open={isOpen}
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onClick={onGroupClicked as any}
-    >
-      <summary className="group-title">
+    <details className={cn.join(' ')} data-group={group} open={isOpen}>
+      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+      <summary className="group-title" onClick={onGroupClicked as any}>
         <Icon name="angle-right" className="icon-button group-caret" />
         <span className="group-name">{group}</span>
         <i className="counter">{notes.length}</i>
@@ -60,7 +55,8 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
 }
 
 function onGroupClicked(event: MouseEvent) {
-  const target = event.currentTarget as HTMLDetailsElement;
+  const target = (event.currentTarget as HTMLElement)
+    .parentElement as HTMLDetailsElement;
   const isOpen = target.hasAttribute('open');
   const key = getGroupOpenId(target.dataset.group!);
 

@@ -8,18 +8,25 @@ import {
   NoteContent,
   NoteId
 } from '../2-entities/Note';
-import { Settings } from '../2-entities/Settings';
-import { DEFAULT_SETTINGS } from '../5-app/DEFAULT_SETTINGS';
+import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
+import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts';
 import { AsyncStore } from './AsyncStore';
 import { RemoteCollection } from './helpers/RemoteCollection';
 import { RemoteValue } from './helpers/RemoteValue';
 
 export class AppStorage<ReadOptions, WriteOptions> {
-  private readonly settings = new RemoteValue(
+  readonly settings = new RemoteValue(
     this.store,
     'settings.json',
     DEFAULT_SETTINGS as Settings,
   );
+
+  readonly shortcuts = new RemoteValue(
+    this.store,
+    'shortcuts.json',
+    DEFAULT_SHORTCUTS as Shortcuts,
+  );
+
   private readonly notes = new RemoteCollection<
     Note,
     NoteId,
@@ -35,11 +42,6 @@ export class AppStorage<ReadOptions, WriteOptions> {
 
   getNotes = this.notes.get;
   onNotesChange = this.notes.onChange;
-
-  getSettings = this.settings.get;
-  setSettings = this.settings.set;
-  onSettingsChange = this.settings.onChange;
-
   onNoteChanged = this.noteChanged.subscribe;
   onNoteContentChanged = this.noteContentChanged.subscribe;
 
