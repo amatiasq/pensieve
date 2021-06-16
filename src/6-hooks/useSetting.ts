@@ -8,8 +8,11 @@ import { hookStore } from './helpers/hookStore';
 const useSettings = hookStore<Settings, []>(
   DEFAULT_SETTINGS,
   () => (store, setValue) => {
-    store.settings.read().then(x => setValue(deserialize(x)));
-    return store.settings.onChange(x => setValue(deserialize(x)));
+    const subscription = store.settings
+      .read()
+      .subscribe(x => setValue(deserialize(x)));
+
+    return () => subscription.unsubscribe();
   },
 );
 

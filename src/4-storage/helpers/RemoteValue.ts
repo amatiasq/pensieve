@@ -1,11 +1,21 @@
-import { messageBus } from '../../1-core/messageBus';
-import { AsyncStore } from '../AsyncStore';
+import { firstValueFrom, ObservableInput, of, Subject } from 'rxjs';
+import {
+  catchError,
+  distinctUntilChanged,
+  map,
+  mergeWith,
+  skip,
+  startWith,
+  tap
+} from 'rxjs/operators';
 
-type Listener<T> = (listener: (data: T) => void) => () => void;
+import { messageBus } from '../../1-core/messageBus';
+import { deserialize } from '../../util/serialization';
+import { AsyncStore } from '../AsyncStore';
 
 export class RemoteValue<Type, ReadOptions, WriteOptions> {
   private readonly changed: (data: Type) => void;
-  readonly onChange: Listener<Type>;
+  private readonly subject: Subject<Type>;
 
   constructor(
     private readonly store: AsyncStore<ReadOptions, WriteOptions>,
@@ -13,25 +23,29 @@ export class RemoteValue<Type, ReadOptions, WriteOptions> {
     private readonly defaultValue: Type,
   ) {
     const [changed, onChange] = messageBus<Type>(`change:${key}`);
-    this.changed = changed;
-    this.onChange = onChange as Listener<Type>;
 
-    this.get = this.get.bind(this);
-    this.set = this.set.bind(this);
+    this.changed = changed;
+    this.subject = new Subject<Type>();
+
+    onChange(x => this.subject.next(x));
   }
 
-  async get() {
-    try {
-      const json = await this.store.read(this.key);
-      const result = json && (JSON.parse(json) as Type);
-      return result || this.defaultValue;
-    } catch (error) {
-      return this.defaultValue;
-    }
+  get() {
+    return this.store.read(this.key).pipe(
+      map(x => (x ? deserialize<Type>(x) : this.defaultValue)),
+      startWith(this.defaultValue),
+      catchError(() => of(this.defaultValue)),
+      mergeWith(this.subject),
+      distinctUntilChanged(),
+    );
   }
 
   set(value: Type) {
     this.store.write(this.key, JSON.stringify(value, null, 2));
     this.changed(value);
+  }
+
+  asPromise() {
+    return firstValueFrom(this.get().pipe(skip(1)));
   }
 }

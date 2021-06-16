@@ -37,8 +37,7 @@ function init(store: TypedStorage) {
   const setShortcuts = (x: string) =>
     (shortcuts = parseShortcuts(deserialize(x)));
 
-  store.shortcuts.read().then(setShortcuts);
-  store.shortcuts.onChange(setShortcuts);
+  store.shortcuts.read().subscribe(setShortcuts);
 
   onShortcut(event => {
     const keys = event.keys.join('+').toUpperCase();

@@ -1,3 +1,5 @@
+import { from, of } from 'rxjs';
+
 import { AsyncStore, NoOptions } from '../AsyncStore';
 
 export class ForageStore implements AsyncStore {
@@ -14,7 +16,7 @@ export class ForageStore implements AsyncStore {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   read(key: string, options?: NoOptions) {
-    return this.forage.getItem<string>(key);
+    return from(this.forage.getItem<string>(key));
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

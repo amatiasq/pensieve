@@ -1,4 +1,4 @@
-import { of, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import {
   catchError,
   distinctUntilChanged,
@@ -31,7 +31,7 @@ export class RemoteString<ReadOptions, WriteOptions> {
     return this.store.read(this.key, options).pipe(
       startWith(this.defaultValue),
       map(x => x || this.defaultValue),
-      catchError(() => of(this.defaultValue)),
+      catchError(() => this.defaultValue),
       mergeWith(this.subject),
       distinctUntilChanged(),
     );

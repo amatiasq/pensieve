@@ -9,7 +9,6 @@ import { isMobile } from '../../0-dom/isMobile';
 import { getMetadataFromContent } from '../../2-entities/Note';
 import { useSetting } from '../../6-hooks/useSetting';
 import { MobileFallback } from './MobileFallback';
-import { applyMonacoExtensions } from './MonacoExtensions';
 
 export function MonacoEditor({
   value,

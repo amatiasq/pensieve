@@ -1,3 +1,5 @@
+import { throwError } from 'rxjs';
+
 import { Scheduler } from '@amatiasq/scheduler';
 
 import { AsyncStore } from '../AsyncStore';
@@ -28,11 +30,15 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     return this.rejectIfOffline() || this.remote.has(key);
   }
 
-  read(key: string, options?: ReadOptions): Promise<string | null> {
-    return this.rejectIfOffline() || this.remote.read(key, options);
+  read(key: string, options?: ReadOptions) {
+    if (this.isOffline) {
+      return throwError(() => 'OFFLINE');
+    }
+
+    return this.remote.read(key, options);
   }
 
-  write(key: string, value: string, options?: WriteOptions): Promise<void> {
+  write(key: string, value: string, options?: WriteOptions) {
     return this.command('write', [
       key,
       value,
@@ -40,7 +46,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     ]);
   }
 
-  delete(key: string): Promise<void> {
+  delete(key: string) {
     return this.command('delete', [key]);
   }
 

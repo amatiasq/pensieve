@@ -1,3 +1,6 @@
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, startWith } from 'rxjs/operators';
+
 import { AsyncStore } from '../AsyncStore';
 
 class MemoryCache<T> {
@@ -38,43 +41,42 @@ export class CachedStore<ReadOptions, WriteOptions>
   implements AsyncStore<ReadOptions, WriteOptions>
 {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly cache = new MemoryCache<Promise<any>>(30);
+  private readonly keysCache = new MemoryCache<Promise<string[]>>(30);
+  private readonly cache = new MemoryCache<string | null>(30);
 
   constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
 
   keys() {
-    return this.fetch<string[]>('keys', '__KEYS_KEY__');
+    if (this.keysCache.has('.')) {
+      return this.keysCache.get('.');
+    }
+
+    const promise = this.store.keys();
+    this.keysCache.set('.', promise);
+    return promise;
   }
 
   has(key: string) {
     return this.store.has(key);
   }
 
-  read(key: string, options?: ReadOptions): Promise<string | null> {
-    return this.fetch<string>('read', key, options);
+  read(key: string, options?: ReadOptions) {
+    return new Observable<string | null>(observer => {
+      if (this.cache.has(key)) {
+        observer.next(this.cache.get(key));
+      }
+
+      return this.store.read(key, options).subscribe(observer);
+    }).pipe(distinctUntilChanged());
   }
 
   write(key: string, value: string, options?: WriteOptions): Promise<void> {
-    this.cache.set(key, Promise.resolve(value));
+    this.cache.set(key, value);
     return this.store.write(key, value, options);
   }
 
   delete(key: string): Promise<void> {
-    this.cache.set(key, Promise.resolve(null));
+    this.cache.set(key, null);
     return this.store.delete(key);
-  }
-
-  private fetch<T>(
-    method: 'keys' | 'has' | 'read',
-    key: string,
-    options?: ReadOptions | undefined,
-  ) {
-    if (this.cache.has(key)) {
-      return this.cache.get(key);
-    }
-
-    const promise = this.store[method](key, options);
-    this.cache.set(key, promise);
-    return promise as unknown as Promise<T>;
   }
 }

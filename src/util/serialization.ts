@@ -3,13 +3,16 @@ export function serialize(x: any) {
   return JSON.stringify(x, null, 2);
 }
 
-export function deserialize(x: string) {
-  const clean = x.replace(/\/\/[^\n]+\n/g, '');
+export function deserialize<T = any>(x: string) {
+  const clean = x.replace(/[^:]\/\/[^\n]+\n/g, '');
 
   try {
-    return JSON.parse(clean);
+    return JSON.parse(clean) as T;
   } catch (error) {
-    console.warn(`Error in JSON (${error.message}):\n${x}`);
+    const [position] = error.message.split(/\s/g).reverse();
+    console.warn(
+      `Error in JSON (${error.message}):\n${clean.substr(position - 100, 200)}`,
+    );
     throw error;
   }
 }
