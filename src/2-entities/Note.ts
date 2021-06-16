@@ -11,8 +11,9 @@ export interface Note {
 }
 
 export function getMetadataFromContent(content: NoteContent) {
-  const lineBreak = content.indexOf('\n');
-  const firstLine = lineBreak === -1 ? content : content.substr(0, lineBreak);
+  const trimmed = content.trim();
+  const lineBreak = trimmed.indexOf('\n');
+  const firstLine = lineBreak === -1 ? trimmed : trimmed.substr(0, lineBreak);
   const extension = getExtensionFor(firstLine);
   const cleanLine = removeCommentFrom(firstLine, extension);
   const [title, group] = cleanLine

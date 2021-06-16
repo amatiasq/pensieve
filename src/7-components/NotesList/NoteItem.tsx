@@ -11,6 +11,7 @@ import { IconButton } from '../atoms/IconButton';
 export function NoteItem({ note }: { note: Note }) {
   const navigator = useNavigator();
   const store = useContext(AppStorageContext);
+  const [title, setTitle] = useState(note.title);
   const [active, setActive] = useState(navigator.isNote(note));
 
   const cn = [
@@ -18,6 +19,14 @@ export function NoteItem({ note }: { note: Note }) {
     note.favorite ? 'favorite' : '',
     active ? 'active' : '',
   ];
+
+  store.onNoteTitleChanged(note.id).subscribe(setTitle);
+
+  useEffect(() => {
+    if (title !== note.title) {
+      setTitle(note.title);
+    }
+  }, [note.title]);
 
   useEffect(() =>
     navigator.onNavigate(next => {
@@ -40,7 +49,7 @@ export function NoteItem({ note }: { note: Note }) {
         />
       </div>
 
-      <h5 className="title-part">{note.title}</h5>
+      <h5 className="title-part">{title}</h5>
 
       <div className="actions-part">
         <IconButton icon="trash" onClick={() => store.deleteNote(note.id)} />
