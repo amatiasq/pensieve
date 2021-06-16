@@ -11,14 +11,12 @@ import { Editor } from '../Editor/Editor';
 export function EditNoteFromUrl() {
   const { noteId } = useParams() as { noteId: NoteId };
   const store = useContext(AppStorageContext);
-  const [maybeNote, isNoteLoading] = useNote(noteId);
+  const [note, isNoteLoading] = useNote(noteId);
   const [content, isContentLoading] = useNoteContent(noteId);
 
-  if (isNoteLoading || isContentLoading) {
+  if (isNoteLoading || isContentLoading || !note) {
     return <Loader />;
   }
-
-  const note = maybeNote!;
 
   return (
     <Editor
@@ -33,6 +31,7 @@ export function EditNoteFromUrl() {
 
   function update(value: string): void {
     const { title } = getMetadataFromContent(value);
-    store.noteChanged(note!.id, { ...note, title });
+    console.log(title);
+    store.noteChanged(note!.id, { ...note!, title });
   }
 }

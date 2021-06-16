@@ -1,6 +1,7 @@
 import { Scheduler } from '@amatiasq/scheduler';
 
 import { GHRepositoryApi, StagedFiles } from '../../3-github/GHRepositoryApi';
+import { fromPromise } from '../../util/rxjs-extensions';
 import { AsyncStore, NoOptions } from '../AsyncStore';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
@@ -12,11 +13,11 @@ interface PendingCommit {
   reject(reason: Error): void;
 }
 
-interface Urgenteable {
+interface GHRepoWriteOptions {
   urgent?: boolean;
 }
 
-export class GHRepoStore implements AsyncStore<NoOptions, Urgenteable> {
+export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
   private readonly scheduler = new Scheduler(100, () => this.push());
   private readonly pending: PendingCommit[] = [];
 
@@ -35,12 +36,12 @@ export class GHRepoStore implements AsyncStore<NoOptions, Urgenteable> {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   read(key: string, options?: NoOptions) {
-    return key === 'README.md'
-      ? this.repo.getReadme()
-      : this.repo.readFile(key);
+    return fromPromise(
+      key === 'README.md' ? this.repo.getReadme() : this.repo.readFile(key),
+    );
   }
 
-  write(key: string, value: string, { urgent }: Urgenteable = {}) {
+  write(key: string, value: string, { urgent }: GHRepoWriteOptions = {}) {
     if (urgent) {
       return this.repo.writeFile(key, value, `Urgently write: ${key}`);
     }

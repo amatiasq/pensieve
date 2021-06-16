@@ -1,3 +1,5 @@
+import { firstValueFrom } from 'rxjs';
+import { skip } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 
 import { emitterWithChannels } from '@amatiasq/emitter';
@@ -40,8 +42,8 @@ export class AppStorage<ReadOptions, WriteOptions> {
 
   constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
 
-  getNotes = this.notes.get;
-  onNotesChange = this.notes.onChange;
+  getNotes = this.notes.get.bind(this.notes);
+  // onNotesChange = this.notes.onChange;
   onNoteChanged = this.noteChanged.subscribe;
   onNoteContentChanged = this.noteContentChanged.subscribe;
 
@@ -67,9 +69,8 @@ export class AppStorage<ReadOptions, WriteOptions> {
     this.noteChanged(id, null);
   }
 
-  async getNoteContent(id: NoteId) {
-    const result = await this.store.read(getFilePath(id));
-    return result || '';
+  getNoteContent(id: NoteId) {
+    return this.store.read(getFilePath(id));
   }
 
   async setNoteContent(
@@ -99,7 +100,7 @@ export class AppStorage<ReadOptions, WriteOptions> {
   }
 
   async setGroup(group: string | null, ids: NoteId[]) {
-    const notes = await this.notes.get();
+    const notes = await this.notes.asPromise();
 
     const updated = ids.map(id => {
       const index = notes.findIndex(x => x.id === id);

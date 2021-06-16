@@ -39,13 +39,13 @@ export function EditSettings() {
   ] as const;
 
   useEffect(() => {
-    store.settings.read().then(setSettings);
-    return store.settings.onChange(setSettings);
+    const subscription = store.settings.read().subscribe(setSettings);
+    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
-    store.shortcuts.read().then(setShortcuts);
-    return store.shortcuts.onChange(setShortcuts);
+    const subscription = store.shortcuts.read().subscribe(setShortcuts);
+    return () => subscription.unsubscribe();
   }, []);
 
   const selected = tabs[tab];

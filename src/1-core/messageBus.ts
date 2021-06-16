@@ -20,10 +20,5 @@ export function messageBus<Data = undefined>(key: string) {
     setTimeout(() => postMessage({ type: key, data }, location.origin), 10);
   };
 
-  return [
-    notify as RemoveUndefinedArguments<typeof notify>,
-    emit.subscribe as (listener: RemoveUndefinedArguments<(data: Data) => void>) => () => void,
-  ] as const;
+  return [notify, emit.subscribe] as const;
 }
-
-type RemoveUndefinedArguments<T extends (x: any) => U, U = ReturnType<T>> = T extends (x: undefined) => U ? () => U : T;
