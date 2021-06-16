@@ -5,7 +5,7 @@ export const useNoteContent = hookStore<NoteContent, [NoteId]>(
   '',
   id => (store, setValue) => {
     const subscription = store
-      .getNoteContent(id)
+      .readNoteContent(id)
       .subscribe(x => setValue(x || 'null'));
 
     return () => subscription.unsubscribe();

@@ -1,5 +1,6 @@
 import { map } from 'rxjs/operators';
 
+import { deserialize, serialize } from '../../util/serialization';
 import { AsyncStore } from '../AsyncStore';
 import { RemoteValue } from './RemoteValue';
 
@@ -10,16 +11,16 @@ export class RemoteCollection<
   WriteOptions,
 > extends RemoteValue<Type[], ReadOptions, WriteOptions> {
   constructor(store: AsyncStore<ReadOptions, WriteOptions>, key: string) {
-    super(store, key, []);
+    super(store, key, [], serialize, deserialize);
   }
 
   item(id: Id) {
-    return this.get().pipe(map(list => list.find(x => x.id === id) || null));
+    return this.watch().pipe(map(list => list.find(x => x.id === id) || null));
   }
 
   async add(item: Type) {
     const list = await this.asPromise();
-    this.set([item, ...list]);
+    return this.write([item, ...list]);
   }
 
   async edit(id: Id, editor: (item: Type) => Type) {
@@ -28,7 +29,7 @@ export class RemoteCollection<
     const item = list[index];
     const newItem = editor(item);
     list[index] = newItem;
-    this.set(list);
+    await this.write(list);
     return newItem;
   }
 
@@ -38,7 +39,7 @@ export class RemoteCollection<
     if (index === -1) return null;
     const item = list[index];
     list.splice(index, 1);
-    this.set(list);
+    await this.write(list);
     return item;
   }
 }

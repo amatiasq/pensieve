@@ -1,4 +1,4 @@
-import { from, of } from 'rxjs';
+import { from } from 'rxjs';
 
 import { AsyncStore, NoOptions } from '../AsyncStore';
 

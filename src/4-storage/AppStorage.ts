@@ -1,8 +1,11 @@
-import { firstValueFrom } from 'rxjs';
-import { skip } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import {
+  distinctUntilChanged,
+  mergeWith,
+  throttle,
+  throttleTime
+} from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
-
-import { emitterWithChannels } from '@amatiasq/emitter';
 
 import {
   getMetadataFromContent,
@@ -12,6 +15,7 @@ import {
 } from '../2-entities/Note';
 import { DEFAULT_SETTINGS } from '../2-entities/Settings';
 import { DEFAULT_SHORTCUTS } from '../2-entities/Shortcuts';
+import { serialize } from '../util/serialization';
 import { AsyncStore } from './AsyncStore';
 import { RemoteCollection } from './helpers/RemoteCollection';
 import { RemoteString } from './helpers/RemoteString';
@@ -20,13 +24,13 @@ export class AppStorage<ReadOptions, WriteOptions> {
   readonly settings = new RemoteString(
     this.store,
     'settings.json',
-    JSON.stringify(DEFAULT_SETTINGS, null, 2),
+    serialize(DEFAULT_SETTINGS),
   );
 
   readonly shortcuts = new RemoteString(
     this.store,
     'shortcuts.json',
-    JSON.stringify(DEFAULT_SHORTCUTS, null, 2),
+    serialize(DEFAULT_SHORTCUTS),
   );
 
   private readonly notes = new RemoteCollection<
@@ -36,19 +40,18 @@ export class AppStorage<ReadOptions, WriteOptions> {
     WriteOptions
   >(this.store, 'README.md');
 
-  readonly noteChanged = emitterWithChannels<string, Note | null>();
-  private readonly noteContentChanged =
-    emitterWithChannels<string, NoteContent>();
+  private readonly noteChanged = new Map<NoteId, Subject<Note | null>>();
+  private readonly noteTitleUpdated = new Map<NoteId, Subject<string>>();
+  private readonly noteContentChanged = new Map<NoteId, Subject<NoteContent>>();
 
   constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
 
-  getNotes = this.notes.get.bind(this.notes);
-  // onNotesChange = this.notes.onChange;
-  onNoteChanged = this.noteChanged.subscribe;
-  onNoteContentChanged = this.noteContentChanged.subscribe;
+  getNotes = this.notes.read.bind(this.notes);
 
   getNote(id: NoteId) {
-    return this.notes.item(id);
+    return this.notes
+      .item(id)
+      .pipe(mergeWith(this.getNoteSubject(this.noteChanged, id)));
   }
 
   async createNote(content?: NoteContent) {
@@ -66,14 +69,25 @@ export class AppStorage<ReadOptions, WriteOptions> {
       hasContent ? this.store.delete(contentFile) : null,
     ]);
 
-    this.noteChanged(id, null);
+    this.getNoteSubject(this.noteChanged, id).next(null);
   }
 
-  getNoteContent(id: NoteId) {
+  updateNoteContent(id: NoteId, content: NoteContent) {
+    const { title } = getMetadataFromContent(content);
+    this.getNoteSubject(this.noteTitleUpdated, id).next(title);
+  }
+
+  onNoteTitleChanged(id: NoteId) {
+    return new Observable<string>(x =>
+      this.getNoteSubject(this.noteTitleUpdated, id).subscribe(x),
+    ).pipe(throttleTime(100), distinctUntilChanged());
+  }
+
+  readNoteContent(id: NoteId) {
     return this.store.read(getFilePath(id));
   }
 
-  async setNoteContent(
+  async saveNoteContent(
     id: NoteId,
     content: NoteContent,
     options?: WriteOptions,
@@ -85,7 +99,7 @@ export class AppStorage<ReadOptions, WriteOptions> {
       this.store.write(getFilePath(id), content, options),
     ]);
 
-    this.noteContentChanged(id, content);
+    this.getNoteSubject(this.noteContentChanged, id).next(content);
     return note;
   }
 
@@ -95,7 +109,7 @@ export class AppStorage<ReadOptions, WriteOptions> {
       favorite: !x.favorite,
     }));
 
-    this.noteChanged(note.id, note);
+    this.getNoteSubject(this.noteChanged, id).next(note);
     return note;
   }
 
@@ -111,13 +125,23 @@ export class AppStorage<ReadOptions, WriteOptions> {
       return note;
     });
 
-    await this.notes.set(notes);
+    await this.notes.write(notes);
 
     for (const note of updated) {
-      this.noteChanged(note.id, note);
+      this.getNoteSubject(this.noteChanged, note.id).next(note);
     }
 
     return updated;
+  }
+
+  private getNoteSubject<T>(map: Map<NoteId, Subject<T>>, id: NoteId) {
+    if (map.has(id)) {
+      return map.get(id)!;
+    }
+
+    const subject = new Subject<T>();
+    map.set(id, subject);
+    return subject;
   }
 }
 

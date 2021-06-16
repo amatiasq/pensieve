@@ -52,7 +52,7 @@ function defineCodeLenses(monaco: Monaco) {
           {
             range,
             id: 'THIS IS MY TEST',
-            command: { id: 0, title: 'OPEN' },
+            command: { id: '0', title: 'OPEN' },
           },
         ],
         dispose: () => {
@@ -60,7 +60,7 @@ function defineCodeLenses(monaco: Monaco) {
         },
       };
     },
-    resolveCodeLens: function (model, codeLens, token) {
+    resolveCodeLens: function (model, codeLens) {
       return codeLens;
     },
   });
@@ -101,6 +101,7 @@ function defineSemanticTokens(monaco: Monaco) {
 
       return {
         data: new Uint32Array(data),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resultId: null as any,
       };
     },

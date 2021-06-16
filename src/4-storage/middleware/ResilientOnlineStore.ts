@@ -9,6 +9,8 @@ interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   params: Parameters<AsyncStore[T]>;
 }
 
+export class StoreOfflineError extends Error {}
+
 export class ResilientOnlineStore<ReadOptions, WriteOptions>
   implements AsyncStore<ReadOptions, WriteOptions>
 {
@@ -22,6 +24,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
   constructor(private readonly remote: AsyncStore<ReadOptions, WriteOptions>) {
     window.addEventListener('online', () => this.executePending());
   }
+
   keys() {
     return this.rejectIfOffline() || this.remote.keys();
   }
@@ -32,7 +35,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
 
   read(key: string, options?: ReadOptions) {
     if (this.isOffline) {
-      return throwError(() => 'OFFLINE');
+      return throwError(() => new StoreOfflineError());
     }
 
     return this.remote.read(key, options);
@@ -52,7 +55,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
 
   private rejectIfOffline() {
     if (this.isOffline) {
-      return Promise.reject('OFFLINE');
+      return Promise.reject(new StoreOfflineError());
     }
   }
 
@@ -62,7 +65,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
   ) {
     if (this.isOffline) {
       this.pending.push({ method, params });
-      return Promise.reject('OFFLINE');
+      return Promise.reject(new StoreOfflineError());
     }
 
     // TS doesn't recognize params as valid parameters for method

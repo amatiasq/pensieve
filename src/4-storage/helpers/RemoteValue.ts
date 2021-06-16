@@ -1,16 +1,13 @@
-import { firstValueFrom, ObservableInput, of, Subject } from 'rxjs';
+import { lastValueFrom, of, Subject } from 'rxjs';
 import {
   catchError,
   distinctUntilChanged,
   map,
   mergeWith,
-  skip,
-  startWith,
-  tap
+  startWith
 } from 'rxjs/operators';
 
 import { messageBus } from '../../1-core/messageBus';
-import { deserialize } from '../../util/serialization';
 import { AsyncStore } from '../AsyncStore';
 
 export class RemoteValue<Type, ReadOptions, WriteOptions> {
@@ -21,6 +18,8 @@ export class RemoteValue<Type, ReadOptions, WriteOptions> {
     private readonly store: AsyncStore<ReadOptions, WriteOptions>,
     private readonly key: string,
     private readonly defaultValue: Type,
+    private readonly serialize: (x: Type) => string,
+    private readonly deserialize: (x: string) => Type,
   ) {
     const [changed, onChange] = messageBus<Type>(`change:${key}`);
 
@@ -30,22 +29,25 @@ export class RemoteValue<Type, ReadOptions, WriteOptions> {
     onChange(x => this.subject.next(x));
   }
 
-  get() {
-    return this.store.read(this.key).pipe(
-      map(x => (x ? deserialize<Type>(x) : this.defaultValue)),
+  watch() {
+    return this.read().pipe(mergeWith(this.subject), distinctUntilChanged());
+  }
+
+  read(options?: ReadOptions) {
+    return this.store.read(this.key, options).pipe(
+      map(x => (x ? this.deserialize(x) : this.defaultValue)),
       startWith(this.defaultValue),
       catchError(() => of(this.defaultValue)),
-      mergeWith(this.subject),
       distinctUntilChanged(),
     );
   }
 
-  set(value: Type) {
-    this.store.write(this.key, JSON.stringify(value, null, 2));
+  write(value: Type, options?: WriteOptions) {
+    this.store.write(this.key, this.serialize(value), options);
     this.changed(value);
   }
 
   asPromise() {
-    return firstValueFrom(this.get().pipe(skip(1)));
+    return lastValueFrom(this.read());
   }
 }

@@ -1,5 +1,5 @@
-import { observable, Observable, Subscriber } from 'rxjs';
-import { distinctUntilChanged, mergeWith, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged, tap } from 'rxjs/operators';
 
 import { AsyncStore } from '../AsyncStore';
 
@@ -22,14 +22,14 @@ export class MixedStore<RO1, WO1, RO2, WO2>
   read(key: string, options?: RO1 & RO2) {
     return new Observable<string | null>(observer => {
       const flags = new Set<string>();
-      const handlers = propagate(observer, flags);
 
       this.offline
         .read(key, options)
         .pipe(flag(flags, 'offline'))
         .subscribe({
           next: value => !flags.has('remote:next') && observer.next(value),
-          ...handlers('remote'),
+          error: error => flags.has('remote:error') && observer.error(error),
+          complete: () => flags.has('remote:complete') && observer.complete(),
         });
 
       this.remote
@@ -37,7 +37,8 @@ export class MixedStore<RO1, WO1, RO2, WO2>
         .pipe(flag(flags, 'remote'))
         .subscribe({
           next: value => observer.next(value),
-          ...handlers('offline'),
+          error: error => flags.has('offline:error') && observer.error(error),
+          complete: () => observer.complete(),
         });
     }).pipe(distinctUntilChanged());
   }
@@ -63,19 +64,4 @@ function flag<T>(flags: Set<string>, key: string) {
         complete: () => flags.add(`${key}:complete`),
       }),
     );
-}
-
-function propagate<T>(observer: Subscriber<T>, flags: Set<string>) {
-  return (other: 'remote' | 'offline') => ({
-    error(reason: unknown) {
-      if (flags.has(`${other}:error`)) {
-        observer.error(reason);
-      }
-    },
-    complete() {
-      if (flags.has(`${other}:complete`)) {
-        observer.complete();
-      }
-    },
-  });
 }
