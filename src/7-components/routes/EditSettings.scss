@@ -1,0 +1,20 @@
+.settings-editor {
+  flex: 1;
+
+  nav {
+    display: flex;
+    align-items: stretch;
+    min-height: 2rem;
+    border-bottom: 1px solid var(--border-color);
+
+    .tab {
+      cursor: default;
+      padding: var(--sidebar-gap) calc(var(--sidebar-gap) * 2);
+      border-right: 1px solid var(--border-color);
+
+      &:hover {
+        background-color: var(--bg-color-hover);
+      }
+    }
+  }
+}

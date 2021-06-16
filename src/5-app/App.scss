@@ -93,7 +93,7 @@
   }
 
   @include desktop {
-    &.page-note > aside.hidden {
+    &:not(.page-home) > aside.hidden {
       display: none;
     }
   }

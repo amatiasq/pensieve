@@ -8,23 +8,23 @@ import {
   NoteContent,
   NoteId
 } from '../2-entities/Note';
-import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
-import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts';
+import { DEFAULT_SETTINGS } from '../2-entities/Settings';
+import { DEFAULT_SHORTCUTS } from '../2-entities/Shortcuts';
 import { AsyncStore } from './AsyncStore';
 import { RemoteCollection } from './helpers/RemoteCollection';
-import { RemoteValue } from './helpers/RemoteValue';
+import { RemoteString } from './helpers/RemoteString';
 
 export class AppStorage<ReadOptions, WriteOptions> {
-  readonly settings = new RemoteValue(
+  readonly settings = new RemoteString(
     this.store,
     'settings.json',
-    DEFAULT_SETTINGS as Settings,
+    JSON.stringify(DEFAULT_SETTINGS, null, 2),
   );
 
-  readonly shortcuts = new RemoteValue(
+  readonly shortcuts = new RemoteString(
     this.store,
     'shortcuts.json',
-    DEFAULT_SHORTCUTS as Shortcuts,
+    JSON.stringify(DEFAULT_SHORTCUTS, null, 2),
   );
 
   private readonly notes = new RemoteCollection<
@@ -34,7 +34,7 @@ export class AppStorage<ReadOptions, WriteOptions> {
     WriteOptions
   >(this.store, 'README.md');
 
-  private readonly noteChanged = emitterWithChannels<string, Note | null>();
+  readonly noteChanged = emitterWithChannels<string, Note | null>();
   private readonly noteContentChanged =
     emitterWithChannels<string, NoteContent>();
 

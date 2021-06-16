@@ -2,23 +2,25 @@ import { useHistory } from 'react-router-dom';
 
 import { Note, NoteId } from '../2-entities/Note';
 
-const note = '/note/:noteId';
-
 class Navigator {
+  readonly settings = '/settings';
   readonly note = '/note/:noteId';
+
   constructor(
     private readonly history: ReturnType<typeof useHistory>,
     readonly path: string,
   ) {}
 
-  readonly toNote = acceptNoteOrId(id => note.replace(':noteId', id));
+  readonly goSettings = () => this.history.push(this.settings);
+
+  readonly toNote = acceptNoteOrId(id => this.note.replace(':noteId', id));
 
   readonly goNote = acceptNoteOrId(id =>
-    this.history.push(note.replace(':noteId', id)),
+    this.history.push(this.note.replace(':noteId', id)),
   );
 
   readonly isNote = acceptNoteOrId(
-    id => this.path === note.replace(':noteId', id),
+    id => this.path === this.note.replace(':noteId', id),
   );
 
   onNavigate(listener: (next: Navigator) => void) {

@@ -2,17 +2,13 @@ import './App.scss';
 
 import React, { useEffect, useState } from 'react';
 import { render } from 'react-dom';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 
-// import { Placeholder } from '../7-components/Placeholder';
 import { createStore, TypedStorage } from '../4-storage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
-// Only exception to layer hierarchy
-// import { EditGistFromUrl } from '../7-components/EditGist/EditGistFromUrl';
-import { EditNoteFromUrl } from '../7-components/NoteEditor/EditNoteFromUrl';
-import { NotesList } from '../7-components/NotesList/NotesList';
 import { AppStorageContext } from './contexts';
+import { Router } from './Router';
 import { useGithubAuth } from './useGithubAuth';
 
 function App() {
@@ -37,12 +33,7 @@ function App() {
   return (
     <AppStorageContext.Provider value={store}>
       <div className={`app page-${pageName}`}>
-        <NotesList />
-        {/* <Route path="/" component={Placeholder} exact /> */}
-        {/* <Route path="/sketch" component={SketchPad} /> */}
-        {/* <Route path="/settings" component={EditSettings} /> */}
-        <Route path={navigator.note} component={EditNoteFromUrl}></Route>
-        {/* <Route path="/gist/:gistId/:filename" component={EditGistFromUrl}></Route> */}
+        <Router />
       </div>
     </AppStorageContext.Provider>
   );

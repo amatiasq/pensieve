@@ -2,15 +2,14 @@ import { useContext, useEffect, useState } from 'react';
 
 import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
 import { AppStorageContext } from '../5-app/contexts';
+import { deserialize, serialize } from '../util/serialization';
 import { hookStore } from './helpers/hookStore';
-
-const serialize = JSON.stringify;
 
 const useSettings = hookStore<Settings, []>(
   DEFAULT_SETTINGS,
   () => (store, setValue) => {
-    store.settings.get().then(setValue);
-    return store.settings.onChange(setValue);
+    store.settings.read().then(x => setValue(deserialize(x)));
+    return store.settings.onChange(x => setValue(deserialize(x)));
   },
 );
 
@@ -26,8 +25,8 @@ export function useSetting<Key extends keyof Settings>(key: Key) {
   return [value, set] as const;
 
   function set(newValue: Settings[Key]) {
-    if (serialize(value) !== serialize(newValue)) {
-      store.settings.set({ ...settings, [key]: newValue });
+    if (value !== newValue) {
+      store.settings.write(serialize({ ...settings, [key]: newValue }));
       setValue(newValue);
     }
   }
