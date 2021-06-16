@@ -1,4 +1,4 @@
-import './ContentEditor.scss';
+import './MonacoEditor.scss';
 
 import { editor } from 'monaco-editor';
 import React from 'react';
@@ -9,16 +9,18 @@ import { isMobile } from '../../0-dom/isMobile';
 import { getMetadataFromContent } from '../../2-entities/Note';
 import { useSetting } from '../../6-hooks/useSetting';
 import { MobileFallback } from './MobileFallback';
+import { applyMonacoExtensions } from './MonacoExtensions';
 
-// type Monaco = typeof monaco;
-// type IEditor = monaco.editor.IStandaloneCodeEditor;
-
-export function ContentEditor({
+export function MonacoEditor({
   value,
+  ext,
+  gap,
   readonly,
   onChange,
 }: {
   value: string;
+  ext?: string;
+  gap?: string;
   readonly?: boolean;
   onChange: (newValue: string | undefined) => void;
 }) {
@@ -27,31 +29,31 @@ export function ContentEditor({
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
-  // const [defaultFileExtension] = useSetting('defaultFileExtension');
 
   const lines = value.split('\n').length;
   const { extension } = getMetadataFromContent(value);
-  const language =
-    getLanguageFor(extension) ||
-    // getLanguageFor(defaultFileExtension) ||
-    'markdown';
+  const language = getLanguageFor(ext || extension) || 'markdown';
 
   if (isMobile) {
     return (
-      <MobileFallback {...{ language, value, readonly, onChange }} autofocus />
+      <MobileFallback
+        {...{ gap, language, value, readonly, onChange }}
+        autofocus
+      />
     );
   }
 
   return (
     <Editor
       className="editor"
-      height="100vh"
+      height={gap ? `calc(100vh - ${gap}` : '100vh'}
       theme="vs-dark"
       language={language}
       value={value}
-      onChange={onChange}
-      onMount={x => x.focus()}
       options={getEditorOptions(language === 'markdown')}
+      onChange={onChange}
+      // beforeMount={x => applyMonacoExtensions(x)}
+      onMount={x => x.focus()}
     />
   );
 
@@ -66,12 +68,12 @@ export function ContentEditor({
       tabSize,
       wordBasedSuggestions: isMarkdown ? false : true,
       wordWrap: wordWrap ? 'on' : 'off',
+      'semanticHighlighting.enabled': true,
     } as editor.IStandaloneEditorConstructionOptions;
   }
 
   function getLanguageFor(ext: string) {
     if (!monaco) return null;
-
     const list = monaco.languages.getLanguages();
     const lang = list.find(lang => lang.extensions?.includes(ext));
     return lang?.id;

@@ -10,6 +10,8 @@ export const DEFAULT_SHORTCUTS: Shortcuts = {
   'CMD+W': 'goHome',
   'CMD+N': 'newNote',
 
+  'CMD+SHIFT+E': 'clearFilter',
+
   // 'CMD+ArrowRight': 'nextFile',
   // 'CMD+ArrowLeft': 'prevFile',
 
@@ -24,11 +26,12 @@ export const DEFAULT_SHORTCUTS: Shortcuts = {
 };
 
 export type ShortcutCommand =
-  | 'newNote'
+  | 'clearFilter'
   | 'goBack'
   | 'goForward'
   | 'goHome'
   | 'hideSidebar'
+  | 'newNote'
   | 'save'
   | 'settings'
   | 'toggleWordWrap';

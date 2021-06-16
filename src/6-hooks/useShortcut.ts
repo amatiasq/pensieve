@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { onShortcut } from '../1-core/keyboard';
 import {
@@ -8,6 +8,7 @@ import {
 } from '../2-entities/Shortcuts';
 import { TypedStorage } from '../4-storage/index';
 import { AppStorageContext } from '../5-app/contexts';
+import { deserialize } from '../util/serialization';
 
 type Executor = () => void;
 
@@ -15,7 +16,14 @@ const commands: Partial<Record<ShortcutCommand, Executor>> = {};
 let initialized = false;
 
 export function useShortcut(name: ShortcutCommand, execute: Executor) {
-  commands[name] = execute;
+  const before = commands[name];
+
+  useEffect(() => {
+    commands[name] = execute;
+    return () => {
+      commands[name] = before;
+    };
+  });
 
   if (!initialized) {
     const store = useContext(AppStorageContext);
@@ -25,9 +33,11 @@ export function useShortcut(name: ShortcutCommand, execute: Executor) {
 
 function init(store: TypedStorage) {
   let shortcuts = parseShortcuts(DEFAULT_SHORTCUTS);
-  const setShortcuts = (x: Shortcuts) => (shortcuts = parseShortcuts(x));
 
-  store.shortcuts.get().then(setShortcuts);
+  const setShortcuts = (x: string) =>
+    (shortcuts = parseShortcuts(deserialize(x)));
+
+  store.shortcuts.read().then(setShortcuts);
   store.shortcuts.onChange(setShortcuts);
 
   onShortcut(event => {

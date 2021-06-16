@@ -11,27 +11,31 @@ export interface Note {
 }
 
 export function getMetadataFromContent(content: NoteContent) {
-  const [rawTitle, rawGroup] = content.split('\n');
-  // const rawTitle = getTitleFromContent(content);
-  const extension = getExtensionFromTitle(rawTitle);
-  const comment = getCommentFromExtension(extension);
-  const title = clean(rawTitle, `${comment}+`) || 'Top Secret';
-  const group = clean(rawGroup, `${comment} group:`) || null;
+  const lineBreak = content.indexOf('\n');
+  const firstLine = lineBreak === -1 ? content : content.substr(0, lineBreak);
+  const extension = getExtensionFor(firstLine);
+  const cleanLine = removeCommentFrom(firstLine, extension);
+  const [title, group] = cleanLine
+    .split('/')
+    .reverse()
+    .map(x => x.trim());
 
   return { title, group, extension, content };
 }
 
-function clean(text = '', startsWith: string) {
-  return text
-    .trim()
-    .replace(new RegExp(`^${startsWith}`), '')
-    .trim()
-    .substr(0, 100);
-}
-
-function getExtensionFromTitle(title: string) {
+function getExtensionFor(title: string) {
   const match = title.match(/(\.\w+)+$/);
   return match ? match[0] : '.md';
+}
+
+function removeCommentFrom(text: string, extension: string) {
+  const remover = getCommentRemover(extension);
+  return text.trim().replace(remover, '').trim();
+}
+
+function getCommentRemover(extension: string) {
+  const comment = getCommentFromExtension(extension);
+  return new RegExp(`^\\s*(${comment})+`);
 }
 
 function getCommentFromExtension(extension: string) {

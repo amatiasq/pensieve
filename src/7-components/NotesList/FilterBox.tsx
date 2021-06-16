@@ -1,6 +1,7 @@
 import React, { createRef, useState } from 'react';
 
 import { useScheduler } from '../../6-hooks/useScheduler';
+import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
 import { IconButton } from '../atoms/IconButton';
 
@@ -14,6 +15,8 @@ export function FilterBox({
   const scheduler = useScheduler(50, () =>
     onChange(term ? new StringComparer(term) : null),
   );
+
+  useShortcut('clearFilter', () => process(''));
 
   return (
     <>

@@ -8,7 +8,8 @@ import MarkdownPreview from '@uiw/react-markdown-preview';
 export interface MobileFallbackProps {
   language: string;
   value: string;
-  readonly: boolean | undefined;
+  gap?: string;
+  readonly?: boolean;
   autofocus: boolean;
   onChange: (newValue: string | undefined) => void;
 }
@@ -16,6 +17,7 @@ export interface MobileFallbackProps {
 export function MobileFallback({
   language,
   value,
+  gap,
   readonly,
   autofocus,
   onChange,
@@ -37,6 +39,7 @@ export function MobileFallback({
       <textarea
         className="mobile-fallback mobile-fallback--textarea"
         defaultValue={value}
+        data-gap={gap || 0}
         readOnly={readonly}
         autoFocus={autofocus}
         autoComplete=""
