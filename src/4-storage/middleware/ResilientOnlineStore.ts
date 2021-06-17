@@ -1,4 +1,5 @@
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { Scheduler } from '@amatiasq/scheduler';
 
@@ -14,6 +15,7 @@ export class StoreOfflineError extends Error {}
 export class ResilientOnlineStore<ReadOptions, WriteOptions>
   implements AsyncStore<ReadOptions, WriteOptions>
 {
+  private readonly reading = new Map<string, Observable<string | null>>();
   private readonly pending: Command[] = [];
   private readonly reconnect = new Scheduler(1000, () => this.executePending());
 
@@ -34,11 +36,17 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
   }
 
   read(key: string, options?: ReadOptions) {
+    if (this.reading.has(key)) {
+      return this.reading.get(key)!;
+    }
+
     if (this.isOffline) {
       return throwError(() => new StoreOfflineError());
     }
 
-    return this.remote.read(key, options);
+    const observable = this.remote.read(key, options);
+    this.reading.set(key, observable);
+    return observable.pipe(tap({ complete: () => this.reading.delete(key) }));
   }
 
   write(key: string, value: string, options?: WriteOptions) {

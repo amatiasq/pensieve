@@ -32,6 +32,20 @@ export async function createStore(
 
   const storage = new AppStorage(store);
 
+  // store.read('potato').subscribe({
+  //   next: x => console.log(1, x),
+  //   complete: () => console.log('1 completed'),
+  // });
+
+  // store.read('potato').subscribe(x => {
+  //   console.log(2, x);
+  //   store.delete('potato');
+  // });
+
+  // setTimeout(() => {
+  //   store.write('potato', 'AY ME');
+  // });
+
   if (await repo.createIfNecessary('Database for notes', true)) {
     // repo.commit('Initial commit', storage.getInitialData());
   }

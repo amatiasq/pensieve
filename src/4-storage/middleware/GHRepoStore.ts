@@ -41,10 +41,11 @@ export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   write(key: string, value: string, { urgent }: GHRepoWriteOptions = {}) {
-    if (urgent) {
-      return this.repo.writeFile(key, value, `Urgently write: ${key}`);
-    }
+    // if (urgent) {
+    //   return this.repo.writeFile(key, value, `Urgently write: ${key}`);
+    // }
 
     return this.commit(`Update ${key}`, { [key]: value });
   }
