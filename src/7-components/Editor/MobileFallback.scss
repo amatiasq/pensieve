@@ -2,6 +2,7 @@
 
 .mobile-fallback {
   padding: 24px;
+  --toolbar-height: 0;
 
   &--textarea {
     appearance: none;
@@ -11,8 +12,9 @@
     background-color: #1c1c1c;
     color: inherit;
     width: 100%;
-    height: calc(100% - attr(data-gap));
+    height: calc(100vh - var(--toolbar-height));
     padding: 32px;
+    box-sizing: border-box;
   }
 
   &--markdown {

@@ -37,9 +37,9 @@ export function MobileFallback({
   if (!isPreview) {
     return (
       <textarea
+        ref={x => x?.style.setProperty('--toolbar-height', `${gap || 0}px`)}
         className="mobile-fallback mobile-fallback--textarea"
         defaultValue={value}
-        data-gap={gap || 0}
         readOnly={readonly}
         autoFocus={autofocus}
         autoComplete=""

@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
+import { onPageVisibilityChange } from '../../0-dom/page-visibility';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
@@ -29,6 +32,7 @@ export type EditorProps = ReadonlyEditorProps | EditableEditorProps;
 export function Editor(props: EditorProps) {
   const { title, content, ext, gap } = props;
   const readonly = isReadonly(props) || false;
+  const save = new Subject<{ urgent?: boolean } | void>();
 
   const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
@@ -37,7 +41,7 @@ export function Editor(props: EditorProps) {
 
   const scheduler = useScheduler(autosave * 1000, () => {
     if (autosave !== 0) {
-      save();
+      save.next();
     }
   });
 
@@ -45,7 +49,7 @@ export function Editor(props: EditorProps) {
 
   useEffect(() => {
     if (isEditable(props) && props.saveOnNavigation) {
-      history.listen(() => save());
+      history.listen(() => save.next());
     }
   });
 
@@ -61,12 +65,20 @@ export function Editor(props: EditorProps) {
   }, [content]);
 
   useEffect(() => {
-    const handler = () => save(true);
+    const handler = () => save.next({ urgent: true });
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   });
 
+  useEffect(() => {
+    onPageVisibilityChange(visible => !visible && save.next({ urgent: true }));
+  });
+
   if (value == null) return <Loader />;
+
+  save
+    .pipe(debounceTime(100))
+    .subscribe(options => value !== content && forceSave(options || {}));
 
   return (
     <main>
@@ -86,13 +98,7 @@ export function Editor(props: EditorProps) {
     scheduler.restart();
   }
 
-  function save(urgent = false) {
-    if (value !== content) {
-      forceSave(urgent);
-    }
-  }
-
-  function forceSave(urgent = false) {
+  function forceSave({ urgent = false } = {}) {
     if (!isEditable(props)) return;
     scheduler.stop();
     addSaved(value);

@@ -7,7 +7,13 @@ const https = require('https');
 const encode = encodeURIComponent;
 const decode = decodeURIComponent;
 
-const { PORT, CLIENT_ID_PROD, CLIENT_SECRET_PROD, CLIENT_ID_DEV, CLIENT_SECRET_DEV } = process.env;
+const {
+  PORT,
+  CLIENT_ID_PROD,
+  CLIENT_SECRET_PROD,
+  CLIENT_ID_DEV,
+  CLIENT_SECRET_DEV,
+} = process.env;
 
 const server = http.createServer(async (req, res) => {
   const { code, redirect_uri, state } = parseParams(req.url);

@@ -41,6 +41,7 @@ export function useNavigator() {
   return new Navigator(history, history.location.pathname);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function acceptNoteOrId(op: (id: NoteId) => any) {
   return (noteOrId: Note | NoteId) =>
     op(typeof noteOrId === 'string' ? noteOrId : noteOrId.id);

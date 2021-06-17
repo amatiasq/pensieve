@@ -57,6 +57,7 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
 function onGroupClicked(event: MouseEvent) {
   const target = (event.currentTarget as HTMLElement)
     .parentElement as HTMLDetailsElement;
+
   const isOpen = target.hasAttribute('open');
   const key = getGroupOpenId(target.dataset.group!);
 
