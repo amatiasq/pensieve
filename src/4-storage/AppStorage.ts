@@ -1,5 +1,10 @@
 import { Observable } from 'rxjs';
-import { distinctUntilChanged, mergeWith, throttleTime } from 'rxjs/operators';
+import {
+  catchError,
+  distinctUntilChanged,
+  mergeWith,
+  throttleTime
+} from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 
 import {
@@ -78,7 +83,7 @@ export class AppStorage {
   }
 
   readNoteContent(id: NoteId) {
-    return this.store.read(getFilePath(id));
+    return this.store.read(getFilePath(id)).pipe(catchError(() => ''));
   }
 
   async saveNoteContent(
