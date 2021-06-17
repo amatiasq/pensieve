@@ -6,7 +6,7 @@ import {
   ShortcutCommand,
   Shortcuts
 } from '../2-entities/Shortcuts';
-import { TypedStorage } from '../4-storage/index';
+import { AppStorage } from '../4-storage/AppStorage';
 import { AppStorageContext } from '../5-app/contexts';
 import { deserialize } from '../util/serialization';
 
@@ -31,7 +31,7 @@ export function useShortcut(name: ShortcutCommand, execute: Executor) {
   }
 }
 
-function init(store: TypedStorage) {
+function init(store: AppStorage) {
   let shortcuts = parseShortcuts(DEFAULT_SHORTCUTS);
 
   const setShortcuts = (x: string) =>
