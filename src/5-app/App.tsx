@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 
-import { createStore, TypedStorage } from '../4-storage';
+import { createStore } from '../4-storage';
+import { AppStorage } from '../4-storage/AppStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
 import { AppStorageContext } from './contexts';
@@ -12,14 +13,16 @@ import { Router } from './Router';
 import { useGithubAuth } from './useGithubAuth';
 
 function App() {
-  const [store, setStore] = useState<TypedStorage>(null!);
+  const [store, setStore] = useState<AppStorage>(null!);
   const { token, username } = useGithubAuth();
   const navigator = useNavigator();
   const [pageName, setPageName] = useState(navigator.getPageName());
 
   useEffect(() => {
     if (!token || !username) return;
-    createStore(token, username, 'pensieve-data').then(setStore);
+    createStore(token, username, 'pensieve-data').then(x =>
+      setStore(new AppStorage(x)),
+    );
   }, [token]);
 
   useEffect(() =>

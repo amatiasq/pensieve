@@ -11,12 +11,12 @@ import {
 import { DEFAULT_SETTINGS } from '../2-entities/Settings';
 import { DEFAULT_SHORTCUTS } from '../2-entities/Shortcuts';
 import { serialize } from '../util/serialization';
-import { AsyncStore } from './AsyncStore';
 import { RemoteCollection } from './helpers/RemoteCollection';
 import { RemoteString } from './helpers/RemoteString';
 import { subjectWithChannels } from './helpers/subjectWithChannels';
+import { FinalStore, FinalWriteOptions } from './index';
 
-export class AppStorage<ReadOptions, WriteOptions> {
+export class AppStorage {
   readonly settings = new RemoteString(
     this.store,
     'settings.json',
@@ -29,20 +29,20 @@ export class AppStorage<ReadOptions, WriteOptions> {
     serialize(DEFAULT_SHORTCUTS),
   );
 
-  private readonly notes = new RemoteCollection<
-    Note,
-    NoteId,
-    ReadOptions,
-    WriteOptions
-  >(this.store, 'README.md');
+  private readonly notes = new RemoteCollection<Note, NoteId>(
+    this.store,
+    'README.md',
+  );
 
   private readonly noteChanged = subjectWithChannels<Note | null>();
   private readonly noteTitleUpdated = subjectWithChannels<string>();
   private readonly noteContentChanged = subjectWithChannels<NoteContent>();
 
-  constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
+  constructor(private readonly store: FinalStore) {}
 
-  getNotes = this.notes.read.bind(this.notes);
+  getNotes() {
+    return this.notes.watch();
+  }
 
   getNote(id: NoteId) {
     return this.notes.item(id).pipe(mergeWith(this.noteChanged(id)));
@@ -84,7 +84,7 @@ export class AppStorage<ReadOptions, WriteOptions> {
   async saveNoteContent(
     id: NoteId,
     content: NoteContent,
-    options?: WriteOptions,
+    options?: FinalWriteOptions,
   ) {
     const { title, group } = getMetadataFromContent(content);
 

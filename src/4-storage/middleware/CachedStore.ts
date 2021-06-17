@@ -1,8 +1,7 @@
-import { from, Observable } from 'rxjs';
-import { distinctUntilChanged, mergeWith, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 
 import { AsyncStore } from '../AsyncStore';
-import { subjectWithChannels } from '../helpers/subjectWithChannels';
 
 class MemoryCache<T> {
   private readonly data = new Map<string, unknown>();
@@ -44,7 +43,6 @@ export class CachedStore<ReadOptions, WriteOptions>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private readonly keysCache = new MemoryCache<Promise<string[]>>(30);
   private readonly cache = new MemoryCache<string | null>(30);
-  private readonly subject = subjectWithChannels<string | null>();
 
   constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
 
@@ -63,11 +61,9 @@ export class CachedStore<ReadOptions, WriteOptions>
   }
 
   read(key: string, options?: ReadOptions) {
-    const source = new Observable<string | null>(observer => {
+    return new Observable<string | null>(observer => {
       if (this.cache.has(key)) {
-        if (key === 'potato')
-          observer.next(`${this.constructor.name}:${performance.now()}`);
-        else observer.next(this.cache.get(key));
+        observer.next(this.cache.get(key));
       }
 
       return this.store
@@ -75,22 +71,15 @@ export class CachedStore<ReadOptions, WriteOptions>
         .pipe(tap(x => this.cache.set(key, x)))
         .subscribe(observer);
     });
-
-    return source.pipe(
-      mergeWith(from(this.subject(key))),
-      distinctUntilChanged(),
-    );
   }
 
   write(key: string, value: string, options?: WriteOptions): Promise<void> {
     this.cache.set(key, value);
-    this.subject(key).next(value);
     return this.store.write(key, value, options);
   }
 
   delete(key: string): Promise<void> {
     this.cache.set(key, null);
-    this.subject(key).next(null);
     return this.store.delete(key);
   }
 }

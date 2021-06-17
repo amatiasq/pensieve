@@ -1,16 +1,13 @@
 import { map } from 'rxjs/operators';
 
 import { deserialize, serialize } from '../../util/serialization';
-import { AsyncStore } from '../AsyncStore';
+import { FinalStore } from '../index';
 import { RemoteValue } from './RemoteValue';
 
-export class RemoteCollection<
-  Type extends { id: Id },
-  Id,
-  ReadOptions,
-  WriteOptions,
-> extends RemoteValue<Type[], ReadOptions, WriteOptions> {
-  constructor(store: AsyncStore<ReadOptions, WriteOptions>, key: string) {
+export class RemoteCollection<Type extends { id: Id }, Id> extends RemoteValue<
+  Type[]
+> {
+  constructor(store: FinalStore, key: string) {
     super(store, key, [], serialize, deserialize);
   }
 

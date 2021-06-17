@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { TypedStorage } from '../../4-storage/index';
+import { AppStorage } from '../../4-storage/AppStorage';
 import { AppStorageContext } from '../../5-app/contexts';
 
 export function hookStore<Item, Args extends unknown[]>(
@@ -8,7 +8,7 @@ export function hookStore<Item, Args extends unknown[]>(
   definition: (
     ...args: Args
   ) => (
-    store: TypedStorage,
+    store: AppStorage,
     setValue: (item: Item) => void,
   ) => () => boolean | void,
 ) {
