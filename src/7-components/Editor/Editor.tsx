@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { debounceTime } from 'rxjs/operators';
 
 import { emitter } from '@amatiasq/emitter';
 
-import { onPageVisibilityChange } from '../../0-dom/page-visibility';
+import { onPageActive } from '../../0-dom/page-lifecycle';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
@@ -38,6 +39,7 @@ export function Editor(props: EditorProps) {
   const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
   const [saved, addSaved] = useStack<string>(5, content);
+  const [hasUnsavedChanges, setHasUnsavedChanged] = useState(false);
   const [value, setValue] = useState<string>(content);
 
   const scheduler = useScheduler(autosave * 1000, () => {
@@ -49,39 +51,38 @@ export function Editor(props: EditorProps) {
   useShortcut('save', forceSave);
 
   useEffect(() => {
+    // eslint-disable-next-line no-irregular-whitespace
+    document.title = `${title}  ✏️  Pensieve`;
+  }, [title]);
+
+  useEffect(() => {
     if (isEditable(props) && props.saveOnNavigation) {
       return history.listen(() => requestSave());
     }
   });
 
   useEffect(() => {
-    // eslint-disable-next-line no-irregular-whitespace
-    document.title = `${title}  ✏️  Notes`;
-  }, [title]);
-
-  useEffect(() => {
     if (!saved.includes(content)) {
+      setHasUnsavedChanged(false);
       setValue(content);
     }
   }, [content]);
 
   useEffect(() => {
-    const handler = () => requestSave({ urgent: true });
-    window.addEventListener('beforeunload', handler);
-    return () => window.removeEventListener('beforeunload', handler);
-  });
+    if (!hasUnsavedChanges) return;
 
-  useEffect(() => {
-    onPageVisibilityChange(
-      visible => !visible && requestSave({ urgent: true }),
-    );
+    const sus = onPageActive.subscribe(active => {
+      !active && requestSave({ urgent: true });
+    });
+
+    return () => sus.unsubscribe();
   });
 
   if (value == null) return <Loader />;
 
   fromEmitter(requestSave)
-    // .pipe(debounceTime(100))
-    .subscribe(options => value !== content && forceSave(options || {}));
+    .pipe(debounceTime(100))
+    .subscribe(options => hasUnsavedChanges && forceSave(options || {}));
 
   return (
     <main>
@@ -94,20 +95,18 @@ export function Editor(props: EditorProps) {
   );
 
   function onEditorChange(value = '') {
-    if (!isEditable(props)) return;
-    const { onChange } = props;
+    if (!isEditable(props)) wtf();
+    setHasUnsavedChanged(value !== content);
     setValue(value);
-    onChange && onChange(value);
+    props.onChange && props.onChange(value);
     scheduler.restart();
   }
 
   function forceSave({ urgent = false } = {}) {
-    if (!isEditable(props)) return;
+    if (!isEditable(props)) wtf();
     scheduler.stop();
     addSaved(value);
-    console.log;
-    const { onSave } = props;
-    return onSave(value, { urgent });
+    return props.onSave(value, { urgent });
   }
 }
 
@@ -117,4 +116,8 @@ function isReadonly(props: EditorProps): props is ReadonlyEditorProps {
 
 function isEditable(props: EditorProps): props is EditableEditorProps {
   return 'onSave' in props;
+}
+
+function wtf(): never {
+  throw new Error('How the fuck did you get here???');
 }
