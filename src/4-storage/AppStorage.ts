@@ -103,7 +103,6 @@ export class AppStorage {
     content: NoteContent,
     options?: FinalWriteOptions,
   ) {
-    console.log('SAVE NOTE CONTENT', id);
     const { title, group } = getMetadataFromContent(content);
 
     const [note] = await Promise.all([

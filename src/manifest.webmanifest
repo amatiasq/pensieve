@@ -1,6 +1,6 @@
 {
-  "short_name": "Better Gists",
-  "name": "Better Gists",
+  "short_name": "Pensieve",
+  "name": "Pensieve",
   "description": "Simple app to take notes",
   "display": "fullscreen",
   "background_color": "#1c1c1c",
