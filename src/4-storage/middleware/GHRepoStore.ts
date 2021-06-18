@@ -1,7 +1,7 @@
 import { Scheduler } from '@amatiasq/scheduler';
 
 import { GHRepositoryApi, StagedFiles } from '../../3-github/GHRepositoryApi';
-import { fromPromise } from '../../util/rxjs-extensions';
+import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore, NoOptions } from '../AsyncStore';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
@@ -14,14 +14,16 @@ interface PendingCommit {
 }
 
 interface GHRepoWriteOptions {
-  urgent?: boolean;
+  urgent: boolean;
 }
 
 export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
   private readonly scheduler = new Scheduler(100, () => this.push());
   private readonly pending: PendingCommit[] = [];
 
-  constructor(private readonly repo: GHRepositoryApi) {}
+  constructor(private readonly repo: GHRepositoryApi) {
+    debugMethods(this, ['has', 'keys', 'read', 'write', 'delete']);
+  }
 
   async keys() {
     const files = await this.repo.fetchStructure();
@@ -35,14 +37,18 @@ export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  read(key: string, options?: NoOptions) {
-    return fromPromise(
-      key === 'README.md' ? this.repo.getReadme() : this.repo.readFile(key),
-    );
+  read(key: string, options?: Partial<NoOptions>) {
+    return key === 'README.md'
+      ? this.repo.getReadme()
+      : this.repo.readFile(key);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  write(key: string, value: string, { urgent }: GHRepoWriteOptions = {}) {
+  write(
+    key: string,
+    value: string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    { urgent }: Partial<GHRepoWriteOptions> = {},
+  ) {
     // if (urgent) {
     //   return this.repo.writeFile(key, value, `Urgently write: ${key}`);
     // }

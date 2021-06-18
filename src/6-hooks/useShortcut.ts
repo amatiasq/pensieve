@@ -8,7 +8,7 @@ import {
 } from '../2-entities/Shortcuts';
 import { AppStorage } from '../4-storage/AppStorage';
 import { AppStorageContext } from '../5-app/contexts';
-import { deserialize } from '../util/serialization';
+import { deserialize, serialize } from '../util/serialization';
 
 type Executor = () => void;
 
@@ -37,7 +37,7 @@ function init(store: AppStorage) {
   const setShortcuts = (x: string) =>
     (shortcuts = parseShortcuts(deserialize(x)));
 
-  store.shortcuts.read().subscribe(setShortcuts);
+  store.shortcuts.watch(serialize(DEFAULT_SHORTCUTS)).subscribe(setShortcuts);
 
   onShortcut(event => {
     const keys = event.keys.join('+').toUpperCase();

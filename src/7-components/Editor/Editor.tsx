@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+
+import { emitter } from '@amatiasq/emitter';
 
 import { onPageVisibilityChange } from '../../0-dom/page-visibility';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import { useStack } from '../../6-hooks/useStack';
+import { fromEmitter } from '../../util/rxjs-extensions';
 import { BusinessIndicator } from '../atoms/BusinessIndicator';
 import { Loader } from '../atoms/Loader';
 import { MonacoEditor } from './MonacoEditor';
@@ -32,7 +33,7 @@ export type EditorProps = ReadonlyEditorProps | EditableEditorProps;
 export function Editor(props: EditorProps) {
   const { title, content, ext, gap } = props;
   const readonly = isReadonly(props) || false;
-  const save = new Subject<{ urgent?: boolean } | void>();
+  const requestSave = emitter<{ urgent?: boolean } | void>();
 
   const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
@@ -41,7 +42,7 @@ export function Editor(props: EditorProps) {
 
   const scheduler = useScheduler(autosave * 1000, () => {
     if (autosave !== 0) {
-      save.next();
+      requestSave();
     }
   });
 
@@ -49,7 +50,7 @@ export function Editor(props: EditorProps) {
 
   useEffect(() => {
     if (isEditable(props) && props.saveOnNavigation) {
-      history.listen(() => save.next());
+      return history.listen(() => requestSave());
     }
   });
 
@@ -65,19 +66,21 @@ export function Editor(props: EditorProps) {
   }, [content]);
 
   useEffect(() => {
-    const handler = () => save.next({ urgent: true });
+    const handler = () => requestSave({ urgent: true });
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   });
 
   useEffect(() => {
-    onPageVisibilityChange(visible => !visible && save.next({ urgent: true }));
+    onPageVisibilityChange(
+      visible => !visible && requestSave({ urgent: true }),
+    );
   });
 
   if (value == null) return <Loader />;
 
-  save
-    .pipe(debounceTime(100))
+  fromEmitter(requestSave)
+    // .pipe(debounceTime(100))
     .subscribe(options => value !== content && forceSave(options || {}));
 
   return (
@@ -102,6 +105,7 @@ export function Editor(props: EditorProps) {
     if (!isEditable(props)) return;
     scheduler.stop();
     addSaved(value);
+    console.log;
     const { onSave } = props;
     return onSave(value, { urgent });
   }

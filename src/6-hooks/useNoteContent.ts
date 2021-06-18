@@ -4,11 +4,8 @@ import { hookStore } from './helpers/hookStore';
 export const useNoteContent = hookStore<NoteContent, [NoteId]>(
   '',
   id => (store, setValue) => {
-    const subscription = store
-      .readNoteContent(id)
-      .subscribe(x => setValue(x || ''));
-
-    return () => subscription.unsubscribe();
+    const sus = store.watchNoteContent(id).subscribe(x => setValue(x || ''));
+    return () => sus.unsubscribe();
   },
 );
 

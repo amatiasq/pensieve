@@ -4,7 +4,7 @@ import { hookStore } from './helpers/hookStore';
 export const useNotesList = hookStore<Note[], []>(
   [],
   () => (store, setValue) => {
-    const subscription = store.getNotes().subscribe(setValue);
-    return () => subscription.unsubscribe();
+    const sus = store.getNotes().subscribe(setValue);
+    return () => sus.unsubscribe();
   },
 );
