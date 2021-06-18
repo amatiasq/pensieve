@@ -32,7 +32,6 @@ export class ShortcutStore<ReadOptions, WriteOptions>
   }
 
   write(key: string, value: string, options?: P<WriteOptions>): Promise<void> {
-    console.log('shortcut write', key);
     this.subject(key, value);
     return this.store.write(key, value, options);
   }

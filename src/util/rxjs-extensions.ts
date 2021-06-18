@@ -14,9 +14,9 @@ export function fromPromise<T>(promise: Promise<T>) {
   });
 }
 
-export function fromAsync<T>(fn: () => Promise<T>) {
-  return fromPromise(fn());
-}
+// export function fromAsync<T>(fn: () => Promise<T>) {
+//   return fromPromise(fn());
+// }
 
 export function fromEmitter<Value>(emitter: Emitter<Value>) {
   return new Observable<Value>(observer =>
