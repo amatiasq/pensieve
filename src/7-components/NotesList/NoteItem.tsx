@@ -60,7 +60,9 @@ export function NoteItem({ note }: { note: Note }) {
     </Link>
   );
 
-  function remove() {
+  function remove(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+    event.preventDefault();
+
     if (navigator.isNote(note)) {
       navigator.goRoot();
     }

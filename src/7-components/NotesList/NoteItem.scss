@@ -23,12 +23,7 @@
   &.active {
     color: var(--fg-color-active);
     background-color: var(--bg-color-active);
-    // border-bottom-color: var(--border-color-active);
   }
-
-  // &:last-child {
-  //   border-bottom-width: 0;
-  // }
 
   .star-part .icon-button {
     color: var(--favorite-color);
@@ -44,8 +39,9 @@
 
   .title-part {
     flex: 1;
-    color: inherit;
-    text-decoration: none;
+    overflow: hidden;
     white-space: nowrap;
+    text-overflow: ellipsis;
+    line-height: 1.5em;
   }
 }
