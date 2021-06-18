@@ -75,8 +75,8 @@ export class GithubAuth {
       history.pushState({}, '', this.redirectUri);
     }
 
-    const { result } = await this.requestAccessToken(code, state);
-    const { access_token } = parseParams(`/?${result}`) as {
+    const x = await this.requestAccessToken(code, state);
+    const { access_token } = parseParams(`/?${x}`) as {
       access_token: GithubToken;
     };
 
