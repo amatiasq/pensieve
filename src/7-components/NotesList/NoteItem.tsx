@@ -21,11 +21,7 @@ export function NoteItem({ note }: { note: Note }) {
   ];
 
   useEffect(() => {
-    const sus = store.onNoteTitleChanged(note.id).subscribe(x => {
-      console.log(`${note.id} TITLE ${x}`);
-      setTitle(x);
-    });
-
+    const sus = store.onNoteTitleChanged(note.id).subscribe(setTitle);
     return () => sus.unsubscribe();
   });
 
