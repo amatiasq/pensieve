@@ -9,7 +9,7 @@ const useSettings = hookStore<Settings, []>(
   DEFAULT_SETTINGS,
   () => (store, setValue) => {
     const subscription = store.settings
-      .read()
+      .watch(serialize(DEFAULT_SETTINGS))
       .subscribe(x => setValue(deserialize(x)));
 
     return () => subscription.unsubscribe();

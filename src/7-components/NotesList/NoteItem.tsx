@@ -20,7 +20,14 @@ export function NoteItem({ note }: { note: Note }) {
     active ? 'active' : '',
   ];
 
-  store.onNoteTitleChanged(note.id).subscribe(setTitle);
+  useEffect(() => {
+    const sus = store.onNoteTitleChanged(note.id).subscribe(x => {
+      console.log(`${note.id} TITLE ${x}`);
+      setTitle(x);
+    });
+
+    return () => sus.unsubscribe();
+  });
 
   useEffect(() => {
     if (title !== note.title) {
@@ -52,8 +59,16 @@ export function NoteItem({ note }: { note: Note }) {
       <h5 className="title-part">{title}</h5>
 
       <div className="actions-part">
-        <IconButton icon="trash" onClick={() => store.deleteNote(note.id)} />
+        <IconButton icon="trash" onClick={remove} />
       </div>
     </Link>
   );
+
+  function remove() {
+    if (navigator.isNote(note)) {
+      navigator.goRoot();
+    }
+
+    return store.deleteNote(note.id);
+  }
 }

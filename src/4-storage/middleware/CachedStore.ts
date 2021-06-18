@@ -1,6 +1,4 @@
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-
+import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
 
 class MemoryCache<T> {
@@ -40,11 +38,18 @@ class MemoryCache<T> {
 export class CachedStore<ReadOptions, WriteOptions>
   implements AsyncStore<ReadOptions, WriteOptions>
 {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private readonly keysCache = new MemoryCache<Promise<string[]>>(30);
-  private readonly cache = new MemoryCache<string | null>(30);
+  private readonly keysCache = new MemoryCache<Promise<string[]>>(this.seconds);
+  private readonly cache = new MemoryCache<Promise<string | null>>(
+    this.seconds,
+  );
 
-  constructor(private readonly store: AsyncStore<ReadOptions, WriteOptions>) {}
+  constructor(
+    private readonly store: AsyncStore<ReadOptions, WriteOptions>,
+    private readonly seconds: number,
+    label: string,
+  ) {
+    debugMethods(this, ['has', 'keys', 'read', 'write', 'delete'], label);
+  }
 
   keys() {
     if (this.keysCache.has('.')) {
@@ -60,26 +65,24 @@ export class CachedStore<ReadOptions, WriteOptions>
     return this.store.has(key);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   read(key: string, options?: ReadOptions) {
-    return new Observable<string | null>(observer => {
-      if (this.cache.has(key)) {
-        observer.next(this.cache.get(key));
-      }
+    if (this.cache.has(key)) {
+      return this.cache.get(key);
+    }
 
-      return this.store
-        .read(key, options)
-        .pipe(tap(x => this.cache.set(key, x)))
-        .subscribe(observer);
-    });
+    const promise = this.store.read(key);
+    this.cache.set(key, promise);
+    return promise;
   }
 
   write(key: string, value: string, options?: WriteOptions): Promise<void> {
-    this.cache.set(key, value);
+    this.cache.set(key, Promise.resolve(value));
     return this.store.write(key, value, options);
   }
 
   delete(key: string): Promise<void> {
-    this.cache.set(key, null);
+    this.cache.set(key, Promise.resolve(null));
     return this.store.delete(key);
   }
 }

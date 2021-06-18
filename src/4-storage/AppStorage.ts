@@ -1,11 +1,7 @@
-import { Observable } from 'rxjs';
-import {
-  catchError,
-  distinctUntilChanged,
-  mergeWith,
-  throttleTime
-} from 'rxjs/operators';
+import { distinctUntilChanged, mergeWith, throttleTime } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
+
+import { emitterWithChannels } from '@amatiasq/emitter';
 
 import {
   getMetadataFromContent,
@@ -15,10 +11,10 @@ import {
 } from '../2-entities/Note';
 import { DEFAULT_SETTINGS } from '../2-entities/Settings';
 import { DEFAULT_SHORTCUTS } from '../2-entities/Shortcuts';
+import { fromEmitterWithChannels, fromPromise } from '../util/rxjs-extensions';
 import { serialize } from '../util/serialization';
 import { RemoteCollection } from './helpers/RemoteCollection';
 import { RemoteString } from './helpers/RemoteString';
-import { subjectWithChannels } from './helpers/subjectWithChannels';
 import { FinalStore, FinalWriteOptions } from './index';
 
 export class AppStorage {
@@ -39,18 +35,23 @@ export class AppStorage {
     'README.md',
   );
 
-  private readonly noteChanged = subjectWithChannels<Note | null>();
-  private readonly noteTitleUpdated = subjectWithChannels<string>();
-  private readonly noteContentChanged = subjectWithChannels<NoteContent>();
+  private readonly noteSaved = emitterWithChannels<NoteId, Note | null>();
+  private readonly noteContentSaved =
+    emitterWithChannels<NoteId, NoteContent>();
+  private readonly noteTitleUpdated = emitterWithChannels<NoteId, string>();
 
   constructor(private readonly store: FinalStore) {}
 
   getNotes() {
-    return this.notes.watch();
+    return this.notes.watch([]);
+  }
+
+  watchNote(id: NoteId) {
+    return this.notes.watchItem(id);
   }
 
   getNote(id: NoteId) {
-    return this.notes.item(id).pipe(mergeWith(this.noteChanged(id)));
+    return this.notes.item(id);
   }
 
   async createNote(content?: NoteContent) {
@@ -68,22 +69,33 @@ export class AppStorage {
       hasContent ? this.store.delete(contentFile) : null,
     ]);
 
-    this.noteChanged(id).next(null);
+    this.noteSaved(id, null);
   }
 
   updateNoteContent(id: NoteId, content: NoteContent) {
     const { title } = getMetadataFromContent(content);
-    this.noteTitleUpdated(id).next(title);
+    this.noteTitleUpdated(id, title);
   }
 
   onNoteTitleChanged(id: NoteId) {
-    return new Observable<string>(x =>
-      this.noteTitleUpdated(id).subscribe(x),
-    ).pipe(throttleTime(100), distinctUntilChanged());
+    return fromEmitterWithChannels(this.noteTitleUpdated, id).pipe(
+      throttleTime(100),
+      distinctUntilChanged(),
+    );
+  }
+
+  watchNoteContent(id: NoteId) {
+    const key = getFilePath(id);
+    const changes = this.store.onChange(key);
+
+    return fromPromise(this.readNoteContent(id)).pipe(
+      mergeWith(changes),
+      distinctUntilChanged(),
+    );
   }
 
   readNoteContent(id: NoteId) {
-    return this.store.read(getFilePath(id)).pipe(catchError(() => ''));
+    return this.store.read(getFilePath(id));
   }
 
   async saveNoteContent(
@@ -91,6 +103,7 @@ export class AppStorage {
     content: NoteContent,
     options?: FinalWriteOptions,
   ) {
+    console.log('SAVE NOTE CONTENT', id);
     const { title, group } = getMetadataFromContent(content);
 
     const [note] = await Promise.all([
@@ -98,7 +111,7 @@ export class AppStorage {
       this.store.write(getFilePath(id), content, options),
     ]);
 
-    this.noteContentChanged(id).next(content);
+    this.noteContentSaved(id, content);
     return note;
   }
 
@@ -108,12 +121,12 @@ export class AppStorage {
       favorite: !x.favorite,
     }));
 
-    this.noteChanged(id).next(note);
+    this.noteSaved(id, note);
     return note;
   }
 
   async setGroup(group: string | null, ids: NoteId[]) {
-    const notes = await this.notes.asPromise();
+    const notes = await this.notes.read();
 
     const updated = ids.map(id => {
       const index = notes.findIndex(x => x.id === id);
@@ -127,7 +140,7 @@ export class AppStorage {
     await this.notes.write(notes);
 
     for (const note of updated) {
-      this.noteChanged(note.id).next(note);
+      this.noteSaved(note.id, note);
     }
 
     return updated;

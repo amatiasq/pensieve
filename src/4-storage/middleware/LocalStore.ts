@@ -1,5 +1,3 @@
-import { of } from 'rxjs';
-
 import { AsyncStore } from '../AsyncStore';
 
 export class SyncLocalStore {
@@ -54,7 +52,7 @@ export class LocalStore implements AsyncStore {
   }
 
   read(key: string) {
-    return of(this.syncStore.read(key));
+    return Promise.resolve(this.syncStore.read(key));
   }
 
   write(key: string, value: string) {

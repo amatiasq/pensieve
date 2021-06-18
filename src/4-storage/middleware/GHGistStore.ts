@@ -1,4 +1,3 @@
-import { fromAsync } from '../../util/rxjs-extensions';
 import { AsyncStore } from '../AsyncStore';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -16,11 +15,9 @@ export class GHGistStore implements AsyncStore {
     return this.gists.exists(key);
   }
 
-  read(key: string) {
-    return fromAsync(async () => {
-      const file = await this.gists.read(key);
-      return file.content;
-    });
+  async read(key: string) {
+    const file = await this.gists.read(key);
+    return file.content;
   }
 
   write(key: string, value: string) {

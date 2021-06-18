@@ -1,8 +1,6 @@
-import { Observable, throwError } from 'rxjs';
-import { tap } from 'rxjs/operators';
-
 import { Scheduler } from '@amatiasq/scheduler';
 
+import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
 
 interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
@@ -15,7 +13,7 @@ export class StoreOfflineError extends Error {}
 export class ResilientOnlineStore<ReadOptions, WriteOptions>
   implements AsyncStore<ReadOptions, WriteOptions>
 {
-  private readonly reading = new Map<string, Observable<string | null>>();
+  private readonly reading = new Map<string, Promise<string | null>>();
   private readonly pending: Command[] = [];
   private readonly reconnect = new Scheduler(1000, () => this.executePending());
 
@@ -25,6 +23,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
 
   constructor(private readonly remote: AsyncStore<ReadOptions, WriteOptions>) {
     window.addEventListener('online', () => this.executePending());
+    debugMethods(this, ['has', 'keys', 'read', 'write', 'delete']);
   }
 
   keys() {
@@ -41,12 +40,12 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     }
 
     if (this.isOffline) {
-      return throwError(() => new StoreOfflineError());
+      return Promise.reject(() => new StoreOfflineError());
     }
 
-    const observable = this.remote.read(key, options);
-    this.reading.set(key, observable);
-    return observable.pipe(tap({ complete: () => this.reading.delete(key) }));
+    const promise = this.remote.read(key, options);
+    this.reading.set(key, promise);
+    return promise.finally(() => this.reading.delete(key));
   }
 
   write(key: string, value: string, options?: WriteOptions) {

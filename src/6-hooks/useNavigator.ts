@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Note, NoteId } from '../2-entities/Note';
 
 class Navigator {
+  readonly root = '/';
   readonly settings = '/settings';
   readonly note = '/note/:noteId';
 
@@ -11,6 +12,7 @@ class Navigator {
     readonly path: string,
   ) {}
 
+  readonly goRoot = () => this.history.push(this.root);
   readonly goSettings = () => this.history.push(this.settings);
 
   readonly toNote = acceptNoteOrId(id => this.note.replace(':noteId', id));
