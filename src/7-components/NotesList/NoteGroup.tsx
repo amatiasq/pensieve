@@ -38,8 +38,7 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
 
   return (
     <details className={cn.join(' ')} data-group={group} open={isOpen}>
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <summary className="group-title" onClick={onGroupClicked as any}>
+      <summary className="group-title" onClick={onGroupClicked}>
         <Icon name="angle-right" className="icon-button group-caret" />
         <span className="group-name">{group}</span>
         <i className="counter">{notes.length}</i>
@@ -54,7 +53,7 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
   );
 }
 
-function onGroupClicked(event: MouseEvent) {
+function onGroupClicked(event: React.MouseEvent<HTMLElement, MouseEvent>) {
   const target = (event.currentTarget as HTMLElement)
     .parentElement as HTMLDetailsElement;
 

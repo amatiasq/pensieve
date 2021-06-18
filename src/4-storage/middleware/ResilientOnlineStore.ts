@@ -76,7 +76,6 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     }
 
     // TS doesn't recognize params as valid parameters for method
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promise: Promise<void> = (this.remote[method] as any)(...params);
 
     return promise.catch(reason => {
@@ -96,7 +95,6 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     this.pending.length = 0;
 
     for (const { method, params } of copy) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (this[method] as any)(params);
     }
   }

@@ -1,16 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { emitter } from '@amatiasq/emitter';
 
 const { isHidden, eventName } = getKeyNames();
 const emitVisibilityChange = emitter<boolean>();
 
-type VisibilityChangeListener = Parameters<typeof emitVisibilityChange.subscribe>[0];
+type VisibilityChangeListener = Parameters<
+  typeof emitVisibilityChange.subscribe
+>[0];
 
 document.addEventListener(
   eventName,
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   () => emitVisibilityChange(!document[isHidden]),
   false,
 );
@@ -29,21 +27,21 @@ function getKeyNames() {
     return {
       isHidden: 'hidden',
       eventName: 'visibilitychange',
-    };
+    } as const;
   }
 
   if ((document as any).msHidden != null) {
     return {
-      isHidden: 'msHidden',
-      eventName: 'msvisibilitychange',
-    };
+      isHidden: 'msHidden' as 'hidden',
+      eventName: 'msvisibilitychange' as 'visibilitychange',
+    } as const;
   }
 
   if ((document as any).webkitHidden != null) {
     return {
-      isHidden: 'webkitHidden',
-      eventName: 'webkitvisibilitychange',
-    };
+      isHidden: 'webkitHidden' as 'hidden',
+      eventName: 'webkitvisibilitychange' as 'visibilitychange',
+    } as const;
   }
 
   throw unsupportedBrowser();

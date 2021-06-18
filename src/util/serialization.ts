@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function serialize(x: any) {
   return JSON.stringify(x, null, 2);
 }

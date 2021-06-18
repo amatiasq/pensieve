@@ -95,7 +95,6 @@ export function InputField({
   }
 
   function resetContent() {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     ref.current!.innerText = value;
   }
 }
