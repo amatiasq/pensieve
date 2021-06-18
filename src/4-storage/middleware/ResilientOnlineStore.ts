@@ -79,6 +79,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     const promise: Promise<void> = (this.remote[method] as any)(...params);
 
     return promise.catch(reason => {
+      console.log('error detected ');
       this.pending.push({ method, params });
       this.reconnect.restart();
       throw reason;
@@ -95,7 +96,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     this.pending.length = 0;
 
     for (const { method, params } of copy) {
-      (this[method] as any)(params);
+      (this[method] as any)(...params);
     }
   }
 }

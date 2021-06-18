@@ -1,7 +1,6 @@
 import { DELETE, GET, PATCH, POST, PUT, RequestBody } from '../1-core/http';
+import { GH_API } from '../config.mjs';
 import { GithubToken } from './GithubAuth';
-
-export const GH_API = 'https://api.github.com';
 
 export enum MediaType {
   Json = 'application/vnd.github.v3+json',

@@ -1,4 +1,6 @@
-import { HttpError } from '../1-core/http';
+import { HttpError, POST } from '../1-core/http';
+import { AUTH_COMMIT } from '../config.mjs';
+import { serialize } from '../util/serialization';
 import { GithubApi, MediaType } from './GithubApi';
 import { GithubToken } from './GithubAuth';
 import { GHApiCommit } from './models/GHApiCommit';
@@ -153,53 +155,28 @@ export class GHRepositoryApi extends GithubApi {
     await this.PUT(`${this.url}/contents/${path}`, { message, content });
   }
 
-  async commit(message: string, files: StagedFiles) {
+  commit(message: string, files: StagedFiles, urgent: boolean) {
+    const { token, username, name, branch } = this;
+    const body = {
+      token,
+      owner: username,
+      repo: name,
+      branch,
+      files,
+      message,
+    };
+
+    if (urgent) {
+      return Promise.resolve(
+        navigator.sendBeacon(AUTH_COMMIT, serialize(body)),
+      );
+    }
+
     this.commiting = true;
 
-    // Get a reference
-    // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#update-a-reference
-    const ref = await this.GET<GHApiRef>(
-      `${this.url}/git/refs/heads/${this.branch}`,
+    return POST<void>(AUTH_COMMIT, body).finally(
+      () => (this.commiting = false),
     );
-
-    const items = Object.entries(files)
-      .map(([path, content]) => {
-        if (content == null) {
-          // delete file
-          return { path, sha: null };
-        }
-
-        if (typeof content === 'string') {
-          return { path, content };
-        }
-
-        return { path, content: JSON.stringify(content, null, 2) };
-      })
-      .map(x => ({ ...x, mode: '100644', type: 'blob' }));
-
-    // Create tree
-    // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-tree
-    const tree = await this.POST<GHApiTree>(`${this.url}/git/trees`, {
-      tree: items,
-      base_tree: ref.object.sha,
-    });
-
-    // Create commit
-    // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-commit
-    const commit = await this.POST<GHApiCommit>(`${this.url}/git/commits`, {
-      message,
-      tree: tree.sha,
-      parents: [ref.object.sha],
-    });
-
-    // Update a reference
-    // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#update-a-reference
-    await this.POST(`${this.url}/git/refs/heads/${this.branch}`, {
-      sha: commit.sha,
-      force: true,
-    });
-
-    this.commiting = false;
   }
 }
 
