@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { v4 as uuid } from 'uuid';
 
 import { Emitter, emitter } from '@amatiasq/emitter';

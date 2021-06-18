@@ -101,7 +101,7 @@ function defineSemanticTokens(monaco: Monaco) {
 
       return {
         data: new Uint32Array(data),
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // null is valid but type definition complains
         resultId: null as any,
       };
     },

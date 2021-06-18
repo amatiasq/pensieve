@@ -1,9 +1,9 @@
 import { AsyncStore } from '../AsyncStore';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// THIS IS JUST PLACEHOLDER
+// CODE NOT IN USE
 export type GithubGists = any;
 
-// THIS IS JUST PLACEHOLDER
 export class GHGistStore implements AsyncStore {
   constructor(private readonly gists: GithubGists) {}
 

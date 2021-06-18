@@ -23,8 +23,7 @@ const CREATE_REPO_CONFIG = {
   is_template: false,
 };
 
-// This is necessary because of https://github.com/microsoft/TypeScript/issues/14174#issuecomment-856812565
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// any is necessary here because of https://github.com/microsoft/TypeScript/issues/14174#issuecomment-856812565
 export type StagedFiles = Record<string, any>;
 
 export interface GHRepoNode {

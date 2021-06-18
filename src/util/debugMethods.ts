@@ -1,8 +1,7 @@
 let indent = 0;
 
 export function debugMethods<Key extends string>(
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  self: Record<Key, Function>,
+  self: Record<Key, (...args: any[]) => any>,
   methods: Key[],
   label?: string,
 ) {
@@ -10,7 +9,7 @@ export function debugMethods<Key extends string>(
   methods.forEach(method => {
     const original = self[method];
 
-    self[method] = (...args: any[]) => {
+    self[method] = (...args: unknown[]) => {
       const x = '  '.repeat(indent++);
       const y = label ? ` [${label}]` : '';
 
