@@ -2,7 +2,7 @@
   "homepage": "https://gist.amatiasq.com/",
   "scripts": {
     "start": "rm -rf .cache && parcel src/index.html",
-    "build": "parcel build src/index.html",
+    "build-web": "parcel build src/index.html",
     "build-ci": "parcel build src/index.html",
     "lint": "eslint . --ext .ts"
   },
