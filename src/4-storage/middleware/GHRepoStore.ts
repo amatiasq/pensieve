@@ -47,31 +47,36 @@ export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
     key: string,
     value: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { urgent }: Partial<GHRepoWriteOptions> = {},
+    { urgent = false }: Partial<GHRepoWriteOptions> = {},
   ) {
-    // if (urgent) {
-    //   return this.repo.writeFile(key, value, `Urgently write: ${key}`);
-    // }
-
-    return this.commit(`Update ${key}`, { [key]: value });
+    console.log(key);
+    return this.commit(`Update ${key}`, { [key]: value }, urgent);
   }
 
   async delete(key: string) {
-    await this.commit(`Remove ${key}`, { [key]: null });
+    await this.commit(`Remove ${key}`, { [key]: null }, false);
   }
 
-  private commit(message: string, files: StagedFiles) {
+  private commit(message: string, files: StagedFiles, isUrgent: boolean) {
+    console.log('commit', files);
     if (!Object.keys(files).length) {
       throw new Error('NO FILES TO COMMIT');
     }
 
     return new Promise<void>((resolve, reject) => {
       this.pending.push({ message, files, resolve, reject });
-      this.scheduler.restart();
+
+      if (isUrgent) {
+        this.push(true);
+      } else {
+        this.scheduler.restart();
+      }
     });
   }
 
-  private push() {
+  private push(isUrgent = false) {
+    console.log('push');
+
     if (this.repo.isCommiting) {
       this.scheduler.restart();
       return;
@@ -92,7 +97,7 @@ export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
         ? `Multiple:\n- ${messages.join('\n- ')}`
         : messages[0];
 
-    this.repo.commit(message, staged).then(
+    this.repo.commit(message, staged, isUrgent).then(
       () => copy.forEach(x => x.resolve()),
       reason => copy.forEach(x => x.reject(reason)),
     );
