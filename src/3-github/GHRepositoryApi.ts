@@ -168,41 +168,9 @@ export class GHRepositoryApi extends GithubApi {
 
     this.commiting = true;
 
-    const sw = navigator.serviceWorker;
-    const whenController = (controller: ServiceWorker) =>
-      controller.postMessage({ type: 'commit', ...body });
-
-    if (sw.controller) {
-      whenController(sw.controller);
-    } else {
-      const listener = () => {
-        if (!sw.controller) return;
-        sw.removeEventListener('controllerchange', listener);
-        whenController(sw.controller);
-      };
-
-      navigator.serviceWorker.addEventListener('controllerchange', listener);
-    }
-
-    return new Promise<void>(resolve => {
-      const listener = (event: any) => {
-        console.log('response', event);
-        navigator.serviceWorker.removeEventListener('message', listener);
-        resolve();
-      };
-
-      navigator.serviceWorker.addEventListener('message', listener);
-    });
-
-    // if (urgent) {
-    // return Promise.resolve(navigator.sendBeacon(AUTH_COMMIT, serialize(body)));
-    // }
-
-    // this.commiting = true;
-
-    // return POST<void>(AUTH_COMMIT, body).finally(
-    //   () => (this.commiting = false),
-    // );
+    return POST<void>(AUTH_COMMIT, body, { keepalive: isUrgent }).finally(
+      () => (this.commiting = false),
+    );
   }
 }
 
