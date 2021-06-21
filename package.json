@@ -1,10 +1,8 @@
 {
   "homepage": "https://gist.amatiasq.com/",
-  "main": "src/api/index.js",
   "scripts": {
     "start": "rm -rf .cache && parcel src/index.html",
-    "build": "node src/api/index.js",
-    "build-web": "parcel build src/index.html",
+    "build": "parcel build src/index.html",
     "build-ci": "parcel build src/index.html",
     "lint": "eslint . --ext .ts"
   },
