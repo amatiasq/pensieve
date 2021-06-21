@@ -2,7 +2,7 @@ const env =
   // eslint-disable-next-line no-undef
   typeof process !== 'undefined' && 'env' in process ? process.env : {};
 
-const API_ROOT = 'https://gist.amatiasq.com';
+const API_ROOT = 'https://amq-pensieve.herokuapp.com';
 
 export const GH_SCOPE = 'repo gist';
 export const GH_API = 'https://api.github.com';
