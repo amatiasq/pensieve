@@ -1,6 +1,6 @@
 import { Scheduler } from '@amatiasq/scheduler';
 
-import { GHRepositoryApi, StagedFiles } from '../../3-github/GHRepositoryApi';
+import { GHRepository, StagedFiles } from '../../3-github/GHRepository';
 import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore, NoOptions } from '../AsyncStore';
 
@@ -21,7 +21,7 @@ export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
   private readonly scheduler = new Scheduler(100, () => this.push());
   private readonly pending: PendingCommit[] = [];
 
-  constructor(private readonly repo: GHRepositoryApi) {
+  constructor(private readonly repo: GHRepository) {
     debugMethods(this, ['has', 'keys', 'read', 'write', 'delete']);
   }
 

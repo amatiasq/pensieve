@@ -1,6 +1,6 @@
 import localforage from 'localforage';
 
-import { GHRepositoryApi } from '../3-github/GHRepositoryApi';
+import { GHRepository } from '../3-github/GHRepository';
 import { GithubToken } from '../3-github/GithubAuth';
 import { AsyncStore } from './AsyncStore';
 import { CachedStore } from './middleware/CachedStore';
@@ -27,7 +27,12 @@ export async function createStore(
   username: string,
   repoName: string,
 ) {
-  const repo = new GHRepositoryApi(token, username, repoName);
+  const repo = new GHRepository(token, username, repoName);
+
+  (async () => {
+    const files = await repo.readFileCool('notes/', 'oid');
+    console.log('FOO', files);
+  })();
 
   if (await repo.createIfNecessary('Database for notes', true)) {
     // repo.commit('Initial commit', storage.getInitialData());
