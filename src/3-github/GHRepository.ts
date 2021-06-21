@@ -1,8 +1,8 @@
 import { HttpError, POST } from '../1-core/http';
 import { AUTH_COMMIT } from '../config.mjs';
-import { serialize } from '../util/serialization';
-import { GithubApi, MediaType } from './GithubApi';
 import { GithubToken } from './GithubAuth';
+import { GithubGraphQlApi } from './GithubGraphQlApi';
+import { GithubRestApi, MediaType } from './GithubRestApi';
 import { GHApiCommit } from './models/GHApiCommit';
 import { GHApiRef } from './models/GHApiRef';
 import {
@@ -41,12 +41,14 @@ export interface GHRepoFile extends GHRepoNode {
   content: string;
 }
 
-export class GHRepositoryApi extends GithubApi {
+export class GHRepository {
+  private readonly rest: GithubRestApi;
+  private readonly gql: GithubGraphQlApi;
   private commiting = false;
   branch = 'main';
 
   get url() {
-    return `/repos/${this.username}/${this.name}`;
+    return `/repos/${this.owner}/${this.name}`;
   }
 
   get isCommiting() {
@@ -54,15 +56,16 @@ export class GHRepositoryApi extends GithubApi {
   }
 
   constructor(
-    token: GithubToken,
-    readonly username: string,
+    readonly token: GithubToken,
+    readonly owner: string,
     readonly name: string,
   ) {
-    super(token);
+    this.rest = new GithubRestApi(token);
+    this.gql = new GithubGraphQlApi(token);
   }
 
   exists() {
-    return this.GET(this.url).then(
+    return this.rest.GET(this.url).then(
       () => true,
       () => false,
     );
@@ -70,7 +73,7 @@ export class GHRepositoryApi extends GithubApi {
 
   async create(description: string, isPrivate: boolean) {
     try {
-      await this.POST('/user/repos', {
+      await this.rest.POST('/user/repos', {
         name: this.name,
         description,
         homepage: '',
@@ -94,20 +97,20 @@ export class GHRepositoryApi extends GithubApi {
   }
 
   async fetchStructure() {
-    const ref = await this.GET<GHApiRef>(
+    const ref = await this.rest.GET<GHApiRef>(
       `${this.url}/git/refs/heads/${this.branch}`,
     );
-    const commit = await this.GET<GHApiCommit>(
+    const commit = await this.rest.GET<GHApiCommit>(
       `${this.url}/git/commits/${ref.object.sha}`,
     );
-    const tree = await this.GET<GHApiTree>(
+    const tree = await this.rest.GET<GHApiTree>(
       `${this.url}/git/trees/${commit.tree.sha}?recursive=1`,
     );
     return tree.tree.map(simplifyNode);
   }
 
   async readDir(path: string) {
-    const content = await this.GET<GHApiRepositoryNode[]>(
+    const content = await this.rest.GET<GHApiRepositoryNode[]>(
       `${this.url}/contents/${path}`,
     );
     return content.map(simplifyNode);
@@ -117,7 +120,7 @@ export class GHRepositoryApi extends GithubApi {
     const url = `${this.url}/contents/${path}`;
 
     try {
-      await this.GET<GHApiRepositoryNode>(url);
+      await this.rest.GET<GHApiRepositoryNode>(url);
       return true;
     } catch (error) {
       if (error instanceof HttpError && error.status === 404) {
@@ -129,11 +132,13 @@ export class GHRepositoryApi extends GithubApi {
   }
 
   async getReadme() {
-    return this.GET<string>(`${this.url}/readme`, { mediaType: MediaType.Raw });
+    return this.rest.GET<string>(`${this.url}/readme`, {
+      mediaType: MediaType.Raw,
+    });
   }
 
   async readFile(path: string): Promise<string> {
-    const file = await this.GET<string | GHApiRepositoryNode[]>(
+    const file = await this.rest.GET<string | GHApiRepositoryNode[]>(
       `${this.url}/contents/${path}`,
       { mediaType: MediaType.Raw },
     );
@@ -142,21 +147,15 @@ export class GHRepositoryApi extends GithubApi {
       throw new Error(`${this.url}/${path} is a directory`);
     }
 
-    // if (file.type !== 'file') {
-    //   throw new Error(`${this.url}/${path} is not a file: ${file.type}`);
-    // }
-
-    // const content = atob(file.content);
-    // return { ...simplifyNode(file), type: 'file', content };
     return file;
   }
 
   async writeFile(path: string, content: string, message: string) {
-    await this.PUT(`${this.url}/contents/${path}`, { message, content });
+    await this.rest.PUT(`${this.url}/contents/${path}`, { message, content });
   }
 
   commit(message: string, files: StagedFiles, isUrgent = false) {
-    const { token, username, name, branch } = this;
+    const { owner: username, name, branch, token } = this;
     const body = {
       token,
       owner: username,
@@ -172,6 +171,20 @@ export class GHRepositoryApi extends GithubApi {
       () => (this.commiting = false),
     );
   }
+
+  async readFileCool(path: string, keys: string) {
+    return this.gql
+      .send(getFileProperty(keys), this.getFileVars(path))
+      .then(x => x.data.repository.file?.text as string);
+  }
+
+  private getFileVars(path: string) {
+    return {
+      owner: this.owner,
+      repo: this.name,
+      path: `${this.branch}:${path}`,
+    };
+  }
 }
 
 function simplifyNode({
@@ -181,4 +194,46 @@ function simplifyNode({
   sha,
 }: Pick<GHApiRepositoryNode, 'type' | 'size' | 'path' | 'sha'>) {
   return { type, size, path, sha } as GHRepoNode;
+}
+
+// export class GHRepositoryQL extends GHGraphQL {
+//   constructor(
+//     token: GithubToken,
+//     public readonly owner: string,
+//     public readonly repo: string,
+//     public branch = 'main',
+//   ) {
+//     super(token);
+//   }
+
+//   async hasFile(path: string) {
+//     return this.send(
+//       getFileProperty('abbreviatedOid'),
+//       this.getFileVars(path),
+//     ).then(x => Boolean(x.data.repository.file));
+//   }
+
+//   async readFile(path: string) {
+//     return this.send(getFileProperty('text'), this.getFileVars(path)).then(
+//       x => x.data.repository.file?.text as string,
+//     );
+//   }
+
+//   private getFileVars(path: string) {
+//     return {
+//       owner: this.owner,
+//       repo: this.repo,
+//       path: `${this.branch}:${path}`,
+//     };
+//   }
+// }
+
+function getFileProperty(keys: string) {
+  return `
+    repository(owner: $owner, name: $repo) {
+      file: object(expression: $path) {
+        ... on Blob { ${keys} }
+      }
+    }
+  `;
 }
