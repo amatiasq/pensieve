@@ -4,27 +4,28 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import { DEFAULT_SETTINGS } from '../../2-entities/Settings';
 import { DEFAULT_SHORTCUTS } from '../../2-entities/Shortcuts';
-import { AppStorageContext } from '../../5-app/contexts';
+import { WriteOptions } from '../../4-storage/helpers/WriteOptions';
+import { NotesStorageContext } from '../../5-app/contexts';
 import { isDeserializable, serialize } from '../../util/serialization';
 import { Loader } from '../atoms/Loader';
 import { Editor } from '../Editor/Editor';
 
 export function EditSettings() {
-  const store = useContext(AppStorageContext);
+  const { settings, shortcuts } = useContext(NotesStorageContext);
   const [tab, setTab] = useState(0);
-  const [settings, setSettings] = useState<string>('');
-  const [shortcuts, setShortcuts] = useState<string>('');
+  const [rawSettings, setRawSettings] = useState<string>('');
+  const [rawShortcuts, setRawShortcuts] = useState<string>('');
 
   const tabs = [
     {
       title: 'Settings',
-      content: settings,
-      onSave: extractWrite(store.settings),
+      content: rawSettings,
+      onSave: save(settings),
     },
     {
       title: 'Shortcuts',
-      content: shortcuts,
-      onSave: extractWrite(store.shortcuts),
+      content: rawShortcuts,
+      onSave: save(shortcuts),
     },
     {
       title: 'Default settings',
@@ -39,13 +40,15 @@ export function EditSettings() {
   ] as const;
 
   useEffect(() => {
-    const subscription = store.settings.read().subscribe(setSettings);
-    return () => subscription.unsubscribe();
+    const read = () => settings.read().then(x => setRawSettings(x!));
+    read();
+    return settings.onChange(read);
   }, []);
 
   useEffect(() => {
-    const subscription = store.shortcuts.read().subscribe(setShortcuts);
-    return () => subscription.unsubscribe();
+    const read = () => shortcuts.read().then(x => setRawShortcuts(x!));
+    read();
+    return shortcuts.onChange(read);
   }, []);
 
   const selected = tabs[tab];
@@ -68,11 +71,8 @@ export function EditSettings() {
     </div>
   );
 
-  function extractWrite(
-    remote: typeof store.settings | typeof store.shortcuts,
-  ) {
-    return (...params: Parameters<typeof remote['write']>) => {
-      const [value, options] = params;
+  function save(remote: typeof settings | typeof shortcuts) {
+    return (value: string, options?: WriteOptions) => {
       if (!isDeserializable(value)) return alert('Invalid JSON');
       remote.write(value, options);
     };

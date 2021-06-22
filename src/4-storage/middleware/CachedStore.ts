@@ -1,74 +1,38 @@
 import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
+import { MemoryCache } from '../helpers/MemoryCache';
+import { WriteOptions } from '../helpers/WriteOptions';
 
-class MemoryCache<T> {
-  private readonly data = new Map<string, unknown>();
-  private readonly time = new Map<string, number>();
+export class CachedStore implements AsyncStore {
+  private readonly readAllCache = new MemoryCache<
+    Promise<Record<string, string>>
+  >(this.seconds);
 
-  constructor(private readonly duration: number) {}
-
-  has(key: string) {
-    const time = this.time.get(key);
-    if (time == null) return false;
-    const seconds = (Date.now() - time) / 1000;
-    const expired = seconds > this.duration;
-
-    if (expired) {
-      this.time.delete(key);
-      this.data.delete(key);
-    }
-
-    return !expired;
-  }
-
-  get(key: string) {
-    // if (!this.has(key)) {
-    //   throw new Error('use HAS you idiot');
-    // }
-
-    return this.data.get(key) as T;
-  }
-
-  set(key: string, value: T) {
-    this.time.set(key, Date.now());
-    this.data.set(key, value);
-  }
-}
-
-export class CachedStore<ReadOptions, WriteOptions>
-  implements AsyncStore<ReadOptions, WriteOptions>
-{
-  private readonly keysCache = new MemoryCache<Promise<string[]>>(this.seconds);
   private readonly cache = new MemoryCache<Promise<string | null>>(
     this.seconds,
   );
 
   constructor(
-    private readonly store: AsyncStore<ReadOptions, WriteOptions>,
+    private readonly store: AsyncStore,
     private readonly seconds: number,
     label: string,
   ) {
-    debugMethods(this, ['has', 'keys', 'read', 'write', 'delete'], label);
+    debugMethods(this, ['readAll', 'read', 'write', 'delete'], label);
   }
 
-  keys() {
-    if (this.keysCache.has('.')) {
-      return this.keysCache.get('.');
+  readAll(pattern: string) {
+    if (this.readAllCache.has(pattern)) {
+      return this.readAllCache.get(pattern);
     }
 
-    const promise = this.store.keys();
-    this.keysCache.set('.', promise);
+    const promise = this.store.readAll(pattern);
+    this.readAllCache.set(pattern, promise);
     return promise;
   }
 
-  has(key: string) {
-    return this.store.has(key);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  read(key: string, options?: ReadOptions) {
+  read(key: string) {
     if (this.cache.has(key)) {
-      return this.cache.get(key);
+      return this.cache.get(key)!;
     }
 
     const promise = this.store.read(key);
@@ -76,12 +40,12 @@ export class CachedStore<ReadOptions, WriteOptions>
     return promise;
   }
 
-  write(key: string, value: string, options?: WriteOptions): Promise<void> {
+  write(key: string, value: string, options?: WriteOptions) {
     this.cache.set(key, Promise.resolve(value));
     return this.store.write(key, value, options);
   }
 
-  delete(key: string): Promise<void> {
+  delete(key: string) {
     this.cache.set(key, Promise.resolve(null));
     return this.store.delete(key);
   }

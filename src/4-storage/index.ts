@@ -2,25 +2,14 @@ import localforage from 'localforage';
 
 import { GHRepository } from '../3-github/GHRepository';
 import { GithubToken } from '../3-github/GithubAuth';
-import { AsyncStore } from './AsyncStore';
 import { CachedStore } from './middleware/CachedStore';
 import { ForageStore } from './middleware/ForageStore';
 import { GHRepoStore } from './middleware/GHRepoStore';
 import { MixedStore } from './middleware/MixedStore';
 import { ResilientOnlineStore } from './middleware/ResilientOnlineStore';
-import { ShortcutStore } from './middleware/ShortcutStore';
+import { NotesStorage } from './NotesStorage';
 
 Object.assign(window, { localforage });
-
-type UnPromisify<T> = T extends Promise<infer U> ? U : T;
-export type FinalStore = UnPromisify<ReturnType<typeof createStore>>;
-export type FinalReadOptions = FinalStore extends AsyncStore<infer R, unknown>
-  ? R
-  : never;
-
-export type FinalWriteOptions = FinalStore extends AsyncStore<unknown, infer W>
-  ? W
-  : never;
 
 export async function createStore(
   token: GithubToken,
@@ -28,11 +17,6 @@ export async function createStore(
   repoName: string,
 ) {
   const repo = new GHRepository(token, username, repoName);
-
-  (async () => {
-    const files = await repo.readFileCool('notes/', 'oid');
-    console.log('FOO', files);
-  })();
 
   if (await repo.createIfNecessary('Database for notes', true)) {
     // repo.commit('Initial commit', storage.getInitialData());
@@ -54,8 +38,5 @@ export async function createStore(
     new CachedStore(resilient, 30, 'remote'),
   );
 
-  // Adds onChange method triggered on every write
-  const shortcut = new ShortcutStore(mixed);
-
-  return shortcut;
+  return new NotesStorage(mixed);
 }

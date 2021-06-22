@@ -1,3 +1,5 @@
+import { serialize, SerializedDate } from '../util/serialization';
+
 export type NoteId = '[string NoteId]';
 export type NoteContent = string;
 
@@ -6,8 +8,16 @@ export interface Note {
   readonly title: string;
   readonly favorite: boolean;
   readonly group: string | null;
-  readonly created: Date;
-  readonly modified: Date;
+  readonly created: SerializedDate;
+  readonly modified: SerializedDate;
+}
+
+export function isNoteIdentical(a: Note | null, b: Note | null) {
+  if ((a == null || b == null) && a !== b) {
+    return false;
+  }
+
+  return serialize(a) === serialize(b);
 }
 
 export function getMetadataFromContent(content: NoteContent) {

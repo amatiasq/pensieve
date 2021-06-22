@@ -1,4 +1,5 @@
 import { AsyncStore } from '../AsyncStore';
+import { patternToRegex } from '../helpers/patternToRegex';
 
 export class SyncLocalStore {
   private get storedKeys() {
@@ -43,12 +44,13 @@ export class LocalStore implements AsyncStore {
 
   constructor(readonly prefix: string) {}
 
-  keys() {
-    return Promise.resolve(this.syncStore.keys());
-  }
-
-  has(key: string) {
-    return Promise.resolve(this.syncStore.has(key));
+  readAll(pattern: string) {
+    const regex = patternToRegex(pattern);
+    const keys = this.syncStore.keys();
+    const match = keys.filter(x => regex.test(x));
+    const entries = match.map(x => [x, this.syncStore.read(x)] as const);
+    const result = entries.filter(Boolean) as [string, string][];
+    return Promise.resolve(Object.fromEntries(result));
   }
 
   read(key: string) {

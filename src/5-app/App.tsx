@@ -5,24 +5,22 @@ import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 
 import { createStore } from '../4-storage';
-import { AppStorage } from '../4-storage/AppStorage';
+import { NotesStorage } from '../4-storage/NotesStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
-import { AppStorageContext } from './contexts';
+import { NotesStorageContext } from './contexts';
 import { Router } from './Router';
 import { useGithubAuth } from './useGithubAuth';
 
 function App() {
-  const [store, setStore] = useState<AppStorage>(null!);
+  const [store, setStore] = useState<NotesStorage>(null!);
   const { token, username } = useGithubAuth();
   const navigator = useNavigator();
   const [pageName, setPageName] = useState(navigator.getPageName());
 
   useEffect(() => {
     if (!token || !username) return;
-    createStore(token, username, 'pensieve-data').then(x =>
-      setStore(new AppStorage(x)),
-    );
+    createStore(token, username, 'pensieve-data').then(setStore);
   }, [token]);
 
   useEffect(() =>
@@ -34,11 +32,11 @@ function App() {
   }
 
   return (
-    <AppStorageContext.Provider value={store}>
+    <NotesStorageContext.Provider value={store}>
       <div className={`app page-${pageName}`}>
         <Router />
       </div>
-    </AppStorageContext.Provider>
+    </NotesStorageContext.Provider>
   );
 }
 

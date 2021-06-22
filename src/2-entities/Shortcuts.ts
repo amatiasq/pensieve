@@ -1,3 +1,5 @@
+import { serialize } from '../util/serialization';
+
 export const DEFAULT_SHORTCUTS: Shortcuts = {
   'CTRL+TAB': 'goBack',
   'CTRL+SHIFT+TAB': 'goForward',
@@ -37,3 +39,7 @@ export type ShortcutCommand =
   | 'toggleWordWrap';
 
 export type Shortcuts = Record<string, ShortcutCommand>;
+
+export function areShortcutsIdentical(a: Shortcuts, b: Shortcuts) {
+  return serialize(a) === serialize(b);
+}

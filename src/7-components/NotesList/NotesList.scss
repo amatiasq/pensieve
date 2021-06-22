@@ -45,9 +45,13 @@ aside {
       display: flex;
       align-items: center;
       justify-content: center;
-      content: 'No results';
+      content: 'Empty';
       opacity: 0.7;
       inset: 0;
     }
+  }
+
+  &[data-filter]:empty::after {
+    content: 'No results';
   }
 }

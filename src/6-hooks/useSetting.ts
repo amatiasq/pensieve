@@ -1,36 +1,58 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
-import { AppStorageContext } from '../5-app/contexts';
-import { deserialize, serialize } from '../util/serialization';
-import { hookStore } from './helpers/hookStore';
-
-const useSettings = hookStore<Settings, []>(
+import {
+  areSettingsIdentical,
   DEFAULT_SETTINGS,
-  () => (store, setValue) => {
-    const subscription = store.settings
-      .watch(serialize(DEFAULT_SETTINGS))
-      .subscribe(x => setValue(deserialize(x)));
+  Settings
+} from '../2-entities/Settings';
+import { NotesStorageContext } from '../5-app/contexts';
+import { serialize } from '../util/serialization';
 
-    return () => subscription.unsubscribe();
-  },
-);
+function useSettings() {
+  const store = useContext(NotesStorageContext);
+  const [loading, setLoading] = useState(true);
+  const [value, setValue] = useState<Settings>(DEFAULT_SETTINGS);
+
+  useEffect(() => {
+    store.settings.get().then(initialize);
+    return store.settings.onChange(initialize);
+  }, []);
+
+  return [value, set, { loading }] as const;
+
+  function initialize(newValue: Settings) {
+    if (!areSettingsIdentical(newValue, value)) {
+      setValue(newValue);
+    }
+
+    if (loading) {
+      setLoading(false);
+    }
+  }
+
+  async function set(newValue: Settings) {
+    if (areSettingsIdentical(newValue, value)) return;
+
+    setLoading(true);
+    setValue(newValue);
+    await store.settings.set(newValue);
+    setLoading(false);
+  }
+}
 
 export function useSetting<Key extends keyof Settings>(key: Key) {
-  const store = useContext(AppStorageContext);
-  const [settings] = useSettings();
+  const [settings, setSettings, loading] = useSettings();
   const value = settings[key];
   const [, setValue] = useState(value);
 
   // Connect `value` to react rendering loop with `setValue`
   useEffect(() => setValue(value), [serialize(value)]);
 
-  return [value, set] as const;
+  return [value, set, loading] as const;
 
   function set(newValue: Settings[Key]) {
-    if (value !== newValue) {
-      store.settings.write(serialize({ ...settings, [key]: newValue }));
-      setValue(newValue);
+    if (serialize(value) !== serialize(newValue)) {
+      setSettings({ ...settings, [key]: newValue });
     }
   }
 }

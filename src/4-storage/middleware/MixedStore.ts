@@ -1,45 +1,63 @@
 import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
+import { WriteOptions } from '../helpers/WriteOptions';
 
-export class MixedStore<RO1, WO1, RO2, WO2>
-  implements AsyncStore<RO1 & RO2, WO1 & WO2>
-{
+export class MixedStore implements AsyncStore {
   constructor(
-    private readonly offline: AsyncStore<RO1, WO1>,
-    private readonly remote: AsyncStore<RO2, WO2>,
+    private readonly local: AsyncStore,
+    private readonly remote: AsyncStore,
   ) {
-    debugMethods(this, ['has', 'keys', 'read', 'write', 'delete']);
+    debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
-  keys() {
-    return this.remote.keys().catch(() => this.offline.keys());
+  readAll(key: string) {
+    return this.readAllRemote(key).catch(() => this.readAllLocal(key));
   }
 
-  has(key: string): Promise<boolean> {
-    return this.remote.has(key).catch(() => this.offline.has(key));
+  async readAllRemote(key: string) {
+    const record = await this.remote.readAll(key);
+    Object.entries(record).forEach(([key, value]) =>
+      this.local.write(key, value),
+    );
+    return record;
   }
 
-  read(key: string, options?: RO1 & RO2) {
-    return this.remote.read(key, options as RO2).then(
+  readAllLocal(key: string) {
+    return this.remote.readAll(key);
+  }
+
+  read(key: string) {
+    return this.remote.read(key).then(
       x => this.updateOffline(key, x),
-      () => this.offline.read(key),
+      () => this.local.read(key),
     );
   }
 
-  async write(key: string, value: string, options?: WO1 & WO2): Promise<void> {
+  readRemote(key: string) {
+    return this.remote.read(key).then(x => this.updateOffline(key, x));
+  }
+
+  readLocal(key: string) {
+    return this.local.read(key);
+  }
+
+  async write(key: string, value: string, options?: WriteOptions) {
     await Promise.race([
-      this.offline.write(key, value, options),
+      this.local.write(key, value, options),
       this.remote.write(key, value, options),
     ]);
   }
 
-  async delete(key: string): Promise<void> {
-    await Promise.race([this.offline.delete(key), this.remote.delete(key)]);
+  async delete(key: string, options?: WriteOptions) {
+    await Promise.race([
+      this.local.delete(key, options),
+      this.remote.delete(key, options),
+    ]);
   }
 
   private updateOffline(key: string, value: string | null) {
-    if (value == null) this.offline.delete(key);
-    else this.offline.write(key, value);
+    if (value == null) this.local.delete(key);
+    else this.local.write(key, value);
     return value;
   }
 }

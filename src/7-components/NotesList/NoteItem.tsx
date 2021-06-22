@@ -1,45 +1,35 @@
 import './NoteItem.scss';
 
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { Note } from '../../2-entities/Note';
-import { AppStorageContext } from '../../5-app/contexts';
+import { NoteId } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
+import { useNote } from '../../6-hooks/useNote';
 import { IconButton } from '../atoms/IconButton';
 
-export function NoteItem({ note }: { note: Note }) {
+export function NoteItem({ id }: { id: NoteId }) {
   const navigator = useNavigator();
-  const store = useContext(AppStorageContext);
-  const [title, setTitle] = useState(note.title);
-  const [active, setActive] = useState(navigator.isNote(note));
-
-  const cn = [
-    'note-item',
-    note.favorite ? 'favorite' : '',
-    active ? 'active' : '',
-  ];
-
-  useEffect(() => {
-    const sus = store.onNoteTitleChanged(note.id).subscribe(setTitle);
-    return () => sus.unsubscribe();
-  });
-
-  useEffect(() => {
-    if (title !== note.title) {
-      setTitle(note.title);
-    }
-  }, [note.title]);
+  const [note, { toggleFavorite, remove }] = useNote(id);
+  const [active, setActive] = useState<boolean>(navigator.isNote(id));
 
   useEffect(() =>
     navigator.onNavigate(next => {
-      const isNextActive = next.isNote(note);
+      const isNextActive = next.isNote(id);
 
       if (active || isNextActive) {
         setActive(isNextActive);
       }
     }),
   );
+
+  if (!note) return null;
+
+  const cn = [
+    'note-item',
+    note.favorite ? 'favorite' : '',
+    active ? 'active' : '',
+  ];
 
   const extraProps = note.group ? { 'data-group': note.group } : {};
 
@@ -48,25 +38,25 @@ export function NoteItem({ note }: { note: Note }) {
       <div className="star-part">
         <IconButton
           icon={note.favorite ? 'star' : 'far star'}
-          onClick={() => store.toggleFavorite(note.id)}
+          onClick={toggleFavorite}
         />
       </div>
 
-      <h5 className="title-part">{title}</h5>
+      <h5 className="title-part">{note.title}</h5>
 
       <div className="actions-part">
-        <IconButton icon="trash" onClick={remove} />
+        <IconButton icon="trash" onClick={trash} />
       </div>
     </Link>
   );
 
-  function remove(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  function trash(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     event.preventDefault();
 
-    if (navigator.isNote(note)) {
+    if (navigator.isNote(id)) {
       navigator.goRoot();
     }
 
-    return store.deleteNote(note.id);
+    return remove();
   }
 }

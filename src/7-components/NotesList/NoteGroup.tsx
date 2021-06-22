@@ -46,7 +46,7 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
 
       <ul className="group-content">
         {notes.map(x => (
-          <NoteItem key={x.id} note={x} />
+          <NoteItem key={x.id} id={x.id} />
         ))}
       </ul>
     </details>

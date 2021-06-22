@@ -6,9 +6,8 @@ import {
   ShortcutCommand,
   Shortcuts
 } from '../2-entities/Shortcuts';
-import { AppStorage } from '../4-storage/AppStorage';
-import { AppStorageContext } from '../5-app/contexts';
-import { deserialize, serialize } from '../util/serialization';
+import { NotesStorage } from '../4-storage/NotesStorage';
+import { NotesStorageContext } from '../5-app/contexts';
 
 type Executor = () => void;
 
@@ -26,18 +25,16 @@ export function useShortcut(name: ShortcutCommand, execute: Executor) {
   });
 
   if (!initialized) {
-    const store = useContext(AppStorageContext);
-    init(store);
+    init(useContext(NotesStorageContext));
   }
 }
 
-function init(store: AppStorage) {
+function init(store: NotesStorage) {
   let shortcuts = parseShortcuts(DEFAULT_SHORTCUTS);
+  const setShortcuts = (x: Shortcuts) => (shortcuts = parseShortcuts(x));
 
-  const setShortcuts = (x: string) =>
-    (shortcuts = parseShortcuts(deserialize(x)));
-
-  store.shortcuts.watch(serialize(DEFAULT_SHORTCUTS)).subscribe(setShortcuts);
+  store.shortcuts.get().then(setShortcuts);
+  store.shortcuts.onChange(setShortcuts);
 
   onShortcut(event => {
     const keys = event.keys.join('+').toUpperCase();

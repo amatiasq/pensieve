@@ -24,3 +24,9 @@ export function isDeserializable(x: string) {
     return false;
   }
 }
+
+export type SerializedDate = '[string SerializedDate]';
+
+export function datestr(date = new Date()) {
+  return date.toISOString() as SerializedDate;
+}
