@@ -2,6 +2,7 @@ import { Scheduler } from '@amatiasq/scheduler';
 
 import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
+import { WriteOptions } from '../helpers/WriteOptions';
 
 interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   method: T;
@@ -10,9 +11,7 @@ interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
 
 export class StoreOfflineError extends Error {}
 
-export class ResilientOnlineStore<ReadOptions, WriteOptions>
-  implements AsyncStore<ReadOptions, WriteOptions>
-{
+export class ResilientOnlineStore implements AsyncStore {
   private readonly reading = new Map<string, Promise<string | null>>();
   private readonly pending: Command[] = [];
   private readonly reconnect = new Scheduler(1000, () => this.executePending());
@@ -21,20 +20,16 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
     return !navigator.onLine;
   }
 
-  constructor(private readonly remote: AsyncStore<ReadOptions, WriteOptions>) {
+  constructor(private readonly remote: AsyncStore) {
     window.addEventListener('online', () => this.executePending());
-    debugMethods(this, ['has', 'keys', 'read', 'write', 'delete']);
+    debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
-  keys() {
-    return this.rejectIfOffline() || this.remote.keys();
+  readAll(pattern: string) {
+    return this.rejectIfOffline() || this.remote.readAll(pattern);
   }
 
-  has(key: string) {
-    return this.rejectIfOffline() || this.remote.has(key);
-  }
-
-  read(key: string, options?: ReadOptions) {
+  read(key: string) {
     if (this.reading.has(key)) {
       return this.reading.get(key)!;
     }
@@ -43,7 +38,7 @@ export class ResilientOnlineStore<ReadOptions, WriteOptions>
       return Promise.reject(() => new StoreOfflineError());
     }
 
-    const promise = this.remote.read(key, options);
+    const promise = this.remote.read(key);
     this.reading.set(key, promise);
     return promise.finally(() => this.reading.delete(key));
   }

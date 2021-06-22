@@ -1,13 +1,41 @@
-import { NoteContent, NoteId } from '../2-entities/Note';
-import { hookStore } from './helpers/hookStore';
+import { useContext, useEffect, useState } from 'react';
 
-export const useNoteContent = hookStore<NoteContent, [NoteId]>(
-  '',
-  id => (store, setValue) => {
-    const sus = store.watchNoteContent(id).subscribe(x => setValue(x || ''));
-    return () => sus.unsubscribe();
-  },
-);
+import { NoteContent, NoteId } from '../2-entities/Note';
+import { WriteOptions } from '../4-storage/helpers/WriteOptions';
+import { NotesStorageContext } from '../5-app/contexts';
+
+export function useNoteContent(id: NoteId) {
+  const store = useContext(NotesStorageContext);
+  const [loading, setLoading] = useState(true);
+  const [value, setValue] = useState<NoteContent>('');
+
+  useEffect(() => {
+    if (!loading) {
+      setLoading(true);
+    }
+
+    const remote = store.note(id);
+    remote.read().then(initialize);
+    return remote.onContentChange(initialize);
+  }, [id]);
+
+  return [value, set, loading] as const;
+
+  function initialize(newValue: NoteContent | null) {
+    if (newValue !== value) {
+      setValue(newValue || '');
+    }
+
+    if (loading) {
+      setLoading(false);
+    }
+  }
+
+  function set(content: NoteContent, options?: WriteOptions) {
+    setLoading(true);
+    store.note(id).write(content, options);
+  }
+}
 
 // export function useNoteContent(id: NoteId) {
 //   const store = useContext(AppStorageContext);

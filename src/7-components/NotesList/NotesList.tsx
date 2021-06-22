@@ -1,12 +1,10 @@
 import './NotesList.scss';
 
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 
 import { isMobile } from '../../0-dom/isMobile';
 import { Note } from '../../2-entities/Note';
-import { AppStorageContext } from '../../5-app/contexts';
-import { useNavigator } from '../../6-hooks/useNavigator';
-import { useNotesList } from '../../6-hooks/useNoteList';
+import { useNoteList } from '../../6-hooks/useNoteList';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
@@ -18,10 +16,7 @@ import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
 
 export function NotesList() {
-  const navigator = useNavigator();
-  const [list, isListLoading] = useNotesList();
-
-  const store = useContext(AppStorageContext);
+  const [list, { loading, createNote }] = useNoteList();
   const [filter, setFilter] = useState<StringComparer | null>(null);
 
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
@@ -29,6 +24,8 @@ export function NotesList() {
 
   useShortcut('newNote', createNote);
   useShortcut('hideSidebar', () => setIsVisible(!isVisible));
+
+  const extraProps = filter ? { 'data-filter': true } : {};
 
   return (
     <aside
@@ -40,18 +37,13 @@ export function NotesList() {
         <IconButton icon="plus" onClick={createNote} />
       </h4>
 
-      <div className="notes-list">
-        {isListLoading ? <Loader /> : renderList()}
+      <div className="notes-list" {...extraProps}>
+        {loading ? <Loader /> : renderList()}
       </div>
 
       <Resizer size={size} onChange={setSize} />
     </aside>
   );
-
-  async function createNote() {
-    const note = await store.createNote();
-    return navigator.goNote(note);
-  }
 
   function renderList() {
     const groups = new Map<string, Note[]>();
@@ -79,7 +71,7 @@ export function NotesList() {
 
     return finalList.map(note => {
       if (typeof note !== 'string') {
-        return <NoteItem key={note.id} note={note} />;
+        return <NoteItem key={note.id} id={note.id} />;
       }
 
       const group = note;

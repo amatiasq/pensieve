@@ -1,40 +1,22 @@
-import { Observable } from 'rxjs';
-import { distinctUntilChanged, map, mergeWith } from 'rxjs/operators';
+import { MixedStore } from '../middleware/MixedStore';
+import { WriteOptions } from './WriteOptions';
 
-import { FinalReadOptions, FinalStore } from '../';
-import { fromPromise } from '../../util/rxjs-extensions';
-import { FinalWriteOptions } from '../index';
-
-export class RemoteValue<Type> {
+export class RemoteValue {
   constructor(
-    private readonly store: FinalStore,
-    private readonly key: string,
-    private readonly defaultValue: Type,
-    private readonly serialize: (x: Type) => string,
-    private readonly deserialize: (x: string) => Type,
+    private readonly store: MixedStore,
+    readonly key: string,
+    readonly defaultValue: string,
   ) {}
 
-  watch(): Observable<Type | null>;
-  watch(ifNull: Type): Observable<Type>;
-  watch(ifNull?: Type) {
-    const changes = this.store
-      .onChange(this.key)
-      .pipe(map(x => (x ? this.deserialize(x) : ifNull || null)));
-
-    return fromPromise(this.read()).pipe(
-      mergeWith(changes),
-      distinctUntilChanged(),
-    );
+  read() {
+    return this.store.read(this.key);
   }
 
-  read(options: FinalReadOptions = {}) {
-    return this.store.read(this.key, { ...options, notifyChanges: false }).then(
-      x => (x ? this.deserialize(x) : this.defaultValue),
-      () => this.defaultValue,
-    );
+  write(value: string, options?: WriteOptions) {
+    return this.store.write(this.key, value, options);
   }
 
-  write(value: Type, options?: FinalWriteOptions) {
-    return this.store.write(this.key, this.serialize(value), options);
+  delete(options?: WriteOptions) {
+    return this.store.delete(this.key, options);
   }
 }

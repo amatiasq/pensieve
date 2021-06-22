@@ -1,5 +1,5 @@
 import { createContext } from 'react';
 
-import { AppStorage } from '../4-storage/AppStorage';
+import { NotesStorage } from '../4-storage/NotesStorage';
 
-export const AppStorageContext = createContext<AppStorage>(null!);
+export const NotesStorageContext = createContext<NotesStorage>(null!);

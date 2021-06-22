@@ -1,3 +1,5 @@
+import { serialize } from '../util/serialization';
+
 export const DEFAULT_SETTINGS = {
   autosave: 5,
   // defaultFileExtension: '.md',
@@ -14,3 +16,7 @@ export const DEFAULT_SETTINGS = {
 };
 
 export type Settings = typeof DEFAULT_SETTINGS;
+
+export function areSettingsIdentical(a: Settings, b: Settings) {
+  return serialize(a) === serialize(b);
+}

@@ -2,7 +2,8 @@ import { Scheduler } from '@amatiasq/scheduler';
 
 import { GHRepository, StagedFiles } from '../../3-github/GHRepository';
 import { debugMethods } from '../../util/debugMethods';
-import { AsyncStore, NoOptions } from '../AsyncStore';
+import { AsyncStore } from '../AsyncStore';
+import { WriteOptions } from '../helpers/WriteOptions';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
 
@@ -13,43 +14,29 @@ interface PendingCommit {
   reject(reason: Error): void;
 }
 
-interface GHRepoWriteOptions {
-  urgent: boolean;
-}
-
-export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
+export class GHRepoStore implements AsyncStore {
   private readonly scheduler = new Scheduler(100, () => this.push());
   private readonly pending: PendingCommit[] = [];
 
   constructor(private readonly repo: GHRepository) {
-    debugMethods(this, ['has', 'keys', 'read', 'write', 'delete']);
+    debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
-  async keys() {
-    const files = await this.repo.fetchStructure();
-    return files
-      .filter(x => x.type === 'blob' || x.type === 'file')
-      .map(x => x.path);
+  async readAll(pattern: string) {
+    const entries = await this.repo.readDir(pattern);
+    return Object.fromEntries(entries);
   }
 
-  has(key: string) {
-    return this.repo.hasFile(key);
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  read(key: string, options?: Partial<NoOptions>) {
-    return key === 'README.md'
-      ? this.repo.getReadme()
-      : this.repo.readFile(key);
+  read(key: string) {
+    return this.repo.readFile(key);
   }
 
   write(
     key: string,
     value: string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { urgent = false }: Partial<GHRepoWriteOptions> = {},
+    { urgent = false }: WriteOptions = {},
   ) {
-    console.log(key);
     return this.commit(`Update ${key}`, { [key]: value }, urgent);
   }
 
@@ -59,6 +46,7 @@ export class GHRepoStore implements AsyncStore<NoOptions, GHRepoWriteOptions> {
 
   private commit(message: string, files: StagedFiles, isUrgent: boolean) {
     console.log('commit', files);
+
     if (!Object.keys(files).length) {
       throw new Error('NO FILES TO COMMIT');
     }

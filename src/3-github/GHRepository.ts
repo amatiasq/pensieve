@@ -3,14 +3,11 @@ import { AUTH_COMMIT } from '../config.mjs';
 import { GithubToken } from './GithubAuth';
 import { GithubGraphQlApi } from './GithubGraphQlApi';
 import { GithubRestApi, MediaType } from './GithubRestApi';
-import { GHApiCommit } from './models/GHApiCommit';
-import { GHApiRef } from './models/GHApiRef';
 import {
   GHApiRepositoryNode,
   GHNodeSha,
   GHRepoNodeType
 } from './models/GHApiRepositoryNode';
-import { GHApiTree } from './models/GHApiTree';
 
 const CREATE_REPO_CONFIG = {
   has_issues: false,
@@ -45,7 +42,7 @@ export class GHRepository {
   private readonly rest: GithubRestApi;
   private readonly gql: GithubGraphQlApi;
   private commiting = false;
-  branch = 'main';
+  branch = 'HEAD';
 
   get url() {
     return `/repos/${this.owner}/${this.name}`;
@@ -96,40 +93,36 @@ export class GHRepository {
     return true;
   }
 
-  async fetchStructure() {
-    const ref = await this.rest.GET<GHApiRef>(
-      `${this.url}/git/refs/heads/${this.branch}`,
-    );
-    const commit = await this.rest.GET<GHApiCommit>(
-      `${this.url}/git/commits/${ref.object.sha}`,
-    );
-    const tree = await this.rest.GET<GHApiTree>(
-      `${this.url}/git/trees/${commit.tree.sha}?recursive=1`,
-    );
-    return tree.tree.map(simplifyNode);
-  }
-
   async readDir(path: string) {
-    const content = await this.rest.GET<GHApiRepositoryNode[]>(
-      `${this.url}/contents/${path}`,
-    );
-    return content.map(simplifyNode);
+    const clean = path.replace(/^\*|\*$/g, '');
+    const {
+      data: {
+        repository: { files },
+      },
+    } = await this.gql.send(getFilesContent(), this.getFileVars(clean));
+
+    if (!files) return [];
+
+    return files.entries.map((x: any) => [x.name, x.object.text]) as [
+      string,
+      string,
+    ][];
   }
 
-  async hasFile(path: string) {
-    const url = `${this.url}/contents/${path}`;
+  // async hasFile(path: string) {
+  //   const url = `${this.url}/contents/${path}`;
 
-    try {
-      await this.rest.GET<GHApiRepositoryNode>(url);
-      return true;
-    } catch (error) {
-      if (error instanceof HttpError && error.status === 404) {
-        return false;
-      }
+  //   try {
+  //     await this.rest.GET<GHApiRepositoryNode>(url);
+  //     return true;
+  //   } catch (error) {
+  //     if (error instanceof HttpError && error.status === 404) {
+  //       return false;
+  //     }
 
-      throw error;
-    }
-  }
+  //     throw error;
+  //   }
+  // }
 
   async getReadme() {
     return this.rest.GET<string>(`${this.url}/readme`, {
@@ -187,52 +180,32 @@ export class GHRepository {
   }
 }
 
-function simplifyNode({
-  type,
-  size,
-  path,
-  sha,
-}: Pick<GHApiRepositoryNode, 'type' | 'size' | 'path' | 'sha'>) {
-  return { type, size, path, sha } as GHRepoNode;
-}
-
-// export class GHRepositoryQL extends GHGraphQL {
-//   constructor(
-//     token: GithubToken,
-//     public readonly owner: string,
-//     public readonly repo: string,
-//     public branch = 'main',
-//   ) {
-//     super(token);
-//   }
-
-//   async hasFile(path: string) {
-//     return this.send(
-//       getFileProperty('abbreviatedOid'),
-//       this.getFileVars(path),
-//     ).then(x => Boolean(x.data.repository.file));
-//   }
-
-//   async readFile(path: string) {
-//     return this.send(getFileProperty('text'), this.getFileVars(path)).then(
-//       x => x.data.repository.file?.text as string,
-//     );
-//   }
-
-//   private getFileVars(path: string) {
-//     return {
-//       owner: this.owner,
-//       repo: this.repo,
-//       path: `${this.branch}:${path}`,
-//     };
-//   }
-// }
-
 function getFileProperty(keys: string) {
   return `
     repository(owner: $owner, name: $repo) {
-      file: object(expression: $path) {
-        ... on Blob { ${keys} }
+      object(expression: $path) {
+        ... on Blob {
+          ${keys}
+        }
+      }
+    }
+  `;
+}
+
+function getFilesContent() {
+  return `
+    repository(owner: $owner, name: $repo) {
+      files: object(expression: $path) {
+        ... on Tree {
+          entries {
+            name
+            object {
+              ... on Blob {
+                text
+              }
+            }
+          }
+        }
       }
     }
   `;

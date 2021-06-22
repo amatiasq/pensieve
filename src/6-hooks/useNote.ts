@@ -1,10 +1,37 @@
-import { Note, NoteId } from '../2-entities/Note';
-import { hookStore } from './helpers/hookStore';
+import { useContext, useEffect, useState } from 'react';
 
-export const useNote = hookStore<Note | null, [NoteId]>(
-  null,
-  id => (store, setValue) => {
-    const sus = store.watchNote(id).subscribe(setValue);
-    return () => sus.unsubscribe();
-  },
-);
+import { isNoteIdentical, Note, NoteContent, NoteId } from '../2-entities/Note';
+import { NotesStorageContext } from '../5-app/contexts';
+
+export function useNote(id: NoteId) {
+  const store = useContext(NotesStorageContext);
+  const remote = store.note(id);
+
+  const toggleFavorite = () => store.note(id).toggleFavorite();
+  const remove = () => store.note(id).delete();
+  const draft = (content: NoteContent) => store.note(id).draft(content);
+
+  const [value, setValue] = useState<Note | null>(remote.get());
+  const [loading, setLoading] = useState(!value);
+
+  useEffect(() => {
+    if (!loading) {
+      setLoading(true);
+    }
+
+    const subs = [remote.onChange(initialize), remote.onDraft(initialize)];
+    return () => subs.forEach(x => x());
+  }, [id]);
+
+  return [value, { loading, toggleFavorite, remove, draft }] as const;
+
+  function initialize(newValue: Note) {
+    if (!isNoteIdentical(newValue, value)) {
+      setValue(newValue);
+    }
+
+    if (loading) {
+      setLoading(false);
+    }
+  }
+}
