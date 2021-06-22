@@ -12,9 +12,9 @@ export function EditNoteFromUrl() {
   const { noteId } = useParams() as { noteId: NoteId };
   const navigator = useNavigator();
   const [note, { loading, draft }] = useNote(noteId);
-  const [content, setContent, isContentLoading] = useNoteContent(noteId);
+  const [content, setContent] = useNoteContent(noteId);
 
-  if (loading || isContentLoading) {
+  if (loading) {
     return <Loader />;
   }
 

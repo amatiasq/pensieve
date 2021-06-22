@@ -9,7 +9,7 @@ import {
 } from '../2-entities/Note';
 import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
 import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts';
-import { deserialize, serialize } from '../util/serialization';
+import { datestr, deserialize, serialize } from '../util/serialization';
 import { fetchValue } from './helpers/fetchValue';
 import { RemoteJson } from './helpers/RemoteJson';
 import { RemoteValue } from './helpers/RemoteValue';
@@ -24,7 +24,7 @@ export class NotesStorage {
   private readonly notes = new Map<NoteId, RemoteNote>();
   private readonly emitNoteCreate: (data: Note) => void;
 
-  readonly onNoteCreated: (listener: (data: Note) => void) => () => boolean;
+  readonly onNoteCreated: (listener: (data: Note) => void) => () => void;
 
   readonly settings = new RemoteJson<Settings>(
     this.store,
@@ -44,7 +44,7 @@ export class NotesStorage {
     this.onNoteCreated = onNoteCreated;
   }
 
-  async all(): Promise<RemoteNote[]> {
+  async all() {
     const pattern = getNotesPath();
 
     return fetchValue(
@@ -53,9 +53,11 @@ export class NotesStorage {
       x => Boolean(Object.keys(x).length),
       x => this.updateList(x),
     ).then(values =>
-      Object.values(values)
-        .map(x => deserialize<Note>(x))
-        .map(x => this.createRemote(x.id, x)),
+      Object.values(values).map(raw => {
+        const note = deserialize<Note>(raw);
+        this.updateRemote(note.id, note);
+        return note;
+      }),
     );
   }
 
@@ -96,6 +98,16 @@ export class NotesStorage {
     return remote;
   }
 
+  private updateRemote(id: NoteId, note: Note) {
+    if (!this.notes.get(id)) {
+      return this.createRemote(id, note);
+    }
+
+    const remote = this.notes.get(id)!;
+    remote.push(note);
+    return remote;
+  }
+
   private createRemote(id: NoteId, note: Note) {
     const remote = new RemoteNote(
       id,
@@ -116,7 +128,7 @@ function createNote(content: NoteContent): Note {
     title,
     group,
     favorite: true,
-    created: new Date(),
-    modified: new Date(),
+    created: datestr(),
+    modified: datestr(),
   };
 }

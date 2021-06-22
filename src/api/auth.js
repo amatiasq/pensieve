@@ -21,6 +21,8 @@ module.exports = async (req, res) => {
     code,
   };
 
+  console.log(params);
+
   const response = axios.get('https://github.com/login/oauth/access_token', {
     params,
   });

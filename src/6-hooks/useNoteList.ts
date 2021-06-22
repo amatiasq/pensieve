@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { isNoteIdentical, Note } from '../2-entities/Note';
+import { isNoteIdentical, Note, NoteId } from '../2-entities/Note';
 import { NotesStorageContext } from '../5-app/contexts';
 import { datestr } from '../util/serialization';
 import { useNavigator } from './useNavigator';
@@ -18,15 +18,20 @@ export function useNoteList() {
       setLoading(true);
     }
 
-    const subs: Array<() => void> = [store.onNoteCreated(addNote)];
+    store.all().then(initialize);
+  }, []);
 
-    store.all().then(notes => {
-      initialize(notes.map(x => x.get()!));
-      subs.push(...notes.map(x => x.onChange(updateNote)));
-    });
+  useEffect(() => {
+    const remotes = value.map(x => store.note(x.id));
+
+    const subs: Array<() => void> = [
+      store.onNoteCreated(addNote),
+      ...remotes.map(x => x.onChange(updateNote)),
+      ...remotes.map(x => x.onDelete(onRemove(x.id))),
+    ];
 
     return () => subs.forEach(x => x());
-  }, []);
+  }, [value]);
 
   return [value, { loading, createNote }] as const;
 
@@ -57,6 +62,12 @@ export function useNoteList() {
     const before = value.slice(0, index);
     const after = value.slice(index + 1);
     initialize([...before, note, ...after]);
+  }
+
+  function onRemove(id: NoteId) {
+    return () => {
+      setValue(value.filter(x => x.id !== id));
+    };
   }
 }
 

@@ -9,6 +9,7 @@ window.addEventListener('message', (event: MessageEvent<any>) => {
   const emitter = emitters[event.data.type];
 
   if (typeof emitter === 'function') {
+    console.debug(`🚎 ${event.data.type}`, event.data.data);
     emitter(event.data.data);
   }
 });
