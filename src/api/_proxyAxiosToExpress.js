@@ -18,6 +18,6 @@ function writeResponse(input, output) {
   }
 
   output.status(input.status);
-  output.send(JSON.stringify(input.data, null, 2));
+  output.send(input.data);
   output.end();
 }
