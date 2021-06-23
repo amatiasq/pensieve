@@ -19,12 +19,12 @@ import { RemoteNote } from './RemoteNote';
 const getNotesPath = () => 'meta/*';
 const getNotePath = (id: NoteId) => `meta/${id}.json`;
 const getContentPath = (id: NoteId) => `note/${id}`;
+const cleanJson = (json: string) => json.trim().replace(/,$/, '');
 
 export class NotesStorage {
   private readonly notes = new Map<NoteId, RemoteNote>();
-  private readonly emitNoteCreate: (data: Note) => void;
-
-  readonly onNoteCreated: (listener: (data: Note) => void) => () => void;
+  private readonly emitNotesCreate: (data: Note[]) => void;
+  readonly onNotesCreated: (listener: (data: Note[]) => void) => () => void;
 
   readonly settings = new RemoteJson<Settings>(
     this.store,
@@ -39,9 +39,10 @@ export class NotesStorage {
   );
 
   constructor(private readonly store: MixedStore) {
-    const [emitNoteCreate, onNoteCreated] = messageBus<Note>('note:created');
-    this.emitNoteCreate = emitNoteCreate;
-    this.onNoteCreated = onNoteCreated;
+    const [emitNotesCreate, onNotesCreated] =
+      messageBus<Note[]>('notes-created');
+    this.emitNotesCreate = emitNotesCreate;
+    this.onNotesCreated = onNotesCreated;
   }
 
   async all() {
@@ -54,7 +55,7 @@ export class NotesStorage {
       x => this.updateList(x),
     ).then(values =>
       Object.values(values).map(raw => {
-        const note = deserialize<Note>(raw);
+        const note = deserialize<Note>(cleanJson(raw));
         this.updateRemote(note.id, note);
         return note;
       }),
@@ -62,16 +63,22 @@ export class NotesStorage {
   }
 
   private updateList(notes: Record<NoteId, string>) {
+    const toBeAdded = [];
+
     for (const [, json] of Object.entries(notes)) {
-      const note = deserialize<Note>(json);
+      const note = deserialize<Note>(cleanJson(json));
       const exists = this.notes.has(note.id);
       const remote = this.note(note.id);
 
       remote.push(note);
 
       if (!exists) {
-        this.emitNoteCreate(note);
+        toBeAdded.push(note);
       }
+    }
+
+    if (toBeAdded.length) {
+      this.emitNotesCreate(toBeAdded);
     }
   }
 
@@ -94,7 +101,7 @@ export class NotesStorage {
       remote.write(content),
     ]);
 
-    this.emitNoteCreate(note);
+    this.emitNotesCreate([note]);
     return remote;
   }
 

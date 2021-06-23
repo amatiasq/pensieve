@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 
 import { isNoteIdentical, Note, NoteId } from '../2-entities/Note';
 import { NotesStorageContext } from '../5-app/contexts';
-import { datestr } from '../util/serialization';
+import { datestr, parseDate } from '../util/serialization';
 import { useNavigator } from './useNavigator';
 
 export function useNoteList() {
@@ -10,8 +10,6 @@ export function useNoteList() {
   const store = useContext(NotesStorageContext);
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<Note[]>([]);
-
-  const addNote = (note: Note) => initialize([note, ...value]);
 
   useEffect(() => {
     if (!loading) {
@@ -25,7 +23,7 @@ export function useNoteList() {
     const remotes = value.map(x => store.note(x.id));
 
     const subs: Array<() => void> = [
-      store.onNoteCreated(addNote),
+      store.onNotesCreated(addNotes),
       ...remotes.map(x => x.onChange(updateNote)),
       ...remotes.map(x => x.onDelete(onRemove(x.id))),
     ];
@@ -37,8 +35,7 @@ export function useNoteList() {
 
   function initialize(notes: Note[]) {
     if (!listAreIdentical(value, notes)) {
-      // SORT HERE
-      setValue(notes);
+      setValue(sort(notes));
     }
 
     if (loading) {
@@ -47,8 +44,14 @@ export function useNoteList() {
   }
 
   function createNote() {
-    const remote = store.create(`${datestr()}\n`);
+    const remote = store.create(`${datestr()}.md\n`);
     navigator.goNote(remote.id);
+  }
+
+  function addNotes(notes: Note[]) {
+    const newIds = notes.map(x => x.id);
+    const previous = value.filter(x => !newIds.includes(x.id));
+    initialize([...notes, ...previous]);
   }
 
   function updateNote(note: Note) {
@@ -73,4 +76,10 @@ export function useNoteList() {
 
 function listAreIdentical(a: Note[], b: Note[]) {
   return a.length === b.length && a.every((x, i) => isNoteIdentical(x, b[i]));
+}
+
+function sort(list: Note[]) {
+  return list.sort(
+    (a, b) => Number(parseDate(b.created)) - Number(parseDate(a.created)),
+  );
 }

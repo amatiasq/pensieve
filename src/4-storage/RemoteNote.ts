@@ -17,6 +17,10 @@ const noop = () => {
 
 const cache = new Map<NoteId, Note>();
 
+export function isIdValid(id: NoteId) {
+  return cache.has(id);
+}
+
 export class RemoteNote {
   private readonly emitChange: (data: Note) => void;
   private readonly emitContentChange: (data: NoteContent) => void;
@@ -44,6 +48,11 @@ export class RemoteNote {
     if (cache.has(id)) {
       throw new Error(`Created RemoteNote twice with same id: ${id}`);
     }
+
+    // this.emitChange = (x: any) => {
+    //   if (!isIdValid(x.id)) debugger;
+    //   emitChange(x);
+    // };
 
     this.emitChange = emitChange;
     this.emitContentChange = emitContentChange;
@@ -124,6 +133,13 @@ export class RemoteNote {
 
   async push(note: Note) {
     const { id } = this;
+
+    if (note.id !== id) {
+      throw new Error(
+        `Pushing note with id ${note.id} into RemoteNote with id ${id}`,
+      );
+    }
+
     const hasChanged = !isNoteIdentical(this.getCache(), note);
 
     cache.set(id, note);
