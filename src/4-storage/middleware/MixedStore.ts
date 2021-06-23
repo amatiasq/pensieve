@@ -25,7 +25,7 @@ export class MixedStore implements AsyncStore {
 
     localKeys
       .filter(x => !remoteKeys.has(x))
-      .forEach(x => this.remote.delete(x));
+      .forEach(x => this.local.delete(x));
 
     remoteKeys.forEach(key => this.local.write(key, remote[key]));
 

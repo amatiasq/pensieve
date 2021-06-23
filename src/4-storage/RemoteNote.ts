@@ -49,11 +49,6 @@ export class RemoteNote {
       throw new Error(`Created RemoteNote twice with same id: ${id}`);
     }
 
-    // this.emitChange = (x: any) => {
-    //   if (!isIdValid(x.id)) debugger;
-    //   emitChange(x);
-    // };
-
     this.emitChange = emitChange;
     this.emitContentChange = emitContentChange;
     this.emitDelete = emitDelete;
@@ -71,6 +66,7 @@ export class RemoteNote {
   get(): Note | null {
     const cached = this.getCache();
 
+    // We can't do this at the same time for all notes
     // this.meta.get().then(x => {
     //   if (!isNoteIdentical(cached, x)) {
     //     cache.set(this.id, x);
