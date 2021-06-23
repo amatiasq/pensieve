@@ -38,19 +38,21 @@ export function NoteItem({ id }: { id: NoteId }) {
       <div className="star-part">
         <IconButton
           icon={note.favorite ? 'star' : 'far star'}
-          onClick={toggleFavorite}
+          onClick={applyFavorite}
         />
       </div>
 
       <h5 className="title-part">{note.title}</h5>
 
       <div className="actions-part">
-        <IconButton icon="trash" onClick={trash} />
+        <IconButton icon="trash" onClick={applyRemove} />
       </div>
     </Link>
   );
 
-  function trash(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  type ClickEvent = React.MouseEvent<HTMLButtonElement, MouseEvent>;
+
+  function applyRemove(event: ClickEvent) {
     event.preventDefault();
 
     if (navigator.isNote(id)) {
@@ -58,5 +60,10 @@ export function NoteItem({ id }: { id: NoteId }) {
     }
 
     return remove();
+  }
+
+  function applyFavorite(event: ClickEvent) {
+    event.preventDefault();
+    toggleFavorite();
   }
 }

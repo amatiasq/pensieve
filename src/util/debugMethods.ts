@@ -5,6 +5,10 @@ export function debugMethods<Key extends string>(
   methods: Key[],
   label?: string,
 ) {
+  if (!('debug' in window)) {
+    return;
+  }
+
   const className = self.constructor.name;
   methods.forEach(method => {
     const original = self[method];

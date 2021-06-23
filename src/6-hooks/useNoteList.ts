@@ -35,7 +35,8 @@ export function useNoteList() {
 
   function initialize(notes: Note[]) {
     if (!listAreIdentical(value, notes)) {
-      setValue(sort(notes));
+      const sorted = sort(notes);
+      setValue(sorted);
     }
 
     if (loading) {
