@@ -11,11 +11,12 @@ if (!port) {
 
 app.use(cors());
 
-// Configuring body parser middleware
-app.use(bodyParser.json({ limit: '50mb', type: 'text/plain' }));
-
 app.post('/auth', require('./auth'));
-app.post('/commit', require('./commit'));
+app.post(
+  '/commit',
+  bodyParser.json({ limit: '50mb', type: 'text/plain' }),
+  require('./commit'),
+);
 
 app.listen(port, () =>
   console.log(`Hello world app listening on port ${port}!`),
