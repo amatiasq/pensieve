@@ -1,11 +1,12 @@
 let indent = 0;
+const DEBUG = Boolean(localStorage.getItem('debug'));
 
 export function debugMethods<Key extends string>(
   self: Record<Key, (...args: any[]) => any>,
   methods: Key[],
   label?: string,
 ) {
-  if (!('debug' in window)) {
+  if (!DEBUG) {
     return;
   }
 

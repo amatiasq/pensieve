@@ -40,6 +40,7 @@ export class NotesStorage {
   constructor(private readonly store: MixedStore) {
     const [emitNotesCreate, onNotesCreated] =
       messageBus<Note[]>('notes-created');
+
     this.emitNotesCreate = emitNotesCreate;
     this.onNotesCreated = onNotesCreated;
   }
@@ -87,7 +88,7 @@ export class NotesStorage {
     }
 
     // throw new Error('This should never happen');
-    return this.createRemote(id, createNote(''));
+    return this.createRemote(id, { ...createNote(''), id });
   }
 
   create(content: NoteContent): RemoteNote {
