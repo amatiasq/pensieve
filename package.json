@@ -1,5 +1,5 @@
 {
-  "homepage": "https://gist.amatiasq.com/",
+  "homepage": "https://pensieve.amatiasq.com/",
   "scripts": {
     "start": "rm -rf .cache && parcel src/index.html",
     "build-web": "parcel build src/index.html",

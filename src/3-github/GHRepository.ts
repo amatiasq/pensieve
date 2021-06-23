@@ -1,5 +1,5 @@
-import { HttpError, POST } from '../1-core/http';
-import { AUTH_COMMIT } from '../config.mjs';
+import { POST } from '../1-core/http';
+import { COMMIT_ENDPOINT } from '../config.mjs';
 import { GithubToken } from './GithubAuth';
 import { GithubGraphQlApi } from './GithubGraphQlApi';
 import { GithubRestApi, MediaType } from './GithubRestApi';
@@ -103,7 +103,7 @@ export class GHRepository {
 
     if (!files) return [];
 
-    return files.entries.map((x: any) => [x.name, x.object.text]) as [
+    return files.entries.map((x: any) => [x.path, x.object.text]) as [
       string,
       string,
     ][];
@@ -160,7 +160,7 @@ export class GHRepository {
 
     this.commiting = true;
 
-    return POST<void>(AUTH_COMMIT, body, { keepalive: isUrgent }).finally(
+    return POST<void>(COMMIT_ENDPOINT, body, { keepalive: isUrgent }).finally(
       () => (this.commiting = false),
     );
   }
@@ -198,7 +198,7 @@ function getFilesContent() {
       files: object(expression: $path) {
         ... on Tree {
           entries {
-            name
+            path
             object {
               ... on Blob {
                 text

@@ -15,15 +15,25 @@ export class MixedStore implements AsyncStore {
   }
 
   async readAllRemote(key: string) {
-    const record = await this.remote.readAll(key);
-    Object.entries(record).forEach(([key, value]) =>
-      this.local.write(key, value),
-    );
-    return record;
+    const [local, remote] = await Promise.all([
+      this.local.readAll(key),
+      this.remote.readAll(key),
+    ]);
+
+    const localKeys = Object.keys(local);
+    const remoteKeys = new Set(Object.keys(remote));
+
+    localKeys
+      .filter(x => !remoteKeys.has(x))
+      .forEach(x => this.remote.delete(x));
+
+    remoteKeys.forEach(key => this.local.write(key, remote[key]));
+
+    return remote;
   }
 
   readAllLocal(key: string) {
-    return this.remote.readAll(key);
+    return this.local.readAll(key);
   }
 
   read(key: string) {

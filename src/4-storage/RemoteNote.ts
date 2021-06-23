@@ -71,12 +71,12 @@ export class RemoteNote {
   get(): Note | null {
     const cached = this.getCache();
 
-    this.meta.get().then(x => {
-      if (!isNoteIdentical(cached, x)) {
-        cache.set(this.id, x);
-        this.emitChange(x);
-      }
-    });
+    // this.meta.get().then(x => {
+    //   if (!isNoteIdentical(cached, x)) {
+    //     cache.set(this.id, x);
+    //     this.emitChange(x);
+    //   }
+    // });
 
     return cached;
   }
@@ -141,7 +141,6 @@ export class RemoteNote {
     }
 
     const hasChanged = !isNoteIdentical(this.getCache(), note);
-
     cache.set(id, note);
 
     if (hasChanged) {

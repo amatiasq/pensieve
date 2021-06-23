@@ -6,8 +6,7 @@ function getDescription() {
     -H "Accept: application/vnd.github.v3+json" \
     https://api.github.com/gists/$1 \
     2>/dev/null \
-    | jq .description \
-    | xargs echo -n
+    | jq .description
 }
 
 function getStarStatus() {
@@ -46,7 +45,7 @@ do
     modified=$(git show --pretty=format:%aI | head -n 1)
     cd ..
 
-    if [[ "$group" == '""' ]]
+    if [[ "$group" == '""' ]] || [[ "$group" == 'null' ]]
     then
       group="$id"
     fi

@@ -10,6 +10,8 @@ export function useNoteContent(id: NoteId) {
   const [value, setValue] = useState<NoteContent>('');
 
   useEffect(() => {
+    setValue('');
+
     if (!loading) {
       setLoading(true);
     }

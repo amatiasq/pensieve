@@ -5,8 +5,8 @@
   "display": "fullscreen",
   "background_color": "#1c1c1c",
   "theme_color": "#1c1c1c",
-  "start_url": "https://gist.amatiasq.com/",
-  "scope": "https://gist.amatiasq.com/",
+  "start_url": "https://pensieve.amatiasq.com/",
+  "scope": "https://pensieve.amatiasq.com/",
   "icons": [
     { "src": "../assets/Matrix-16.png", "type": "image/png", "sizes": "16x16" },
     { "src": "../assets/Matrix-24.png", "type": "image/png", "sizes": "24x24" },
