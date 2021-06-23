@@ -6,8 +6,7 @@ import {
   NoteContent,
   NoteId
 } from '../2-entities/Note';
-import { datestr, isDeserializable } from '../util/serialization';
-import { MemoryCache } from './helpers/MemoryCache';
+import { datestr } from '../util/serialization';
 import { RemoteJson } from './helpers/RemoteJson';
 import { RemoteValue } from './helpers/RemoteValue';
 import { WriteOptions } from './helpers/WriteOptions';
@@ -20,13 +19,15 @@ const cache = new Map<NoteId, Note>();
 
 export class RemoteNote {
   private readonly emitChange: (data: Note) => void;
-  private readonly emitContentChange: (data: string) => void;
+  private readonly emitContentChange: (data: NoteContent) => void;
   private readonly emitDelete: (data: void) => void;
   private readonly emitDraft: (data: Note) => void;
   readonly onChange: (listener: (data: Note) => void) => () => void;
-  readonly onContentChange: (listener: (data: string) => void) => () => void;
+  readonly onContentChange: (
+    listener: (data: NoteContent) => void,
+  ) => () => void;
   readonly onDelete: (listener: (data: void) => void) => () => void;
-  readonly onDraft: (listener: (data: Note) => void) => () => boolean;
+  readonly onDraft: (listener: (data: Note) => void) => () => void;
 
   constructor(
     readonly id: NoteId,
@@ -39,6 +40,10 @@ export class RemoteNote {
     const [emitContentChange, onContentChange] = messageBus<NoteContent>(
       `note:content-changed:${id}`,
     );
+
+    if (cache.has(id)) {
+      throw new Error(`Created RemoteNote twice with same id: ${id}`);
+    }
 
     this.emitChange = emitChange;
     this.emitContentChange = emitContentChange;
@@ -83,15 +88,26 @@ export class RemoteNote {
     this.emitDraft({ ...current, title, group });
   }
 
-  read() {
-    return this.content.read();
+  async read() {
+    const wasSavedUrgently = localStorage.getItem('URGENT_SAVE') === this.id;
+
+    if (wasSavedUrgently) {
+      localStorage.removeItem('URGENT_SAVE');
+      await new Promise(x => setTimeout(x, 500));
+    }
+
+    const content = (await this.content.read()) || '';
+    this.updateFromContent(content);
+    return content;
   }
 
   async write(value: NoteContent, options?: WriteOptions) {
-    const { title, group } = getMetadataFromContent(value);
+    if (options && options.urgent) {
+      localStorage.setItem('URGENT_SAVE', this.id);
+    }
 
     await Promise.all([
-      this.update(x => ({ ...x, title, group, modified: datestr() }), options),
+      this.updateFromContent(value, options),
       this.content.write(value, options),
     ]);
 
@@ -120,17 +136,22 @@ export class RemoteNote {
   private async update(operator: (x: Note) => Note, options?: WriteOptions) {
     const meta = await this.meta.get();
     const updated = operator(meta);
+    const modified = datestr();
 
-    if (
-      !isNoteIdentical(
-        { ...meta, modified: new Date(0) },
-        { ...updated, modified: new Date(0) },
-      )
-    ) {
+    if (!isNoteIdentical({ ...meta, modified }, { ...updated, modified })) {
       await this.meta.set(updated, options);
       this.emitChange(updated);
     }
 
     return updated;
+  }
+
+  private updateFromContent(content: NoteContent, options?: WriteOptions) {
+    const { title, group } = getMetadataFromContent(content);
+
+    return this.update(
+      x => ({ ...x, title, group, modified: datestr() }),
+      options,
+    );
   }
 }

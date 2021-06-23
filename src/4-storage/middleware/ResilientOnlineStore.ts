@@ -74,7 +74,6 @@ export class ResilientOnlineStore implements AsyncStore {
     const promise: Promise<void> = (this.remote[method] as any)(...params);
 
     return promise.catch(reason => {
-      console.log('error detected ');
       this.pending.push({ method, params });
       this.reconnect.restart();
       throw reason;

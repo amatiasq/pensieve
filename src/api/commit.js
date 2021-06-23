@@ -10,6 +10,9 @@ module.exports = async (req, res) => {
 
 async function githubCommit({ token, owner, repo, branch, files, message }) {
   const { GH_API } = await config;
+  const key = `${owner}/${repo}:${branch}`;
+
+  console.log(`${key} - Commit requests`);
 
   const request = axios.create({
     baseURL: `${GH_API}/repos/${owner}/${repo}`,
@@ -18,7 +21,9 @@ async function githubCommit({ token, owner, repo, branch, files, message }) {
 
   const items = prepareFilesForRequest(files);
 
+  console.log(`${key} - Requesting ref...`);
   const { data: ref } = await request.get(`/git/refs/heads/${branch}`);
+  console.log(`${key} - Creating tree...`);
 
   // Create tree
   // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-tree
@@ -26,6 +31,8 @@ async function githubCommit({ token, owner, repo, branch, files, message }) {
     tree: items,
     base_tree: ref.object.sha,
   });
+
+  console.log(`${key} - Creating commit...`);
 
   // Create commit
   // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-commit
@@ -35,12 +42,18 @@ async function githubCommit({ token, owner, repo, branch, files, message }) {
     parents: [ref.object.sha],
   });
 
+  console.log(`${key} - Updating branch...`);
+
   // Update a reference
   // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#update-a-reference
-  return request.post(`/git/refs/heads/${branch}`, {
-    sha: commit.sha,
-    force: true,
-  });
+  return request
+    .post(`/git/refs/heads/${branch}`, {
+      sha: commit.sha,
+      force: true,
+    })
+    .finally(() => {
+      console.log(`${key} - Complete`);
+    });
 }
 
 function prepareFilesForRequest(files) {

@@ -45,7 +45,7 @@ export class GHRepoStore implements AsyncStore {
   }
 
   private commit(message: string, files: StagedFiles, isUrgent: boolean) {
-    console.log('commit', files);
+    // console.log('commit', files);
 
     if (!Object.keys(files).length) {
       throw new Error('NO FILES TO COMMIT');
@@ -63,7 +63,7 @@ export class GHRepoStore implements AsyncStore {
   }
 
   private push(isUrgent = false) {
-    console.log('push');
+    // console.log('push');
 
     if (this.repo.isCommiting) {
       this.scheduler.restart();

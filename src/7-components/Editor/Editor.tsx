@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, map, mergeWith } from 'rxjs/operators';
 
 import { emitter } from '@amatiasq/emitter';
 
@@ -34,7 +34,8 @@ export type EditorProps = ReadonlyEditorProps | EditableEditorProps;
 export function Editor(props: EditorProps) {
   const { title, content, ext, gap } = props;
   const readonly = isReadonly(props) || false;
-  const requestSave = emitter<{ urgent?: boolean } | void>();
+  const requestSave = emitter<void>();
+  const requestUrgentSave = emitter<void>();
 
   const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
@@ -71,8 +72,10 @@ export function Editor(props: EditorProps) {
   useEffect(() => {
     if (!hasUnsavedChanges) return;
 
+    console.log('suscription');
     const sus = onPageActive.subscribe(active => {
-      !active && requestSave({ urgent: true });
+      console.log('onPageActive2', active);
+      if (!active) requestUrgentSave();
     });
 
     return () => sus.unsubscribe();
@@ -80,8 +83,12 @@ export function Editor(props: EditorProps) {
 
   if (value == null) return <Loader />;
 
+  const urgent = fromEmitter(requestUrgentSave).pipe(
+    map(() => ({ urgent: true })),
+  );
+
   fromEmitter(requestSave)
-    .pipe(debounceTime(100))
+    .pipe(debounceTime(100), mergeWith(urgent))
     .subscribe(options => hasUnsavedChanges && forceSave(options || {}));
 
   return (

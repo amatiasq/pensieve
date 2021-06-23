@@ -42,7 +42,7 @@ export class GHRepository {
   private readonly rest: GithubRestApi;
   private readonly gql: GithubGraphQlApi;
   private commiting = false;
-  branch = 'HEAD';
+  branch = 'main';
 
   get url() {
     return `/repos/${this.owner}/${this.name}`;
