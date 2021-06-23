@@ -72,9 +72,7 @@ export function Editor(props: EditorProps) {
   useEffect(() => {
     if (!hasUnsavedChanges) return;
 
-    console.log('suscription');
     const sus = onPageActive.subscribe(active => {
-      console.log('onPageActive2', active);
       if (!active) requestUrgentSave();
     });
 

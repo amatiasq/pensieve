@@ -34,8 +34,12 @@ export function datestr(date = new Date()) {
   const hour = pad(date.getHours());
   const min = pad(date.getMinutes());
   const sec = pad(date.getSeconds());
-  const str = `${year}-${month}-${day} ${hour}:${min}:${sec}.md`;
+  const str = `${year}-${month}-${day} ${hour}:${min}:${sec}`;
   return str as SerializedDate;
+}
+
+export function parseDate(str: SerializedDate) {
+  return new Date(str);
 }
 
 function pad(x: number) {

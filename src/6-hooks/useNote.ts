@@ -15,6 +15,14 @@ export function useNote(id: NoteId) {
   const [loading, setLoading] = useState(!value);
 
   useEffect(() => {
+    const note = remote.get();
+
+    if (note) {
+      initialize(note);
+    } else {
+      setLoading(true);
+    }
+
     const subs = [remote.onChange(initialize), remote.onDraft(initialize)];
     return () => subs.forEach(x => x());
   }, [id]);

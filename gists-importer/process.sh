@@ -6,7 +6,8 @@ function getDescription() {
     -H "Accept: application/vnd.github.v3+json" \
     https://api.github.com/gists/$1 \
     2>/dev/null \
-    | jq .description
+    | jq .description \
+    | xargs echo -n
 }
 
 function getStarStatus() {
@@ -20,8 +21,8 @@ function getStarStatus() {
     awk '{print $3}'
 }
 
-rm -r note meta
-mkdir note meta
+rm -r ../output/note ../output/meta
+mkdir -p ../output/note ../output/meta
 
 for dir in */
 do
@@ -47,7 +48,7 @@ do
 
     if [[ "$group" == '""' ]]
     then
-      group="\"$id\""
+      group="$id"
     fi
 
     if [[ "$httpStatus" == "204" ]]
@@ -73,26 +74,24 @@ do
 
     iid="${id}__$title"
 
-    meta="meta/$iid.json"
+    meta="../output/meta/$iid.json"
     echo "  {" > "$meta"
     echo "    \"id\": \"$iid\"," >> "$meta"
     echo "    \"title\": \"$title\"," >> "$meta"
-    echo "    \"group\": $group," >> "$meta"
+    echo "    \"group\": \"$group\"," >> "$meta"
     echo "    \"favorite\": $starred," >> "$meta"
     echo "    \"created\": \"$created\"," >> "$meta"
     echo "    \"modified\": \"$modified\"" >> "$meta"
     # echo "    \"content\": \"$comment $title\"" >> "$meta"
-    echo "  }," >> "$meta"
+    echo "  }" >> "$meta"
 
-    cleangroup=$(echo $group | sed 's/^"//' | sed 's/"$//')
-
-    if [ ! -z $"cleangroup" ]
+    if [ ! -z $"group" ]
     then
-      cleangroup="$cleangroup /"
+      group="$group /"
     fi
 
-    content="note/$iid"
-    echo "$comment $cleangroup $title" > "$content"
+    content="../output/note/$iid"
+    echo "$comment $group $title" > "$content"
     echo "" >> "$content"
     cat "$file" >> "$content"
   done

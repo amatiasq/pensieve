@@ -91,6 +91,6 @@ export class GithubAuth {
       code,
     });
 
-    return POST<{ result: string }>(url, {});
+    return POST<{ result: string }>(url);
   }
 }

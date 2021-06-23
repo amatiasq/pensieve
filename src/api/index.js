@@ -12,6 +12,7 @@ if (!port) {
 app.use(cors());
 
 app.post('/auth', require('./auth'));
+
 app.post(
   '/commit',
   bodyParser.json({ limit: '50mb', type: 'text/plain' }),
