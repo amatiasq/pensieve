@@ -1,12 +1,6 @@
 import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector';
 import { renderApp } from './5-app/App';
 
-window.addEventListener('load', () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./service-worker.js');
-  }
-});
-
 const container = document.getElementById('app-container');
 
 if (!container) {
