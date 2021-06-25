@@ -1,4 +1,5 @@
 import { MixedStore } from '../middleware/MixedStore';
+import { fetchAndUpdate } from './fetchAndUpdate';
 import { setDefaultReason } from './setDefaultReason';
 import { WriteOptions } from './WriteOptions';
 
@@ -11,6 +12,16 @@ export class RemoteValue {
 
   read() {
     return this.store.read(this.key);
+  }
+
+  readAsap(callback: (updated: string) => void) {
+    const def = (x: string | null) => x || '';
+
+    return fetchAndUpdate(
+      this.store.readLocal(this.key).then(def),
+      this.store.readRemote(this.key).then(def),
+      callback,
+    );
   }
 
   write(value: string, options?: WriteOptions) {

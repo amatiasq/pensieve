@@ -109,8 +109,15 @@ export class RemoteNote {
       await new Promise(x => setTimeout(x, 500));
     }
 
-    const content = (await this.content.read()) || '';
-    this.updateFromContent(content);
+    const content = await this.content.readAsap(updated => {
+      this.updateFromContent(updated);
+      this.emitContentChange(updated);
+    });
+
+    if (content) {
+      this.updateFromContent(content);
+    }
+
     return content;
   }
 

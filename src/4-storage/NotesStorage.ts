@@ -56,8 +56,8 @@ export class NotesStorage {
     return fetchAndUpdate(
       this.store.readAllLocal(pattern).then(log('local')),
       this.store.readAllRemote(pattern).then(log('remote')),
-      x => Boolean(Object.keys(x).length),
       x => this.synchronize(x),
+      x => Boolean(Object.keys(x).length),
     ).then(values =>
       Object.values(values).map(raw => {
         const note = deserialize<Note>(cleanJson(raw));
