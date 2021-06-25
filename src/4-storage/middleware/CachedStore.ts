@@ -45,8 +45,8 @@ export class CachedStore implements AsyncStore {
     return this.store.write(key, value, options);
   }
 
-  delete(key: string) {
+  delete(key: string, options?: WriteOptions) {
     this.cache.set(key, Promise.resolve(null));
-    return this.store.delete(key);
+    return this.store.delete(key, options);
   }
 }

@@ -1,4 +1,5 @@
 import { MixedStore } from '../middleware/MixedStore';
+import { setDefaultReason } from './setDefaultReason';
 import { WriteOptions } from './WriteOptions';
 
 export class RemoteValue {
@@ -13,10 +14,12 @@ export class RemoteValue {
   }
 
   write(value: string, options?: WriteOptions) {
-    return this.store.write(this.key, value, options);
+    const opts = setDefaultReason(options, `Write ${this.key}`);
+    return this.store.write(this.key, value, opts);
   }
 
   delete(options?: WriteOptions) {
-    return this.store.delete(this.key, options);
+    const opts = setDefaultReason(options, `Delete ${this.key}`);
+    return this.store.delete(this.key, opts);
   }
 }

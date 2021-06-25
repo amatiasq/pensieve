@@ -3,6 +3,7 @@ import { Scheduler } from '@amatiasq/scheduler';
 import { GHRepository, StagedFiles } from '../../3-github/GHRepository';
 import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
+import { setDefaultReason } from '../helpers/setDefaultReason';
 import { WriteOptions } from '../helpers/WriteOptions';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
@@ -31,22 +32,17 @@ export class GHRepoStore implements AsyncStore {
     return this.repo.readFile(key);
   }
 
-  write(
-    key: string,
-    value: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    { urgent = false }: WriteOptions = {},
-  ) {
-    return this.commit(`Update ${key}`, { [key]: value }, urgent);
+  write(key: string, value: string, options?: WriteOptions) {
+    const { urgent, reason } = setDefaultReason(options, `Update ${key}`);
+    return this.commit(reason, { [key]: value }, urgent);
   }
 
-  async delete(key: string) {
-    await this.commit(`Remove ${key}`, { [key]: null }, false);
+  async delete(key: string, options?: WriteOptions) {
+    const { urgent, reason } = setDefaultReason(options, `Remove ${key}`);
+    await this.commit(reason, { [key]: null }, urgent);
   }
 
   private commit(message: string, files: StagedFiles, isUrgent: boolean) {
-    // console.log('commit', files);
-
     if (!Object.keys(files).length) {
       throw new Error('NO FILES TO COMMIT');
     }
