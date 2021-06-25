@@ -65,6 +65,10 @@ export class MixedStore implements AsyncStore {
     ]);
   }
 
+  deleteLocal(key: string) {
+    this.local.delete(key);
+  }
+
   private updateOffline(key: string, value: string | null) {
     if (value == null) this.local.delete(key);
     else this.local.write(key, value);

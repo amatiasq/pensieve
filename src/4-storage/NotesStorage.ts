@@ -52,7 +52,7 @@ export class NotesStorage {
       this.store.readAllLocal(pattern),
       this.store.readAllRemote(pattern),
       x => Boolean(Object.keys(x).length),
-      x => this.updateList(x),
+      x => this.synchronize(x),
     ).then(values =>
       Object.values(values).map(raw => {
         const note = deserialize<Note>(cleanJson(raw));
@@ -62,12 +62,13 @@ export class NotesStorage {
     );
   }
 
-  private updateList(notes: Record<NoteId, string>) {
+  private synchronize(notes: Record<NoteId, string>) {
     const toBeAdded = [];
+    const existing = new Set<NoteId>(...(this.notes.keys() as any));
 
     for (const [, json] of Object.entries(notes)) {
       const note = deserialize<Note>(cleanJson(json));
-      const exists = this.notes.has(note.id);
+      const exists = existing.delete(note.id);
       const remote = this.note(note.id);
 
       remote.push(note);
@@ -79,6 +80,11 @@ export class NotesStorage {
 
     if (toBeAdded.length) {
       this.emitNotesCreate(toBeAdded);
+    }
+
+    for (const id of existing) {
+      this.store.deleteLocal(getNotePath(id));
+      this.store.deleteLocal(getContentPath(id));
     }
   }
 
@@ -95,10 +101,11 @@ export class NotesStorage {
     const note = createNote(content);
     const { id } = note;
     const remote = this.createRemote(id, note);
+    const reason = `Create note "${note.title}"`;
 
     Promise.all([
-      this.store.write(getNotePath(id), serialize(note)),
-      remote.write(content),
+      this.store.write(getNotePath(id), serialize(note), { reason }),
+      remote.write(content, { reason }),
     ]);
 
     this.emitNotesCreate([note]);

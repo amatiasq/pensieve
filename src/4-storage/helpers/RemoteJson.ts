@@ -2,6 +2,7 @@ import { messageBus } from '../../1-core/messageBus';
 import { deserialize, serialize } from '../../util/serialization';
 import { MixedStore } from '../middleware/MixedStore';
 import { RemoteValue } from './RemoteValue';
+import { setDefaultReason } from './setDefaultReason';
 import { WriteOptions } from './WriteOptions';
 
 export class RemoteJson<T> extends RemoteValue {
@@ -24,7 +25,8 @@ export class RemoteJson<T> extends RemoteValue {
 
   set(value: T, options?: WriteOptions): Promise<void> {
     const content = serialize(value);
-    return this.write(content, options);
+    const opts = setDefaultReason(options, `Set ${this.key}`);
+    return this.write(content, opts);
   }
 
   async write(value: string, options?: WriteOptions) {

@@ -9,6 +9,7 @@ import {
 import { datestr } from '../util/serialization';
 import { RemoteJson } from './helpers/RemoteJson';
 import { RemoteValue } from './helpers/RemoteValue';
+import { setDefaultReason } from './helpers/setDefaultReason';
 import { WriteOptions } from './helpers/WriteOptions';
 
 const noop = () => {
@@ -32,6 +33,11 @@ export class RemoteNote {
   ) => () => void;
   readonly onDelete: (listener: (data: void) => void) => () => void;
   readonly onDraft: (listener: (data: Note) => void) => () => void;
+
+  get title() {
+    const note = this.get();
+    return note ? note.title : '(unknown)';
+  }
 
   constructor(
     readonly id: NoteId,
@@ -78,9 +84,11 @@ export class RemoteNote {
   }
 
   async delete(options?: WriteOptions): Promise<void> {
+    const opts = setDefaultReason(options, `Delete note "${this.title}"`);
+
     await Promise.all([
-      this.meta.delete(options).catch(noop),
-      this.content.delete(options).catch(noop),
+      this.meta.delete(opts).catch(noop),
+      this.content.delete(opts).catch(noop),
     ]);
 
     this.emitDelete();
@@ -111,20 +119,30 @@ export class RemoteNote {
       localStorage.setItem('URGENT_SAVE', this.id);
     }
 
+    const { title } = getMetadataFromContent(value);
+    const opts = setDefaultReason(
+      options,
+      `Update note "${this.title}"${
+        title !== this.title ? ` renamed "${title}"` : ''
+      }`,
+    );
+
     await Promise.all([
-      this.updateFromContent(value, options),
-      this.content.write(value, options),
+      this.updateFromContent(value, opts),
+      this.content.write(value, opts),
     ]);
 
     this.emitContentChange(value);
   }
 
   setGroup(group: string, options?: WriteOptions): Promise<Note> {
-    return this.update(x => ({ ...x, group }), options);
+    const opts = setDefaultReason(options, `Add note to group "${group}"`);
+    return this.update(x => ({ ...x, group }), opts);
   }
 
   toggleFavorite(options?: WriteOptions): Promise<Note> {
-    return this.update(x => ({ ...x, favorite: !x.favorite }), options);
+    const opts = setDefaultReason(options, `Toggle "${this.title}" favorite`);
+    return this.update(x => ({ ...x, favorite: !x.favorite }), opts);
   }
 
   async push(note: Note) {

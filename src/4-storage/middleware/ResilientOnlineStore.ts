@@ -56,15 +56,11 @@ export class ResilientOnlineStore implements AsyncStore {
   }
 
   write(key: string, value: string, options?: WriteOptions) {
-    return this.command('write', [
-      key,
-      value,
-      options as Record<string, never>,
-    ]);
+    return this.command('write', [key, value, options]);
   }
 
-  delete(key: string) {
-    return this.command('delete', [key]);
+  delete(key: string, options?: WriteOptions) {
+    return this.command('delete', [key, options]);
   }
 
   private rejectIfOffline() {
