@@ -10,6 +10,7 @@ import {
 import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
 import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts';
 import { datestr, deserialize, serialize } from '../util/serialization';
+import { fetchAndUpdate } from './helpers/fetchAndUpdate';
 import { RemoteJson } from './helpers/RemoteJson';
 import { RemoteValue } from './helpers/RemoteValue';
 import { MixedStore } from './middleware/MixedStore';
@@ -47,10 +48,14 @@ export class NotesStorage {
 
   async all() {
     const pattern = getNotesPath();
+    const log = (key: string) => (result: Record<string, string>) => {
+      console.log(`Notes found in ${key}`, Object.keys(result).length);
+      return result;
+    };
 
     return fetchAndUpdate(
-      this.store.readAllLocal(pattern),
-      this.store.readAllRemote(pattern),
+      this.store.readAllLocal(pattern).then(log('local')),
+      this.store.readAllRemote(pattern).then(log('remote')),
       x => Boolean(Object.keys(x).length),
       x => this.synchronize(x),
     ).then(values =>
@@ -146,29 +151,4 @@ function createNote(content: NoteContent): Note {
     created: datestr(),
     modified: datestr(),
   };
-}
-
-function fetchAndUpdate<T>(
-  local: Promise<T>,
-  remote: Promise<T>,
-  isValid: (x: T) => boolean,
-  patch: (x: T) => void,
-) {
-  remote.then(x =>
-    console.log('Notes fetched from remote', Object.keys(x).length),
-  );
-
-  return local.then(
-    cached => {
-      console.log('Notes cached in locally', Object.keys(cached).length);
-
-      if (!isValid(cached)) {
-        return remote;
-      }
-
-      remote.then(patch);
-      return cached;
-    },
-    () => remote,
-  );
 }
