@@ -53,6 +53,10 @@ export function NoteItem({ id }: { id: NoteId }) {
   type ClickEvent = React.MouseEvent<HTMLButtonElement, MouseEvent>;
 
   function applyRemove(event: ClickEvent) {
+    if (!confirm(`Delete ${note!.title}?`)) {
+      return;
+    }
+
     event.preventDefault();
 
     if (navigator.isNote(id)) {
