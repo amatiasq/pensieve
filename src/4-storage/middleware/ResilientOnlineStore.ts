@@ -1,3 +1,4 @@
+import { ClientStorage } from '@amatiasq/client-storage';
 import { Scheduler } from '@amatiasq/scheduler';
 
 import { debugMethods } from '../../util/debugMethods';
@@ -7,13 +8,24 @@ import { WriteOptions } from '../helpers/WriteOptions';
 interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   method: T;
   params: Parameters<AsyncStore[T]>;
+  attempts: number;
 }
 
 export class StoreOfflineError extends Error {}
 
+const pending = new ClientStorage<Command[]>('pensieve.pending-commands', {
+  default: [],
+});
+
+const addToPending = (comm: Command) => pending.set([...pending.cache, comm]);
+const retrievePending = () => {
+  const result = [...pending.cache];
+  pending.reset();
+  return result;
+};
+
 export class ResilientOnlineStore implements AsyncStore {
   private readonly reading = new Map<string, Promise<string | null>>();
-  private readonly pending: Command[] = [];
   private readonly reconnect = new Scheduler(1000, () => this.executePending());
 
   get isOffline() {
@@ -64,9 +76,10 @@ export class ResilientOnlineStore implements AsyncStore {
   private command<Method extends keyof AsyncStore>(
     method: Method,
     params: Parameters<AsyncStore[Method]>,
+    attempts = 0,
   ) {
     if (this.isOffline) {
-      this.pending.push({ method, params });
+      addToPending({ method, params, attempts });
       return Promise.reject(new StoreOfflineError());
     }
 
@@ -74,7 +87,7 @@ export class ResilientOnlineStore implements AsyncStore {
     const promise: Promise<void> = (this.remote[method] as any)(...params);
 
     return promise.catch(reason => {
-      this.pending.push({ method, params });
+      addToPending({ method, params, attempts: attempts + 1 });
       this.reconnect.restart();
       throw reason;
     });
@@ -86,11 +99,12 @@ export class ResilientOnlineStore implements AsyncStore {
       return;
     }
 
-    const copy = [...this.pending];
-    this.pending.length = 0;
-
-    for (const { method, params } of copy) {
-      (this[method] as any)(...params);
+    for (const { method, params, attempts } of retrievePending()) {
+      if (attempts < 5) {
+        this.command(method, params, attempts);
+      } else {
+        console.warn(`Command ${method} failed ${attempts} times`, ...params);
+      }
     }
   }
 }
