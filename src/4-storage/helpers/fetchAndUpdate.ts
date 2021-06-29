@@ -20,19 +20,19 @@ export function fetchAndUpdate<T>(
         },
       );
 
-    local
-      .finally(() => (isLocalComplete = true))
-      .then(
-        x => {
-          if (isValid(x)) {
-            resolve(x);
-          }
-        },
-        e => {
-          if (isRemoteComplete) {
-            reject(e);
-          }
-        },
-      );
+    local.then(
+      x => {
+        if (isValid(x)) {
+          isLocalComplete = true;
+          resolve(x);
+        }
+      },
+      e => {
+        isLocalComplete = true;
+        if (isRemoteComplete) {
+          reject(e);
+        }
+      },
+    );
   });
 }

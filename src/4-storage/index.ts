@@ -18,7 +18,12 @@ export async function createStore(
 ) {
   const repo = new GHRepository(token, username, repoName);
 
-  repo.createIfNecessary('Database for notes', true);
+  if (navigator.onLine) {
+    await repo
+      .createIfNecessary('Database for notes', true)
+      // We don't want the app to crash if this doesn't work
+      .catch(() => null);
+  }
 
   // const local = new LocalStore(repoName);
   const local = new ForageStore(localforage.createInstance({ name: repoName }));
