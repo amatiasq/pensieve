@@ -111,8 +111,20 @@ export function Editor(props: EditorProps) {
     if (!isEditable(props)) wtf();
     scheduler.stop();
     addSaved(value);
-    return props.onSave(value, { urgent });
+    const formatted = format(value);
+    addSaved(formatted);
+    return props.onSave(formatted, { urgent });
   }
+}
+
+function format(value: string) {
+  const trimmed = value.replace(/ +\n| +$/g, '\n');
+
+  if (trimmed[trimmed.length - 1] === '\n') {
+    return trimmed;
+  }
+
+  return `${trimmed}\n`;
 }
 
 function isReadonly(props: EditorProps): props is ReadonlyEditorProps {
