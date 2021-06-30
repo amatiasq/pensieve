@@ -11,11 +11,14 @@ export class RemoteValue {
   ) {}
 
   read() {
-    return this.store.read(this.key);
+    return this.store.read(this.key).then(
+      x => x || this.defaultValue,
+      () => this.defaultValue,
+    );
   }
 
   readAsap(callback: (updated: string) => void) {
-    const def = (x: string | null) => x || '';
+    const def = (x: string | null) => x || this.defaultValue;
 
     return fetchAndUpdate(
       this.store.readLocal(this.key).then(def),
