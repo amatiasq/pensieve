@@ -182,12 +182,19 @@ export class RemoteNote {
     return updated;
   }
 
-  private updateFromContent(content: NoteContent, options?: WriteOptions) {
+  private async updateFromContent(
+    content: NoteContent,
+    options?: WriteOptions,
+  ) {
     const { title, group } = getMetadataFromContent(content);
 
-    return this.update(
+    const result = await this.update(
       x => ({ ...x, title, group, modified: datestr() }),
       options,
     );
+
+    cache.set(this.id, result);
+
+    return result;
   }
 }
