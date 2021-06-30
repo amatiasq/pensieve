@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 
 import { isMobile } from '../../0-dom/isMobile';
 import { Note } from '../../2-entities/Note';
+import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
 import { useNoteList } from '../../6-hooks/useNoteList';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
@@ -18,6 +19,7 @@ import { NoteItem } from './NoteItem';
 export function NotesList() {
   const [list, { loading, createNote }] = useNoteList();
   const [filter, setFilter] = useState<StringComparer | null>(null);
+  const filtered = useFilteredNotes(list, filter);
 
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
   const [size, setSize] = useSetting('sidebarWidth');
@@ -47,7 +49,7 @@ export function NotesList() {
 
   function renderList() {
     const groups = new Map<string, Note[]>();
-    const filtered = filter ? applyFilter(list, filter) : list;
+    // const filtered = filter ? applyFilter(list, filter) : list;
 
     const notes = [
       ...filtered.filter(x => x.favorite),

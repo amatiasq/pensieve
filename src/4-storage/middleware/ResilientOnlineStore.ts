@@ -37,6 +37,10 @@ export class ResilientOnlineStore implements AsyncStore {
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
+  has(key: string): Promise<boolean> {
+    throw new Error('Do not use me');
+  }
+
   readAll(pattern: string) {
     return this.rejectIfOffline() || this.remote.readAll(pattern);
   }

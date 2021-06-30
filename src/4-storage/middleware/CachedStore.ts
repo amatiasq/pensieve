@@ -20,6 +20,10 @@ export class CachedStore implements AsyncStore {
     debugMethods(this, ['readAll', 'read', 'write', 'delete'], label);
   }
 
+  has(key: string): Promise<boolean> {
+    return this.store.has(key);
+  }
+
   readAll(pattern: string) {
     if (this.readAllCache.has(pattern)) {
       return this.readAllCache.get(pattern);
