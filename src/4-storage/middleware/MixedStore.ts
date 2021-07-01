@@ -10,6 +10,14 @@ export class MixedStore implements AsyncStore {
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
+  has(key: string): Promise<boolean> {
+    throw new Error('Do not use me');
+  }
+
+  localHas(key: string) {
+    return this.local.has(key);
+  }
+
   readAll(key: string) {
     return this.readAllRemote(key).catch(() => this.readAllLocal(key));
   }

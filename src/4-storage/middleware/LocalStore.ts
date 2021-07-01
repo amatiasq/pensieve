@@ -44,6 +44,10 @@ export class LocalStore implements AsyncStore {
 
   constructor(readonly prefix: string) {}
 
+  has(key: string): Promise<boolean> {
+    return Promise.resolve(this.syncStore.has(key));
+  }
+
   readAll(pattern: string) {
     const regex = patternToRegex(pattern);
     const keys = this.syncStore.keys();

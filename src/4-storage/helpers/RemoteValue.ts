@@ -4,6 +4,10 @@ import { setDefaultReason } from './setDefaultReason';
 import { WriteOptions } from './WriteOptions';
 
 export class RemoteValue {
+  get isCached() {
+    return this.store.localHas(this.key);
+  }
+
   constructor(
     private readonly store: MixedStore,
     readonly key: string,

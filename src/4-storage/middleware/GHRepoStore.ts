@@ -23,6 +23,10 @@ export class GHRepoStore implements AsyncStore {
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
+  has(key: string): Promise<boolean> {
+    throw new Error('Do not use me');
+  }
+
   async readAll(pattern: string) {
     const entries = await this.repo.readDir(pattern);
     return Object.fromEntries(entries);

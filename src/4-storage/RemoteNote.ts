@@ -39,6 +39,10 @@ export class RemoteNote {
     return note ? note.title : '(unknown)';
   }
 
+  get hasCachedContent(): Promise<boolean> {
+    return Promise.resolve(true);
+  }
+
   constructor(
     readonly id: NoteId,
     private readonly meta: RemoteJson<Note>,

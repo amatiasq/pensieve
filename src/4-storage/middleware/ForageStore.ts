@@ -3,8 +3,21 @@ import { AsyncStore } from '../AsyncStore';
 import { patternToRegex } from '../helpers/patternToRegex';
 
 export class ForageStore implements AsyncStore {
+  private keys: string[] | null = null;
+
   constructor(private readonly forage: LocalForage) {
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
+  }
+
+  async has(key: string): Promise<boolean> {
+    const keys = this.keys || (await this.forage.keys());
+
+    if (!this.keys) {
+      this.keys = keys;
+      setTimeout(() => (this.keys = null), 3000);
+    }
+
+    return keys.includes(key);
   }
 
   async readAll(pattern: string) {
