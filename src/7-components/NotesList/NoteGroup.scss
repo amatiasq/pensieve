@@ -9,7 +9,7 @@
     background-color: var(--group-active-color);
   }
 
-  &.has-favorite .counter {
+  .fav-counter {
     color: var(--favorite-color);
   }
 
@@ -28,6 +28,7 @@
       flex: 1;
     }
 
+    .fav-counter,
     .counter {
       font-size: 0.8rem;
     }
