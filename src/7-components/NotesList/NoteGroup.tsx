@@ -30,10 +30,12 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
     }),
   );
 
+  const favorites = notes.filter(x => x.favorite);
+
   const cn = [
     'group',
     containsActiveNote ? 'has-active' : '',
-    notes.some(x => x.favorite) ? 'has-favorite' : '',
+    favorites.length ? 'has-favorite' : '',
   ];
 
   return (
@@ -41,6 +43,11 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
       <summary className="group-title" onClick={onGroupClicked}>
         <Icon name="angle-right" className="icon-button group-caret" />
         <span className="group-name">{group}</span>
+        {favorites.length ? (
+          <>
+            <i className="fav-counter">{favorites.length}</i> /
+          </>
+        ) : null}
         <i className="counter">{notes.length}</i>
       </summary>
 
