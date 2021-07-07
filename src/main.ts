@@ -1,5 +1,5 @@
 import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector';
-import { renderApp } from './5-app/App';
+import { renderApp } from './5-app/renderApp';
 
 const container = document.getElementById('app-container');
 

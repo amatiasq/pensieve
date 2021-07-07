@@ -1,8 +1,6 @@
 import './App.scss';
 
 import React, { useEffect, useState } from 'react';
-import { render } from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
 
 import { createStore } from '../4-storage';
 import { NotesStorage } from '../4-storage/NotesStorage';
@@ -12,7 +10,7 @@ import { NotesStorageContext } from './contexts';
 import { Router } from './Router';
 import { useGithubAuth } from './useGithubAuth';
 
-function App() {
+export function App() {
   const [store, setStore] = useState<NotesStorage>(null!);
   const { token, username } = useGithubAuth();
   const navigator = useNavigator();
@@ -37,14 +35,5 @@ function App() {
         <Router />
       </div>
     </NotesStorageContext.Provider>
-  );
-}
-
-export function renderApp(container: HTMLElement): void {
-  render(
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>,
-    container,
   );
 }
