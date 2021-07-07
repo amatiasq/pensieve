@@ -72,7 +72,6 @@ export class GithubAuth {
 
     if (code) {
       this.requestState.reset();
-      history.pushState({}, '', this.redirectUri);
     }
 
     const x = await this.requestAccessToken(code, state);

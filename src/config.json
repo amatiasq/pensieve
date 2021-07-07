@@ -1,0 +1,9 @@
+{
+  "GH_SCOPE": "repo gist",
+  "GH_API": "https://api.github.com",
+  "AUTH_ENDPOINT": "https://pensieve.amatiasq.com/auth",
+  "COMMIT_ENDPOINT": "https://pensieve.amatiasq.com/commit",
+  "APP_ROOT": "https://pensieve.amatiasq.com/",
+  "CLIENT_ID_DEV": "c55d2c46c215f9a4c3cb",
+  "CLIENT_ID_PROD": "09580e62d66243b6b09d"
+}

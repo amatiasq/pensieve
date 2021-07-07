@@ -1,15 +1,10 @@
 const axios = require('axios');
-const config = import('../config.mjs');
 const pipeAxiosToExpress = require('./_proxyAxiosToExpress');
 
-module.exports = async (req, res) => {
-  const {
-    CLIENT_ID_PROD,
-    CLIENT_SECRET_PROD,
-    CLIENT_ID_DEV,
-    CLIENT_SECRET_DEV,
-  } = await config;
+const { CLIENT_ID_PROD, CLIENT_ID_DEV } = require('../config.json');
+const { CLIENT_SECRET_PROD, CLIENT_SECRET_DEV } = process.env;
 
+module.exports = async (req, res) => {
   const { code, redirect_uri, state } = req.query;
   const isDev = redirect_uri.startsWith('http://localhost');
 

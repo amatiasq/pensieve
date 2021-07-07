@@ -1,5 +1,5 @@
 import { POST } from '../1-core/http';
-import { COMMIT_ENDPOINT } from '../config.mjs';
+import { COMMIT_ENDPOINT } from '../config.json';
 import { GithubToken } from './GithubAuth';
 import { GithubGraphQlApi } from './GithubGraphQlApi';
 import { GithubRestApi, MediaType } from './GithubRestApi';

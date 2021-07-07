@@ -12,7 +12,7 @@ import {
   CLIENT_ID_DEV,
   CLIENT_ID_PROD,
   GH_SCOPE
-} from '../config.mjs';
+} from '../config.json';
 
 const isLocalHost = location.hostname === 'localhost';
 

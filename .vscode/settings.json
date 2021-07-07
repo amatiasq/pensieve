@@ -7,5 +7,6 @@
     "crosslink",
     "datestr",
     "wmde"
-  ]
+  ],
+  "editor.formatOnSave": true
 }

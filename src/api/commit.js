@@ -1,6 +1,6 @@
 const axios = require('axios');
-const config = import('../config.mjs');
 const pipeAxiosToExpress = require('./_proxyAxiosToExpress');
+const { GH_API } = require('../config.json');
 
 module.exports = async (req, res) => {
   const { token, owner, repo, branch, files, message } = req.body;
@@ -9,7 +9,6 @@ module.exports = async (req, res) => {
 };
 
 async function githubCommit({ token, owner, repo, branch, files, message }) {
-  const { GH_API } = await config;
   const key = `${owner}/${repo}:${branch}`;
 
   console.log(`${key} - Commit requests`);
