@@ -6,6 +6,7 @@
     "commiting",
     "crosslink",
     "datestr",
+    "vite",
     "wmde"
   ],
   "editor.formatOnSave": true

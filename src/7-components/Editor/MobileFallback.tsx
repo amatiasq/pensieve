@@ -3,7 +3,8 @@ import './MobileFallback.scss';
 import React, { createRef, useEffect, useState } from 'react';
 
 import { useMonaco } from '@monaco-editor/react';
-import MarkdownPreview from '@uiw/react-markdown-preview';
+
+// import MarkdownPreview from '@uiw/react-markdown-preview';
 
 export interface MobileFallbackProps {
   language: string;
@@ -48,16 +49,16 @@ export function MobileFallback({
     );
   }
 
-  if (language === 'markdown') {
-    return (
-      <div
-        className="mobile-fallback mobile-fallback--markdown"
-        onClick={() => setIsPreview(false)}
-      >
-        <MarkdownPreview className="mobile-fallback--renderer" source={value} />
-      </div>
-    );
-  }
+  // if (language === 'markdown') {
+  //   return (
+  //     <div
+  //       className="mobile-fallback mobile-fallback--markdown"
+  //       onClick={() => setIsPreview(false)}
+  //     >
+  //       <MarkdownPreview className="mobile-fallback--renderer" source={value} />
+  //     </div>
+  //   );
+  // }
 
   return (
     <pre

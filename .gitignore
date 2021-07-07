@@ -1,5 +1,8 @@
 .cache
+.DS_Store
 .env
+*.local
 deploy.sh
 dist
+dist-ssr
 node_modules
