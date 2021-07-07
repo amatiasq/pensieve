@@ -1,3 +1,5 @@
+import { WriteOptions } from './WriteOptions';
+
 export function setDefaultReason(
   options: WriteOptions | undefined,
   reason: string,
