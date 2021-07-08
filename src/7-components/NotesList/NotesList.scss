@@ -1,6 +1,7 @@
 @import '../../0-dom/hide-scrollbar.scss';
 
 aside {
+  grid-area: list;
   display: flex;
   flex-direction: column;
   background-color: var(--bg-color-sidebar);

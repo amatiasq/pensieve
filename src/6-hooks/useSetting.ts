@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
+import { ClientStorage } from '@amatiasq/client-storage';
+
 import {
   areSettingsIdentical,
   DEFAULT_SETTINGS,
@@ -8,10 +10,19 @@ import {
 import { NotesStorageContext } from '../5-app/contexts';
 import { serialize } from '../util/serialization';
 
+const localCache = new ClientStorage<Settings | null>(
+  'pensieve.settings-hook',
+  { version: 1 },
+);
+
+localCache.get();
+
 function useSettings() {
   const store = useContext(NotesStorageContext);
   const [loading, setLoading] = useState(true);
-  const [value, setValue] = useState<Settings>(DEFAULT_SETTINGS);
+  const [value, setValue] = useState<Settings>(
+    localCache.cache || DEFAULT_SETTINGS,
+  );
 
   useEffect(() => {
     store.settings.get().then(initialize);
@@ -22,6 +33,7 @@ function useSettings() {
 
   function initialize(newValue: Settings) {
     if (!areSettingsIdentical(newValue, value)) {
+      localCache.set(newValue);
       setValue(newValue);
     }
 
@@ -33,6 +45,7 @@ function useSettings() {
   async function set(newValue: Settings) {
     if (areSettingsIdentical(newValue, value)) return;
 
+    localCache.set(newValue);
     setLoading(true);
     setValue(newValue);
     await store.settings.set(newValue);
@@ -46,7 +59,15 @@ export function useSetting<Key extends keyof Settings>(key: Key) {
   const [, setValue] = useState(value);
 
   // Connect `value` to react rendering loop with `setValue`
-  useEffect(() => setValue(value), [serialize(value)]);
+  useEffect(() => {
+    setValue(value);
+
+    const cssValue = typeof value !== 'boolean' ? value : value ? 1 : 0;
+    document.documentElement.style.setProperty(
+      `--setting-${key}`,
+      `${cssValue}`,
+    );
+  }, [serialize(value)]);
 
   return [value, set, loading] as const;
 

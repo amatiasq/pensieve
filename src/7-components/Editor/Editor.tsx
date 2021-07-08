@@ -90,13 +90,13 @@ export function Editor(props: EditorProps) {
     .subscribe(options => hasUnsavedChanges && forceSave(options || {}));
 
   return (
-    <main>
+    <div>
       <MonacoEditor
         {...{ ext, gap, value, readonly }}
         onChange={onEditorChange}
       />
       <BusinessIndicator />
-    </main>
+    </div>
   );
 
   function onEditorChange(value = '') {

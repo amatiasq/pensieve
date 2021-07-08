@@ -2,7 +2,6 @@ import './NotesList.scss';
 
 import React, { useState } from 'react';
 
-import { isMobile } from '../../0-dom/isMobile';
 import { Note } from '../../2-entities/Note';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
 import { useNoteList } from '../../6-hooks/useNoteList';
@@ -27,19 +26,20 @@ export function NotesList() {
   useShortcut('newNote', createNote);
   useShortcut('hideSidebar', () => setIsVisible(!isVisible));
 
-  const extraProps = filter ? { 'data-filter': true } : {};
+  if (!isVisible) {
+    return null;
+  }
+
+  const listProps = filter ? { 'data-filter': true } : {};
 
   return (
-    <aside
-      className={isMobile || isVisible ? '' : 'hidden'}
-      style={{ width: size }}
-    >
+    <aside>
       <h4 className="filter">
         <FilterBox onChange={setFilter} />
         <IconButton icon="plus" onClick={createNote} />
       </h4>
 
-      <div className="notes-list" {...extraProps}>
+      <div className="notes-list" {...listProps}>
         {loading ? <Loader /> : renderList()}
       </div>
 
@@ -49,7 +49,6 @@ export function NotesList() {
 
   function renderList() {
     const groups = new Map<string, Note[]>();
-    // const filtered = filter ? applyFilter(list, filter) : list;
 
     const notes = [
       ...filtered.filter(x => x.favorite),
@@ -81,10 +80,4 @@ export function NotesList() {
       return <NoteGroup key={`group/${group}`} group={group} notes={list} />;
     });
   }
-}
-
-function applyFilter(list: Note[], comparer: StringComparer) {
-  return list.filter(gist =>
-    comparer.matchesAny([gist.id, gist.title, gist.group]),
-  );
 }
