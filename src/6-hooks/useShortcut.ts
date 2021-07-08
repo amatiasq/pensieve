@@ -16,6 +16,7 @@ let initialized = false;
 
 export function useShortcut(name: ShortcutCommand, execute: Executor) {
   const before = commands[name];
+  const store = useContext(NotesStorageContext);
 
   useEffect(() => {
     commands[name] = execute;
@@ -25,7 +26,7 @@ export function useShortcut(name: ShortcutCommand, execute: Executor) {
   });
 
   if (!initialized) {
-    init(useContext(NotesStorageContext));
+    init(store);
   }
 }
 

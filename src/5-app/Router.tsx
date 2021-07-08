@@ -14,7 +14,6 @@ export function Router() {
 
   return (
     <>
-      <NotesList />
       {/* <Route path="/" component={Placeholder} exact /> */}
       {/* <Route path="/sketch" component={SketchPad} /> */}
       <Route path="/settings" component={EditSettings} />

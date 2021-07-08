@@ -28,6 +28,7 @@ export function useFilteredNotes(
   if (!comparer) return list;
 
   const currentIteration = ++lastIteration;
+
   // not awaited
   setTimeout(searchInContent, 10);
 
