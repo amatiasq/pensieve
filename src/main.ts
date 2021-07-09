@@ -1,3 +1,5 @@
+import { registerSW } from 'virtual:pwa-register';
+
 import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector';
 import { renderApp } from './5-app/renderApp';
 
@@ -15,4 +17,13 @@ onVirtualKeyboardDisplayChange(isVisible => {
   } else {
     container.classList.remove('is-virtual-keyboard-open');
   }
+});
+
+registerSW({
+  onNeedRefresh() {
+    alert('New version downloaded. Please refresh the page');
+  },
+  onOfflineReady() {
+    console.log('📡 Offline ready');
+  },
 });
