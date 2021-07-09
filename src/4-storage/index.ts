@@ -19,10 +19,14 @@ export async function createStore(
   const repo = new GHRepository(token, username, repoName);
 
   if (navigator.onLine) {
-    await repo
+    const isNewRepository = repo
       .createIfNecessary('Database for notes', true)
       // We don't want the app to crash if this doesn't work
-      .catch(() => null);
+      .catch(() => false);
+
+    if (await isNewRepository) {
+      window.location.reload();
+    }
   }
 
   // const local = new LocalStore(repoName);
