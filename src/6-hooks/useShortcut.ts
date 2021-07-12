@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { onShortcut } from '../1-core/keyboard';
 import {
@@ -7,7 +7,7 @@ import {
   Shortcuts
 } from '../2-entities/Shortcuts';
 import { NotesStorage } from '../4-storage/NotesStorage';
-import { NotesStorageContext } from '../5-app/contexts';
+import { useStore } from './useStore';
 
 type Executor = () => void;
 
@@ -16,7 +16,7 @@ let initialized = false;
 
 export function useShortcut(name: ShortcutCommand, execute: Executor) {
   const before = commands[name];
-  const store = useContext(NotesStorageContext);
+  const store = useStore();
 
   useEffect(() => {
     commands[name] = execute;

@@ -4,6 +4,7 @@ import { Note, NoteId } from '../2-entities/Note';
 
 class Navigator {
   readonly root = '/';
+  readonly create = '/new';
   readonly settings = '/settings';
   readonly note = '/note/:noteId';
 

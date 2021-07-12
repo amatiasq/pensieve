@@ -1,10 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { isNoteIdentical, Note, NoteContent, NoteId } from '../2-entities/Note';
-import { NotesStorageContext } from '../5-app/contexts';
+import { useStore } from './useStore';
 
 export function useNote(id: NoteId) {
-  const store = useContext(NotesStorageContext);
+  const store = useStore();
   const remote = store.note(id);
 
   const toggleFavorite = () => store.note(id).toggleFavorite();

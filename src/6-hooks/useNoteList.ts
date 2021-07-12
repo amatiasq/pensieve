@@ -1,13 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { isNoteIdentical, Note, NoteId } from '../2-entities/Note';
-import { NotesStorageContext } from '../5-app/contexts';
-import { datestr, parseDate } from '../util/serialization';
-import { useNavigator } from './useNavigator';
+import { parseDate } from '../util/serialization';
+import { useStore } from './useStore';
 
 export function useNoteList() {
-  const navigator = useNavigator();
-  const store = useContext(NotesStorageContext);
+  const store = useStore();
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<Note[]>([]);
 
@@ -31,7 +29,7 @@ export function useNoteList() {
     return () => subs.forEach(x => x());
   }, [value]);
 
-  return [value, { loading, createNote }] as const;
+  return [value, loading] as const;
 
   function initialize(notes: Note[]) {
     if (!listAreIdentical(value, notes)) {
@@ -42,11 +40,6 @@ export function useNoteList() {
     if (loading) {
       setLoading(false);
     }
-  }
-
-  function createNote() {
-    const remote = store.create(`${datestr()}.md\n`);
-    navigator.goNote(remote.id);
   }
 
   function addNotes(notes: Note[]) {

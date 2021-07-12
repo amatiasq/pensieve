@@ -3,6 +3,7 @@ import './NotesList.scss';
 import React, { useState } from 'react';
 
 import { Note } from '../../2-entities/Note';
+import { useCreateNote } from '../../6-hooks/useCreateNote';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
 import { useNoteList } from '../../6-hooks/useNoteList';
 import { useSetting } from '../../6-hooks/useSetting';
@@ -16,7 +17,8 @@ import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
 
 export function NotesList() {
-  const [list, { loading, createNote }] = useNoteList();
+  const createNote = useCreateNote();
+  const [list, loading] = useNoteList();
   const [filter, setFilter] = useState<StringComparer | null>(null);
   const filtered = useFilteredNotes(list, filter);
 
