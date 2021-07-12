@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { NoteContent, NoteId } from '../2-entities/Note';
 import { WriteOptions } from '../4-storage/helpers/WriteOptions';
-import { NotesStorageContext } from '../5-app/contexts';
+import { useStore } from './useStore';
 
 export function useNoteContent(id: NoteId) {
-  const store = useContext(NotesStorageContext);
+  const store = useStore();
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<NoteContent>('');
 

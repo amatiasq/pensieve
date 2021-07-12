@@ -1,8 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Note } from '../2-entities/Note';
-import { NotesStorageContext } from '../5-app/contexts';
 import StringComparer from '../util/StringComparer';
+import { useStore } from './useStore';
 
 let lastIteration = 0;
 
@@ -12,7 +12,7 @@ export function useFilteredNotes(
 ) {
   const [value, setValue] = useState<Note[]>([]);
   const [cursor, setCursor] = useState(0);
-  const store = useContext(NotesStorageContext);
+  const store = useStore();
 
   useEffect(() => {
     if (!comparer) return;

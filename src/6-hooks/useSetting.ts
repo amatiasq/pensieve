@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ClientStorage } from '@amatiasq/client-storage';
 
@@ -7,8 +7,8 @@ import {
   DEFAULT_SETTINGS,
   Settings
 } from '../2-entities/Settings';
-import { NotesStorageContext } from '../5-app/contexts';
 import { serialize } from '../util/serialization';
+import { useStore } from './useStore';
 
 const localCache = new ClientStorage<Settings | null>(
   'pensieve.settings-hook',
@@ -18,7 +18,7 @@ const localCache = new ClientStorage<Settings | null>(
 localCache.get();
 
 function useSettings() {
-  const store = useContext(NotesStorageContext);
+  const store = useStore();
   const [loading, setLoading] = useState(true);
   const [value, setValue] = useState<Settings>(
     localCache.cache || DEFAULT_SETTINGS,
