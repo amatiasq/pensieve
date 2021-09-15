@@ -44,4 +44,9 @@
     text-overflow: ellipsis;
     line-height: 1.5em;
   }
+
+  .actions-part a {
+    text-decoration: none;
+    color: hsl(0, 0%, 70%);
+  }
 }

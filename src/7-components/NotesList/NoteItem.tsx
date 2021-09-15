@@ -8,6 +8,8 @@ import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
 import { IconButton } from '../atoms/IconButton';
 
+const NOTE_URL = 'https://github.com/amatiasq/pensieve-data/blob/main/note';
+
 export function NoteItem({ id }: { id: NoteId }) {
   const navigator = useNavigator();
   const [note, { toggleFavorite, remove }] = useNote(id);
@@ -33,6 +35,16 @@ export function NoteItem({ id }: { id: NoteId }) {
 
   const extraProps = note.group ? { 'data-group': note.group } : {};
 
+  const ghLink = (
+    <a
+      target="_blank"
+      href={`${NOTE_URL}/${note.id}`}
+      onClick={event => event.stopPropagation()}
+    >
+      GH
+    </a>
+  );
+
   return (
     <Link className={cn.join(' ')} {...extraProps} to={navigator.toNote(note)}>
       <div className="star-part">
@@ -45,6 +57,7 @@ export function NoteItem({ id }: { id: NoteId }) {
       <h5 className="title-part">{note.title}</h5>
 
       <div className="actions-part">
+        {ghLink}
         <IconButton icon="trash" onClick={applyRemove} />
       </div>
     </Link>
