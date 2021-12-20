@@ -1,7 +1,5 @@
-import { useState } from 'react';
-
 import { ClientStorage } from '@amatiasq/client-storage';
-
+import { useState } from 'react';
 import { parseParams } from '../1-core/url';
 import { GithubAuth, GithubToken } from '../3-github/GithubAuth';
 import { GithubUsers } from '../3-github/GithubUsers';
@@ -11,7 +9,7 @@ import {
   AUTH_ENDPOINT,
   CLIENT_ID_DEV,
   CLIENT_ID_PROD,
-  GH_SCOPE
+  GH_SCOPE,
 } from '../config.json';
 
 const isLocalHost = location.hostname === 'localhost';
@@ -49,6 +47,10 @@ export function useGithubAuth(): Record<string, never> | GithubAuthData {
 
   if (data) {
     return data;
+  }
+
+  if (location.pathname === '/halt') {
+    return {};
   }
 
   auth.requestGithubAuthorization();
