@@ -8,11 +8,16 @@
     "serve": "vite preview --port 1234",
     "pwa": "npm run build && npm run serve",
     "lint": "eslint . --ext .ts",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "cypress": "cypress open",
+    "e2e": "cypress run"
   },
   "browserslist": [
     "> 1% and last 2 versions"
   ],
+  "cypress-cucumber-preprocessor": {
+    "nonGlobalStepDefinitions": true
+  },
   "dependencies": {
     "@amatiasq/client-storage": "^3.0.3",
     "@amatiasq/emitter": "^4.1.2",
@@ -36,6 +41,8 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "cypress": "^9.1.1",
+    "dotenv": "^10.0.0",
     "eslint": "^7.19.0",
     "husky": "^7.0.1",
     "sass": "^1.32.6",
