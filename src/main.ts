@@ -1,5 +1,4 @@
 import { registerSW } from 'virtual:pwa-register';
-
 import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector';
 import { renderApp } from './5-app/renderApp';
 

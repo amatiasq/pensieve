@@ -1,6 +1,5 @@
-import { v4 as uuid } from 'uuid';
-
 import { Emitter, emitter } from '@amatiasq/emitter';
+import { v4 as uuid } from 'uuid';
 
 const emitters: Record<string, Emitter<any>> = {};
 const id = uuid();

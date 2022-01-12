@@ -1,5 +1,4 @@
 import { ClientStorage } from '@amatiasq/client-storage';
-
 import { POST } from '../1-core/http';
 import { parseParams, withParams } from '../1-core/url';
 

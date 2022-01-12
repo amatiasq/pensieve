@@ -1,6 +1,5 @@
-import './Resizer.css';
-
 import React, { useState } from 'react';
+import './Resizer.css';
 
 interface ResizerProps {
   size: number;

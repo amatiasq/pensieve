@@ -1,5 +1,4 @@
 import localforage from 'localforage';
-
 import { GHRepository } from '../3-github/GHRepository';
 import { GithubToken } from '../3-github/GithubAuth';
 import { CachedStore } from './middleware/CachedStore';

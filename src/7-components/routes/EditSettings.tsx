@@ -1,7 +1,4 @@
-import './EditSettings.scss';
-
 import React, { useEffect, useState } from 'react';
-
 import { DEFAULT_SETTINGS } from '../../2-entities/Settings';
 import { DEFAULT_SHORTCUTS } from '../../2-entities/Shortcuts';
 import { RemoteJson } from '../../4-storage/helpers/RemoteJson';
@@ -10,6 +7,7 @@ import { useStore } from '../../6-hooks/useStore';
 import { isDeserializable, serialize } from '../../util/serialization';
 import { Loader } from '../atoms/Loader';
 import { Editor } from '../Editor/Editor';
+import './EditSettings.scss';
 
 function useRemoteJson<T>(remote: RemoteJson<T>) {
   const [loading, setLoading] = useState(true);

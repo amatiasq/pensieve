@@ -1,6 +1,5 @@
 import React from 'react';
 import { Route } from 'react-router-dom';
-
 import { useNavigator } from '../6-hooks/useNavigator';
 import { useShortcut } from '../6-hooks/useShortcut';
 import { CreateNote } from '../7-components/routes/CreateNote';

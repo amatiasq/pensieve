@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
-
 import { onShortcut } from '../1-core/keyboard';
 import {
   DEFAULT_SHORTCUTS,
   ShortcutCommand,
-  Shortcuts
+  Shortcuts,
 } from '../2-entities/Shortcuts';
 import { NotesStorage } from '../4-storage/NotesStorage';
 import { useStore } from './useStore';

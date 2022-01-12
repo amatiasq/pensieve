@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-
 import { isNoteIdentical, Note, NoteId } from '../2-entities/Note';
 import { parseDate } from '../util/serialization';
 import { useStore } from './useStore';

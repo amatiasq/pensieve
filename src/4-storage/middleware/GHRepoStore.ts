@@ -1,5 +1,4 @@
 import { Scheduler } from '@amatiasq/scheduler';
-
 import { GHRepository, StagedFiles } from '../../3-github/GHRepository';
 import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';

@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
-
 import { ClientStorage } from '@amatiasq/client-storage';
-
+import { useEffect, useState } from 'react';
 import {
   areSettingsIdentical,
   DEFAULT_SETTINGS,
-  Settings
+  Settings,
 } from '../2-entities/Settings';
 import { serialize } from '../util/serialization';
 import { useStore } from './useStore';

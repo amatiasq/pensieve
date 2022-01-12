@@ -1,8 +1,6 @@
-import './BusinessIndicator.scss';
-
 import React, { useEffect, useState } from 'react';
-
 import { onBusinessChange } from '../../1-core/busy-indicator';
+import './BusinessIndicator.scss';
 import { Icon } from './Icon';
 
 export function BusinessIndicator() {

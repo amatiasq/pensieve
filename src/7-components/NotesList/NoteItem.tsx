@@ -1,16 +1,14 @@
-import './NoteItem.scss';
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
 import { NoteId } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
 import { IconButton } from '../atoms/IconButton';
-
-const NOTE_URL = 'https://github.com/amatiasq/pensieve-data/blob/main/note';
+import './NoteItem.scss';
 
 export function NoteItem({ id }: { id: NoteId }) {
+  const NOTE_URL = 'https://github.com/amatiasq/pensieve-data/blob/main/note';
+
   const navigator = useNavigator();
   const [note, { toggleFavorite, remove }] = useNote(id);
   const [active, setActive] = useState<boolean>(navigator.isNote(id));

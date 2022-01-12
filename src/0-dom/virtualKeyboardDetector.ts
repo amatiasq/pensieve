@@ -1,5 +1,4 @@
 import { emitter } from '@amatiasq/emitter';
-
 import { isMobile } from './isMobile';
 
 type Size = { w: number; h: number };

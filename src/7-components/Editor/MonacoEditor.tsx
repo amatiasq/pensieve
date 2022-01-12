@@ -1,14 +1,11 @@
-import './MonacoEditor.scss';
-
+import Editor, { useMonaco } from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
 import React from 'react';
-
-import Editor, { useMonaco } from '@monaco-editor/react';
-
 import { isMobile } from '../../0-dom/isMobile';
 import { getMetadataFromContent } from '../../2-entities/Note';
 import { useSetting } from '../../6-hooks/useSetting';
 import { MobileFallback } from './MobileFallback';
+import './MonacoEditor.scss';
 
 export function MonacoEditor({
   value,

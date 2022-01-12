@@ -1,9 +1,7 @@
+import { emitter } from '@amatiasq/emitter';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { debounceTime, map, mergeWith } from 'rxjs/operators';
-
-import { emitter } from '@amatiasq/emitter';
-
 import { onPageActive } from '../../0-dom/page-lifecycle';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';

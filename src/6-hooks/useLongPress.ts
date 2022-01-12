@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import { useScheduler } from './useScheduler';
 
 type Event = React.MouseEvent<HTMLDivElement, MouseEvent>;

@@ -10,7 +10,8 @@
   background: linear-gradient($backgroundColor 33%, rgba(21, 0, 255, 0)),
     linear-gradient(rgba(21, 0, 255, 0), $backgroundColor 66%) 0 100%,
     radial-gradient(farthest-side at 0 0, $shadowColor, rgba(0, 0, 0, 0)),
-    radial-gradient(farthest-side at 0 100%, $shadowColor, rgba(0, 0, 0, 0)) 0 100%;
+    radial-gradient(farthest-side at 0 100%, $shadowColor, rgba(0, 0, 0, 0)) 0
+      100%;
 
   background-color: $backgroundColor;
   background-repeat: no-repeat;
@@ -22,7 +23,8 @@
   background: linear-gradient($backgroundColor 33%, rgba(21, 0, 255, 0)),
     linear-gradient(rgba(21, 0, 255, 0), $backgroundColor 66%) 0 100%,
     radial-gradient(farthest-side at 0 0, $shadowColor, rgba(0, 0, 0, 0)),
-    radial-gradient(farthest-side at 100% 0, $shadowColor, rgba(0, 0, 0, 0)) 100% 0;
+    radial-gradient(farthest-side at 100% 0, $shadowColor, rgba(0, 0, 0, 0))
+      100% 0;
 
   background-color: $backgroundColor;
   background-repeat: no-repeat;

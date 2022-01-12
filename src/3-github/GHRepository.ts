@@ -6,7 +6,7 @@ import { GithubRestApi, MediaType } from './GithubRestApi';
 import {
   GHApiRepositoryNode,
   GHNodeSha,
-  GHRepoNodeType
+  GHRepoNodeType,
 } from './models/GHApiRepositoryNode';
 
 const CREATE_REPO_CONFIG = {
