@@ -1,18 +1,16 @@
-import './App.scss';
-
 import React, { useEffect, useState } from 'react';
-
 import { createStore } from '../4-storage';
-import { NotesStorage } from '../4-storage/NotesStorage';
+import { AppStorage } from '../4-storage/AppStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
 import { NotesList } from '../7-components/NotesList/NotesList';
-import { NotesStorageContext } from './contexts';
+import './App.scss';
+import { StorageContext } from './contexts';
 import { Router } from './Router';
 import { useGithubAuth } from './useGithubAuth';
 
 export function App() {
-  const [store, setStore] = useState<NotesStorage>(null!);
+  const [store, setStore] = useState<AppStorage>(null!);
   const { token, username } = useGithubAuth();
   const navigator = useNavigator();
   const [pageName, setPageName] = useState(navigator.getPageName());
@@ -31,13 +29,13 @@ export function App() {
   }
 
   return (
-    <NotesStorageContext.Provider value={store}>
+    <StorageContext.Provider value={store}>
       <div className={`app page-${pageName}`}>
         <NotesList />
         <main>
           <Router />
         </main>
       </div>
-    </NotesStorageContext.Provider>
+    </StorageContext.Provider>
   );
 }

@@ -1,12 +1,12 @@
 import localforage from 'localforage';
 import { GHRepository } from '../3-github/GHRepository';
 import { GithubToken } from '../3-github/GithubAuth';
+import { AppStorage } from './AppStorage';
 import { CachedStore } from './middleware/CachedStore';
 import { ForageStore } from './middleware/ForageStore';
 import { GHRepoStore } from './middleware/GHRepoStore';
 import { MixedStore } from './middleware/MixedStore';
 import { ResilientOnlineStore } from './middleware/ResilientOnlineStore';
-import { NotesStorage } from './NotesStorage';
 
 Object.assign(window, { localforage });
 
@@ -44,5 +44,5 @@ export async function createStore(
     new CachedStore(resilient, 30, 'remote'),
   );
 
-  return new NotesStorage(mixed);
+  return new AppStorage(username, mixed);
 }
