@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom';
 import { NoteId } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
+import { useUsername } from '../../6-hooks/useUsername';
 import { IconButton } from '../atoms/IconButton';
 import './NoteItem.scss';
 
 export function NoteItem({ id }: { id: NoteId }) {
-  const NOTE_URL = 'https://github.com/amatiasq/pensieve-data/blob/main/note';
-
   const navigator = useNavigator();
+  const username = useUsername();
   const [note, { toggleFavorite, remove }] = useNote(id);
   const [active, setActive] = useState<boolean>(navigator.isNote(id));
 
@@ -25,6 +25,8 @@ export function NoteItem({ id }: { id: NoteId }) {
 
   if (!note) return null;
 
+  const githubUrl = `https://github.com/${username}/pensieve-data/blob/main/note/${note.id}`;
+
   const cn = [
     'note-item',
     note.favorite ? 'favorite' : '',
@@ -36,7 +38,7 @@ export function NoteItem({ id }: { id: NoteId }) {
   const ghLink = (
     <a
       target="_blank"
-      href={`${NOTE_URL}/${note.id}`}
+      href={githubUrl}
       onClick={event => event.stopPropagation()}
     >
       GH
