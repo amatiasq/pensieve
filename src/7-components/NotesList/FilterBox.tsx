@@ -1,5 +1,4 @@
 import React, { createRef, useState } from 'react';
-
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';

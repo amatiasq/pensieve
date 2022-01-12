@@ -1,9 +1,7 @@
-import './IconButton.scss';
-
 import React from 'react';
-
 import { Button, ButtonProps } from './Button';
 import { Icon } from './Icon';
+import './IconButton.scss';
 
 export function IconButton(props: ButtonProps & { icon: string }) {
   const { icon, className, ...buttonProps } = props;

@@ -4,7 +4,7 @@ import {
   isNoteIdentical,
   Note,
   NoteContent,
-  NoteId
+  NoteId,
 } from '../2-entities/Note';
 import { datestr } from '../util/serialization';
 import { RemoteJson } from './helpers/RemoteJson';

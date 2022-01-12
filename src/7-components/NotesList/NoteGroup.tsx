@@ -1,10 +1,8 @@
-import './NoteGroup.scss';
-
 import React, { useEffect, useState } from 'react';
-
 import { Note } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { Icon } from '../atoms/Icon';
+import './NoteGroup.scss';
 import { NoteItem } from './NoteItem';
 
 const getGroupOpenId = (group: string) => `group-open:${group}`;

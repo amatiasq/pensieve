@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-
 import { Note } from '../2-entities/Note';
 import StringComparer from '../util/StringComparer';
 import { useStore } from './useStore';

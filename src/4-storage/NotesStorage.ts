@@ -1,11 +1,10 @@
 import { v4 as uuid } from 'uuid';
-
 import { messageBus } from '../1-core/messageBus';
 import {
   getMetadataFromContent,
   Note,
   NoteContent,
-  NoteId
+  NoteId,
 } from '../2-entities/Note';
 import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
 import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts';

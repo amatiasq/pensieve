@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-
 import { NoteContent, NoteId } from '../2-entities/Note';
 import { WriteOptions } from '../4-storage/helpers/WriteOptions';
 import { useStore } from './useStore';

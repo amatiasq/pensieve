@@ -1,5 +1,4 @@
 import { useHistory } from 'react-router-dom';
-
 import { Note, NoteId } from '../2-entities/Note';
 
 class Navigator {

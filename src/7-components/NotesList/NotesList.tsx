@@ -1,7 +1,4 @@
-import './NotesList.scss';
-
 import React, { useState } from 'react';
-
 import { Note } from '../../2-entities/Note';
 import { useCreateNote } from '../../6-hooks/useCreateNote';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
@@ -15,6 +12,7 @@ import { Resizer } from '../atoms/Resizer';
 import { FilterBox } from './FilterBox';
 import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
+import './NotesList.scss';
 
 export function NotesList() {
   const createNote = useCreateNote();

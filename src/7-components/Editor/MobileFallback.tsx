@@ -1,8 +1,6 @@
-import './MobileFallback.scss';
-
-import React, { createRef, useEffect, useState } from 'react';
-
 import { useMonaco } from '@monaco-editor/react';
+import React, { createRef, useEffect, useState } from 'react';
+import './MobileFallback.scss';
 
 // import MarkdownPreview from '@uiw/react-markdown-preview';
 

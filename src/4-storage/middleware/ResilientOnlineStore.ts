@@ -1,6 +1,5 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 import { Scheduler } from '@amatiasq/scheduler';
-
 import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
 import { WriteOptions } from '../helpers/WriteOptions';

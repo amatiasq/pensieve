@@ -1,7 +1,10 @@
 const encode = encodeURIComponent;
 const decode = decodeURIComponent;
 
-export function withParams(path: string, params: Record<string, string | number | boolean> = {}) {
+export function withParams(
+  path: string,
+  params: Record<string, string | number | boolean> = {},
+) {
   const query = Object.entries(params)
     .map(([key, value]) => `${encode(key)}=${encode(value)}`)
     .join('&');
