@@ -1,12 +1,10 @@
-import './App.scss';
-
 import React, { useEffect, useState } from 'react';
-
 import { createStore } from '../4-storage';
 import { NotesStorage } from '../4-storage/NotesStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
 import { NotesList } from '../7-components/NotesList/NotesList';
+import './App.scss';
 import { NotesStorageContext } from './contexts';
 import { Router } from './Router';
 import { useGithubAuth } from './useGithubAuth';
