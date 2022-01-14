@@ -85,7 +85,7 @@ body {
   --gist-item-height: 28px;
 
   @include mobile {
-    grid-template-columns: 1fr;
+    grid-template-columns: 100vw;
 
     &.page-home {
       grid-template-areas: 'list';
