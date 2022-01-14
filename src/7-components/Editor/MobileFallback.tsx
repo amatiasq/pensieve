@@ -1,6 +1,9 @@
 import { useMonaco } from '@monaco-editor/react';
 import React, { createRef, useEffect, useState } from 'react';
+import { useSetting } from '../../6-hooks/useSetting';
 import './MobileFallback.scss';
+import { extendMonaco } from './monaco/extendMonaco';
+import { monacoThemeName } from './monacoConfiguration';
 
 // import MarkdownPreview from '@uiw/react-markdown-preview';
 
@@ -23,12 +26,20 @@ export function MobileFallback({
 }: MobileFallbackProps) {
   const ref = createRef<HTMLElement>();
   const monaco = useMonaco();
+  const [links] = useSetting('links');
+  const [highlight] = useSetting('highlight');
   const [isPreview, setIsPreview] = useState(true);
+
+  useEffect(() => {
+    if (monaco) {
+      extendMonaco(monaco, highlight, links);
+    }
+  }, [monaco, highlight, links]);
 
   useEffect(() => {
     if (monaco && ref.current) {
       monaco.editor.colorizeElement(ref.current, {
-        theme: 'vs-dark',
+        theme: monacoThemeName,
       });
     }
   }, [monaco, ref.current]);

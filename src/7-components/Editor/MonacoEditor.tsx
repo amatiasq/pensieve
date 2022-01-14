@@ -5,6 +5,8 @@ import { isMobile } from '../../0-dom/isMobile';
 import { getMetadataFromContent } from '../../2-entities/Note';
 import { useSetting } from '../../6-hooks/useSetting';
 import { MobileFallback } from './MobileFallback';
+import { extendMonaco } from './monaco/extendMonaco';
+import { monacoThemeName } from './monacoConfiguration';
 import './MonacoEditor.scss';
 
 export function MonacoEditor({
@@ -21,9 +23,11 @@ export function MonacoEditor({
   onChange: (newValue: string | undefined) => void;
 }) {
   const monaco = useMonaco();
+  const [links] = useSetting('links');
   const [rulers] = useSetting('rulers');
   const [tabSize] = useSetting('tabSize');
   const [wordWrap] = useSetting('wordWrap');
+  const [highlight] = useSetting('highlight');
   const [renderIndentGuides] = useSetting('renderIndentGuides');
 
   const lines = value.split('\n').length;
@@ -43,18 +47,20 @@ export function MonacoEditor({
     <Editor
       className="editor"
       height={gap ? `calc(100vh - ${gap}` : '100vh'}
-      theme="vs-dark"
+      theme={monacoThemeName}
       language={language}
       value={value}
       options={getEditorOptions(language === 'markdown')}
       onChange={onChange}
-      // beforeMount={x => applyMonacoExtensions(x)}
-      onMount={x => x.focus()}
+      beforeMount={monaco => extendMonaco(monaco, highlight, links)}
+      onMount={editor => editor.focus()}
     />
   );
 
   function getEditorOptions(isMarkdown: boolean) {
     return {
+      'semanticHighlighting.enabled': true,
+      automaticLayout: true,
       contextmenu: false,
       minimap: { enabled: lines > 100 },
       readOnly: readonly,
@@ -64,7 +70,6 @@ export function MonacoEditor({
       tabSize,
       wordBasedSuggestions: isMarkdown ? false : true,
       wordWrap: wordWrap ? 'on' : 'off',
-      'semanticHighlighting.enabled': true,
     } as editor.IStandaloneEditorConstructionOptions;
   }
 

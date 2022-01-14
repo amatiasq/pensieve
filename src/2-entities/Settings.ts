@@ -13,6 +13,15 @@ export const DEFAULT_SETTINGS = {
   tabSize: 2,
   //welcomeGist: 'd195304f7bb1b8d5f3e76392c4a6cd01' as NoteId,
   wordWrap: true,
+
+  highlight: {
+    '~~[^~]*~~': '#505050',
+    '@(\\w|-)+': '#6fb9ef',
+  } as Record<string, string>,
+
+  links: {
+    '\\[(\\w+/\\w+)]': `https://github.com/$1`,
+  } as Record<string, string>,
 };
 
 export type Settings = typeof DEFAULT_SETTINGS;
