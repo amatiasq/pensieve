@@ -7,3 +7,5 @@ deploy.sh
 dist
 dist-ssr
 node_modules
+cypress/screenshots/
+cypress/videos/
