@@ -3,7 +3,7 @@ import React, { createRef, useEffect, useState } from 'react';
 import { useSetting } from '../../6-hooks/useSetting';
 import './MobileFallback.scss';
 import { extendMonaco } from './monaco/extendMonaco';
-import { monacoThemeName } from './monacoConfiguration';
+import { theme } from './monacoConfiguration';
 
 // import MarkdownPreview from '@uiw/react-markdown-preview';
 
@@ -39,7 +39,7 @@ export function MobileFallback({
   useEffect(() => {
     if (monaco && ref.current) {
       monaco.editor.colorizeElement(ref.current, {
-        theme: monacoThemeName,
+        theme: theme,
       });
     }
   }, [monaco, ref.current]);

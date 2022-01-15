@@ -33,6 +33,7 @@
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
     "rxjs": "^7.1.0",
+    "usehooks-ts": "^2.2.1",
     "uuid": "^3.4.0"
   },
   "devDependencies": {

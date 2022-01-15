@@ -6,7 +6,7 @@ import { getMetadataFromContent } from '../../2-entities/Note';
 import { useSetting } from '../../6-hooks/useSetting';
 import { MobileFallback } from './MobileFallback';
 import { extendMonaco } from './monaco/extendMonaco';
-import { monacoThemeName } from './monacoConfiguration';
+import * as hardcodedConfig from './monacoConfiguration';
 import './MonacoEditor.scss';
 
 export function MonacoEditor({
@@ -47,7 +47,7 @@ export function MonacoEditor({
     <Editor
       className="editor"
       height={gap ? `calc(100vh - ${gap}` : '100vh'}
-      theme={monacoThemeName}
+      theme={hardcodedConfig.theme}
       language={language}
       value={value}
       options={getEditorOptions(language === 'markdown')}
@@ -59,13 +59,11 @@ export function MonacoEditor({
 
   function getEditorOptions(isMarkdown: boolean) {
     return {
+      ...hardcodedConfig,
       'semanticHighlighting.enabled': true,
-      automaticLayout: true,
-      contextmenu: false,
       minimap: { enabled: lines > 100 },
       readOnly: readonly,
       renderIndentGuides,
-      renderLineHighlight: 'none',
       rulers,
       tabSize,
       wordBasedSuggestions: isMarkdown ? false : true,

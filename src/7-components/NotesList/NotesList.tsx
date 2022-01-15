@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Note } from '../../2-entities/Note';
 import { useCreateNote } from '../../6-hooks/useCreateNote';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
@@ -8,14 +8,20 @@ import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
 import { IconButton } from '../atoms/IconButton';
 import { Loader } from '../atoms/Loader';
+import { PresenceDetector } from '../atoms/PresenceDetector';
 import { Resizer } from '../atoms/Resizer';
 import { FilterBox } from './FilterBox';
 import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
 import './NotesList.scss';
 
+const INITIAL_ITEMS_COUNT = 20;
+const ITEMS_COUNT_INCREASE = 10;
+
 export function NotesList() {
   const createNote = useCreateNote();
+
+  const [itemsCount, setItemsCount] = useState(INITIAL_ITEMS_COUNT);
   const [list, loading] = useNoteList();
   const [filter, setFilter] = useState<StringComparer | null>(null);
   const filtered = useFilteredNotes(list, filter);
@@ -25,6 +31,12 @@ export function NotesList() {
 
   useShortcut('newNote', createNote);
   useShortcut('hideSidebar', () => setIsVisible(!isVisible));
+
+  const renderMoreItems = useCallback(() => {
+    const newCount = itemsCount + ITEMS_COUNT_INCREASE;
+    console.debug(`🚅 Loading ${ITEMS_COUNT_INCREASE} more items: ${newCount}`);
+    setItemsCount(newCount);
+  }, [itemsCount]);
 
   if (!isVisible) {
     return null;
@@ -41,6 +53,7 @@ export function NotesList() {
 
       <div className="notes-list" {...listProps}>
         {loading ? <Loader /> : renderList()}
+        <PresenceDetector onVisible={renderMoreItems} />
       </div>
 
       <Resizer size={size} onChange={setSize} />
@@ -68,7 +81,8 @@ export function NotesList() {
         groups.set(group, [x]);
         return group;
       })
-      .filter(Boolean) as Array<string | Note>;
+      .filter(Boolean)
+      .slice(0, itemsCount) as Array<string | Note>;
 
     return finalList.map(note => {
       if (typeof note !== 'string') {
