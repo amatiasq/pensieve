@@ -1,7 +1,9 @@
 @import '../../0-dom/hide-scrollbar.scss';
 
 .mobile-fallback {
+  box-sizing: border-box;
   padding: 24px;
+  height: 100vh;
   --toolbar-height: 0;
 
   &--textarea {
