@@ -65,7 +65,7 @@ function onGroupClicked(event: React.MouseEvent<HTMLElement, MouseEvent>) {
   const isOpen = target.hasAttribute('open');
   const key = getGroupOpenId(target.dataset.group!);
 
-  console.log(`${key}: ${!isOpen}`);
+  console.debug(`> ${key}: ${!isOpen}`);
 
   if (isOpen) {
     localStorage.removeItem(key);

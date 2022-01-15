@@ -55,4 +55,9 @@ aside {
   &[data-filter]:empty::after {
     content: 'No results';
   }
+
+  &__end {
+    text-align: center;
+    padding: 8em 1em;
+  }
 }

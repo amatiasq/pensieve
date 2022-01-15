@@ -15,8 +15,8 @@ import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
 import './NotesList.scss';
 
-const INITIAL_ITEMS_COUNT = 20;
-const ITEMS_COUNT_INCREASE = 10;
+const INITIAL_ITEMS_COUNT = 50;
+const ITEMS_COUNT_INCREASE = 50;
 
 export function NotesList() {
   const createNote = useCreateNote();
@@ -53,7 +53,6 @@ export function NotesList() {
 
       <div className="notes-list" {...listProps}>
         {loading ? <Loader /> : renderList()}
-        <PresenceDetector onVisible={renderMoreItems} />
       </div>
 
       <Resizer size={size} onChange={setSize} />
@@ -81,17 +80,36 @@ export function NotesList() {
         groups.set(group, [x]);
         return group;
       })
-      .filter(Boolean)
-      .slice(0, itemsCount) as Array<string | Note>;
+      .filter((x): x is string | Note => Boolean(x));
 
-    return finalList.map(note => {
-      if (typeof note !== 'string') {
-        return <NoteItem key={note.id} id={note.id} />;
-      }
+    const toRender = finalList.slice(0, itemsCount);
+    const finalElement = finalList.length > 50 ? 'No more notes' : null;
+    console.debug(`🚅 Rendering ${toRender.length} of ${finalList.length}`);
 
-      const group = note;
-      const list = groups.get(group)!;
-      return <NoteGroup key={`group/${group}`} group={group} notes={list} />;
-    });
+    return (
+      <>
+        {toRender.map(note => {
+          if (typeof note !== 'string') {
+            return <NoteItem key={note.id} id={note.id} />;
+          }
+
+          const group = note;
+          const list = groups.get(group)!;
+          return (
+            <NoteGroup key={`group/${group}`} group={group} notes={list} />
+          );
+        })}
+        <PresenceDetector
+          className="notes-list__end"
+          onVisible={renderMoreItems}
+        >
+          {itemsCount < finalList.length ? (
+            <Loader onClick={renderMoreItems} />
+          ) : (
+            finalElement
+          )}
+        </PresenceDetector>
+      </>
+    );
   }
 }
