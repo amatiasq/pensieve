@@ -1,5 +1,6 @@
 import { Monaco } from '@monaco-editor/react';
 import { editor, languages } from 'monaco-editor';
+import { errorFor } from '../../../util/errorFor';
 import { extendMonacoLanguage } from './extendMonacoLanguage';
 import { provideCustomLinks } from './extendMonacoLinks';
 import { extendMonacoTheme } from './extendMonacoTheme';
@@ -14,7 +15,11 @@ export function extendMonaco(
   links: Record<string, string>,
 ) {
   if (links) {
-    provideCustomLinks(monaco, links);
+    errorFor(
+      () => provideCustomLinks(monaco, links),
+      'Error in "links" entry from settings. Should be an Array<[string, string]>',
+      links,
+    );
   }
 
   if (!highlight) {
@@ -25,15 +30,36 @@ export function extendMonaco(
   const root: IMonarchLanguageRule[] = [];
   let counter = 0;
 
-  for (const [pattern, color] of Object.entries(highlight)) {
-    const token = `autotoken${counter}`;
-    root.push([pattern, token]);
-    theme.push({ token, foreground: color });
-    counter++;
-  }
+  errorFor(
+    () => {
+      for (const [pattern, color] of Object.entries(highlight)) {
+        errorFor(
+          () => new RegExp(pattern),
+          'Invalid regex pattern for highlighting',
+          pattern,
+        );
 
-  extendMonacoLanguage(monaco, 'markdown', { tokenizer: { root } });
-  extendMonacoTheme(monaco, 'vs-dark', theme);
+        const token = `autotoken${counter}`;
+        root.push([pattern, token]);
+        theme.push({ token, foreground: color });
+        counter++;
+      }
+    },
+    'Error processing highlight in settings. Should be an Array<[string, string]>',
+    highlight,
+  );
+
+  errorFor(
+    () => extendMonacoLanguage(monaco, 'markdown', { tokenizer: { root } }),
+    `Error from extending monaco's language`,
+    root,
+  );
+
+  errorFor(
+    () => extendMonacoTheme(monaco, 'vs-dark', theme),
+    `Error from extending monaco's theme`,
+    theme,
+  );
 
   // const extensions: Record<string, IMonarchLanguage> = {
   //   markdown: { tokenizer: { root: [] } },
