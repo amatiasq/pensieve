@@ -1,32 +1,63 @@
-# Pensieve
+# [Pensieve](https://pensieve.amatiasq.com)
 
-## Next
-- [] Sketchpad?
-  - Right click => Create note from selection
+Notes saved in your private Github repository.
 
-## Sync
-- make queue
-- add all notes sorted by modified date
-- those notes should be fetched
-  - max 1 per second?
-  - slow down will proportional to last modified date
-    - find function name que hace así: __/‾‾
-- when listing notes
-  - detect all notes with changed `modified` date
-  - add them to queue
-- when reading notes
-  - remove them from queue
+## Features
 
-### how
-- https://github.com/amatiasq/better-gists/blob/6c5a79cc3908592ed6a53461d48205177d6504f3/src/4-storage/middleware/MixedStore.ts#L17-L38
-  - needs to go to Store
-  - or emit an event captured by Store
-  - put them first
+- [Configurable](https://pensieve.amatiasq.com/settings) for settings and shortcuts (`CMD+,`)
+- Installable from Chrome. This is required for some shortcuts to work.
+- Works offline for notes opened in the past
 
-## Nice to have
-- Rename group
-- Push note to top
-- Light theme
-- Link {{other notes}}
-- Share as gist
-- Design settings page
+### Organisation
+
+- First line of the file is the filename
+- Folders are created by adding slash (`/`) to the filename
+- Change syntax highlighting by adding extension to the filename
+- Sorted by creation date
+- Star notes you want always at the top
+
+### Writing
+
+- Markdown enabled by default
+- Autosave after 5 seconds of inactivity
+- History of changes visible in Github as commits
+- Same text editor as VS Code (Monaco editor) which includes
+  - Automatic identation
+  - Syntax highlighting
+  - Multiple cursors
+  - Typescript validation
+- Convert regex matches into links. Default settings converts [user/repo] into a Github link
+- Custom highlighting with regex. Default settings show ~~strikethrough~~ and @user in different colors
+
+## Caveats
+
+- When switching devices notes list is not updated, refresh the page to see
+- Opening a note takes a few seconds in mobile for unknown reason
+
+## Changelog
+
+### 1.1 Custom highlighting
+
+Pensieve 1.1 release has been successful with new features like
+
+- [custom/links]
+- custom highlighting as ~~strikethrough~~ or @username
+- all based on RegExp and documented by example in Settings [CMD+,]
+
+After a year of usage Pensieve has generated
+
+- 6500 commis
+- 16mb of data of which
+  - one third is actual notes content
+  - another third is metadata
+  - and the remaining third is git files
+
+```sh
+~/pensieve-data main > du -sh . .* *
+ 16M    .
+5.2M    .git
+4.8M    meta
+5.5M    note
+4.0K    settings.json
+4.0K    shortcuts.json
+```
