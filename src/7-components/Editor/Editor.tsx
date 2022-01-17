@@ -106,11 +106,16 @@ export function Editor(props: EditorProps) {
   }
 
   function forceSave({ urgent = false } = {}) {
+    if (!hasUnsavedChanges) {
+      console.warn('Possibly creating an empty commit!');
+    }
+
     if (!isEditable(props)) wtf();
     scheduler.stop();
     addSaved(value);
     const formatted = format(value);
     addSaved(formatted);
+    setHasUnsavedChanged(false);
     return props.onSave(formatted, { urgent });
   }
 }
