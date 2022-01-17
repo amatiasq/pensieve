@@ -38,6 +38,8 @@ Notes saved in your private Github repository.
 
 ### 1.1 Custom highlighting
 
+![Showcase](https://user-images.githubusercontent.com/1533589/149818231-7f4483b1-30a5-49c8-a2e9-c525d6927797.png)
+
 Pensieve 1.1 release has been successful with new features like
 
 - [custom/links]
@@ -46,8 +48,8 @@ Pensieve 1.1 release has been successful with new features like
 
 After a year of usage Pensieve has generated
 
-- 6500 commis
-- 16mb of data of which
+- 6500 commits
+- `16Mb` of data of which
   - one third is actual notes content
   - another third is metadata
   - and the remaining third is git files
