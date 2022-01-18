@@ -5,7 +5,7 @@ Notes saved in your private Github repository.
 ## Features
 
 - [Configurable](https://pensieve.amatiasq.com/settings) for settings and shortcuts (`CMD+,`)
-- Installable from Chrome. This is required for some shortcuts to work.
+- Installable from Chrome. This is required for some shortcuts to work
 - Works offline for notes opened in the past
 
 ### Organisation
@@ -31,8 +31,8 @@ Notes saved in your private Github repository.
 
 ## Caveats
 
-- When switching devices notes list is not updated, refresh the page to see
-- Opening a note takes a few seconds in mobile for unknown reason
+- When switching devices notes list is not updated, refresh the page to force update
+- Opening a note takes a few seconds on mobile for unknown reason
 
 ## Changelog
 
