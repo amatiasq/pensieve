@@ -46,16 +46,16 @@ Pensieve 1.1 release has been successful with new features like
 - custom highlighting as ~~strikethrough~~ or @username
 - all based on RegExp and documented by example in Settings [CMD+,]
 
-After a year of usage Pensieve has generated
+After a year of usage Pensieve has generated in my private repository:
 
 - 6500 commits
 - `16Mb` of data of which
   - one third is actual notes content
   - another third is metadata
-  - and the remaining third is git files
+  - and the remaining third is git files containing EVERY CHANGE I MADE SINCE I STARTED USING THIS TOOL. DID I MENTION ONLY YOU CONTROL YOUR DATA IN THIS APPLICATION??? you and GitHub. You're welcome. Have a nice day.
 
 ```sh
-~/pensieve-data main > du -sh . .* *
+~/pensieve-notes main > du -sh . .* *
  16M    .
 5.2M    .git
 4.8M    meta
