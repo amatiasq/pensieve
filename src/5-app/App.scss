@@ -101,10 +101,12 @@ body {
   }
 
   @include desktop {
-    --sidebar-width: calc(
-      calc(var(--setting-sidebarWidth, 400) * var(--setting-sidebarVisible)) *
-        1px
-    );
+    &:not(.page-home) {
+      --sidebar-width: calc(
+        calc(var(--setting-sidebarWidth, 400) * var(--setting-sidebarVisible)) *
+          1px
+      );
+    }
 
     grid-template-columns: var(--sidebar-width) 1fr;
     grid-template-areas: 'list editor';

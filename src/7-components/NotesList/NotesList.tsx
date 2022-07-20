@@ -38,7 +38,7 @@ export function NotesList() {
     setItemsCount(newCount);
   }, [itemsCount]);
 
-  if (!isVisible) {
+  if (!isVisible && location.pathname !== '/') {
     return null;
   }
 
