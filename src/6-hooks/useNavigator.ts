@@ -12,6 +12,7 @@ class Navigator {
     readonly path: string,
   ) {}
 
+  readonly go = (target: string) => this.history.push(target);
   readonly goRoot = () => this.history.push(this.root);
   readonly goSettings = () => this.history.push(this.settings);
 

@@ -24,6 +24,19 @@ export function App() {
     navigator.onNavigate(next => setPageName(next.getPageName())),
   );
 
+  useEffect(() => {
+    const abort = new AbortController();
+
+    document.body.addEventListener(
+      'click',
+      (e: MouseEvent) =>
+        handleLinkClick(e, e.target as HTMLAnchorElement, navigator.go),
+      { capture: true, signal: abort.signal },
+    );
+
+    return () => abort.abort();
+  }, [navigator.go]);
+
   if (!store) {
     return <Loader />;
   }
@@ -38,4 +51,25 @@ export function App() {
       </div>
     </StorageContext.Provider>
   );
+}
+
+function handleLinkClick(
+  e: MouseEvent,
+  link: HTMLAnchorElement,
+  go: (url: string) => unknown,
+) {
+  if (link.tagName !== 'A') {
+    return;
+  }
+
+  const { href } = link.dataset;
+
+  if (!href?.startsWith(location.origin)) {
+    return;
+  }
+
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  go(href.replace(location.origin, ''));
 }
