@@ -31,7 +31,7 @@ export function App() {
       'click',
       (e: MouseEvent) =>
         handleLinkClick(e, e.target as HTMLAnchorElement, navigator.go),
-      { capture: true, signal: abort.signal },
+      { capture: true, signal: abort.signal } as AddEventListenerOptions,
     );
 
     return () => abort.abort();
