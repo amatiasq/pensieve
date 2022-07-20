@@ -2,7 +2,7 @@
   "short_name": "Pensieve",
   "name": "Pensieve",
   "description": "Simple app to take notes",
-  "display": "fullscreen",
+  "display": "standalone",
   "background_color": "#1c1c1c",
   "theme_color": "#1c1c1c",
   "start_url": "https://pensieve.amatiasq.com/",
