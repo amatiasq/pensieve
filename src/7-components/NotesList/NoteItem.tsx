@@ -4,6 +4,7 @@ import { NoteId } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
 import { useUsername } from '../../6-hooks/useUsername';
+import { GithubIcon } from '../atoms/GithubIcon';
 import { IconButton } from '../atoms/IconButton';
 import './NoteItem.scss';
 
@@ -41,7 +42,7 @@ export function NoteItem({ id }: { id: NoteId }) {
       href={githubUrl}
       onClick={event => event.stopPropagation()}
     >
-      GH
+      <GithubIcon title="Open note in Github" />
     </a>
   );
 
