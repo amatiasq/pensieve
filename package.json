@@ -1,5 +1,5 @@
 {
-  "name": "Pensieve",
+  "name": "pensieve",
   "homepage": "https://pensieve.amatiasq.com/",
   "scripts": {
     "start": "vite",
@@ -48,7 +48,7 @@
     "husky": "^7.0.1",
     "sass": "^1.32.6",
     "typescript": "^4.3.5",
-    "vite": "^2.4.0",
-    "vite-plugin-pwa": "^0.8.1"
+    "vite": "^3.0.4",
+    "vite-plugin-pwa": "^0.12.3"
   }
 }
