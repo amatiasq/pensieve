@@ -1,9 +1,9 @@
 const WHITESPACE = /\s+/g;
 
 export default class StringComparer {
-  private clean: string;
+  private readonly clean: string;
 
-  constructor(needle: string) {
+  constructor(public readonly needle: string) {
     this.clean = cleanString(needle);
   }
 

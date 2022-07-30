@@ -3,6 +3,8 @@ import { Note } from '../2-entities/Note';
 import StringComparer from '../util/StringComparer';
 import { useStore } from './useStore';
 
+const uniq = <T>(list: T[]) => Array.from(new Set(list));
+
 let lastIteration = 0;
 
 export function useFilteredNotes(
@@ -16,49 +18,50 @@ export function useFilteredNotes(
   useEffect(() => {
     if (!comparer) return;
 
-    setCursor(0);
-    setValue(
-      list.filter(note =>
-        comparer.matchesAny([note.id, note.title, note.group]),
-      ),
+    const title = list.filter(note => comparer.matches(note.title));
+    const group = list.filter(
+      note => note.group && comparer.matches(note.group),
     );
+    const id = list.filter(note => comparer.matches(note.id));
+
+    setCursor(0);
+    setValue(uniq([...title, ...group, ...id]));
   }, [list, comparer]);
 
   if (!comparer) return list;
 
   const currentIteration = ++lastIteration;
 
-  // not awaited
+  // not awaited, this happens in the background
   setTimeout(searchInContent, 10);
 
   return value;
 
-  // secuencialmente de forma asíncrona
-  // leer las notas una por una
-  // si el contador cambia ABORTAR
-
+  // read notes one by one from cache
+  // sequentially asynchronously
   async function searchInContent() {
+    // if the counter is different ABORT!
+    // that means another setTimeout is running after this one
     if (currentIteration !== lastIteration) {
       return;
     }
 
+    const ids = new Set(value.map(x => x.id));
+
     for (let i = cursor; i < list.length; i++) {
       const note = list[i];
 
-      if (value.includes(note)) {
+      if (ids.has(note.id)) {
         continue;
       }
 
       const remote = store.note(note.id);
+      const content = await remote.readFromCache();
 
-      if (await remote.hasCachedContent) {
-        const content = await remote.read();
-
-        if (comparer!.matches(content)) {
-          setCursor(i + 1);
-          setValue([...value, note]);
-          break;
-        }
+      if (content && comparer!.matches(content)) {
+        setCursor(i + 1);
+        setValue([...value, note]);
+        break;
       }
     }
   }

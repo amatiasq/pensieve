@@ -22,7 +22,7 @@ export function PresenceDetector({
 
   return (
     <div ref={ref} className={className}>
-      {children || '&nbsp;'}
+      {children || ' '}
     </div>
   );
 }

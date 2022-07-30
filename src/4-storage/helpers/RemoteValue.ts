@@ -31,6 +31,10 @@ export class RemoteValue {
     );
   }
 
+  readCache() {
+    return this.store.readLocal(this.key);
+  }
+
   write(value: string, options?: WriteOptions) {
     const opts = setDefaultReason(options, `Write ${this.key}`);
     return this.store.write(this.key, value, opts);

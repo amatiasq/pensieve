@@ -39,10 +39,6 @@ export class RemoteNote {
     return note ? note.title : '(unknown)';
   }
 
-  get hasCachedContent(): Promise<boolean> {
-    return Promise.resolve(true);
-  }
-
   constructor(
     readonly id: NoteId,
     private readonly meta: RemoteJson<Note>,
@@ -103,6 +99,12 @@ export class RemoteNote {
     if (!current) return;
     const { title, group } = getMetadataFromContent(draft);
     this.emitDraft({ ...current, title, group });
+  }
+
+  async readFromCache() {
+    if (await this.content.isCached) {
+      return this.content.readCache();
+    }
   }
 
   async read() {
