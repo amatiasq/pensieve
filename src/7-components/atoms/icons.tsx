@@ -101,55 +101,30 @@ export const CaretIcon = icon(
 
 export const TrashIcon = icon(
   <svg
+    xmlns="http://www.w3.org/2000/svg"
     width="24"
     height="24"
-    xmlns="http://www.w3.org/2000/svg"
-    fillRule="evenodd"
-    clipRule="evenodd"
+    viewBox="0 0 24 24"
   >
     <path
       d="
-        M 19 24
-        h -14
-        c -1.104 0-2-.896-2-2
-        v -16
-        h 18
-        v 16
-        c 0 1.104-.896 2-2 2
-        m -9-14
-        c 0-.552-.448-1-1-1
-        s -1 .448-1 1
-        v 9
-        c 0 .552.448 1 1 1
-        s 1-.448 1-1
-        v -9
+        M 6 24
+        h 12
+        l 3-18
+        h -18
+        l 3 18
         z
-        m 6 0
-        c 0-.552-.448-1-1-1
-        s -1 .448-1 1
-        v 9
-        c 0 .552.448 1 1 1
-        s 1-.448 1-1
-        v -9
-        z
-        m 6-5
+        M 22 2
+        v 2
         h -20
         v -2
-        h 6
-        v -1.5
-        c 0-.827.673-1.5 1.5-1.5
-        h 5
-        c .825 0 1.5.671 1.5 1.5
-        v 1.5
-        h 6
-        v 2
+        h 5.711
+        c .9 0 1.631-1.099 1.631-2
+        h 5.316
+        c 0 .901.73 2 1.631 2
+        h 5.711
         z
-        m -12-2
-        h 4
-        v -1
-        h -4
-        v 1
-        z "
+      "
     />
   </svg>,
 );
