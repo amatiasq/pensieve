@@ -1,19 +1,75 @@
-import React, { useEffect, useState } from 'react';
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
+import { useEffect, useState } from 'react';
 import { Note } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
-import { Icon } from '../atoms/Icon';
-import './NoteGroup.scss';
+import { Disclosure, DisclosureToggleEvent } from '../molecule/Disclosure';
+import { GroupCounter } from '../molecule/GroupCounter';
 import { NoteItem } from './NoteItem';
 
+const Title = styled.span`
+  flex: 1;
+`;
+
+const Content = styled.ul`
+  border-left: var(--group-border-width) solid var(--group-border-color);
+  border-bottom: var(--group-border-width) solid var(--group-border-color);
+`;
+
+const NoteGroupItem = styled(NoteItem)`
+  color: red;
+
+  &:not(.active) {
+    --status-line-width: 0;
+  }
+
+  &.active {
+    margin-left: calc(var(--status-line-width) * -1);
+    --status-line-color: var(--border-color-active);
+  }
+`;
+
+const styles = css`
+  --status-line-color: var(--group-color);
+
+  &:hover summary {
+    background-color: var(--bg-color-hover);
+  }
+
+  &.has-active-note summary {
+    background-color: var(--group-active-color);
+  }
+
+  &[open] {
+    summary {
+      border-color: var(--group-border-color);
+    }
+
+    ${Content} {
+      animation: details-show var(--animation-speed) ease-in-out;
+    }
+
+    & + & summary {
+      border-top-width: 0;
+    }
+  }
+
+  @keyframes details-show {
+    from {
+      opacity: 0;
+      transform: var(--details-translate, translateY(-0.5em));
+    }
+  }
+`;
+
 const getGroupOpenId = (group: string) => `group-open:${group}`;
-export const isGroupOpen = (group: string) =>
+const isGroupOpen = (group: string) =>
   Boolean(localStorage[getGroupOpenId(group)]);
 
 export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
   const hasActiveNote = (nav: ReturnType<typeof useNavigator>) =>
     notes.some(x => nav.isNote(x));
 
-  const isOpen = isGroupOpen(group);
   const navigator = useNavigator();
   const [containsActiveNote, setContainsActiveNote] = useState(
     hasActiveNote(navigator),
@@ -30,39 +86,28 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
 
   const favorites = notes.filter(x => x.favorite);
 
-  const cn = [
-    'group',
-    containsActiveNote ? 'has-active' : '',
-    favorites.length ? 'has-favorite' : '',
-  ];
-
   return (
-    <details className={cn.join(' ')} data-group={group} open={isOpen}>
-      <summary className="group-title" onClick={onGroupClicked}>
-        <Icon name="angle-right" className="icon-button group-caret" />
-        <span className="group-name">{group}</span>
-        {favorites.length ? (
-          <>
-            <i className="fav-counter">{favorites.length}</i> /
-          </>
-        ) : null}
-        <i className="counter">{notes.length}</i>
-      </summary>
+    <Disclosure
+      className={containsActiveNote ? 'has-active-note' : undefined}
+      isOpen={isGroupOpen(group)}
+      onToggle={onGroupClicked}
+      css={styles}
+    >
+      <>
+        <Title>{group}</Title>
+        <GroupCounter items={notes.length} favorites={favorites.length} />
+      </>
 
-      <ul className="group-content">
+      <Content>
         {notes.map(x => (
-          <NoteItem key={x.id} id={x.id} />
+          <NoteGroupItem key={x.id} id={x.id} />
         ))}
-      </ul>
-    </details>
+      </Content>
+    </Disclosure>
   );
 }
 
-function onGroupClicked(event: React.MouseEvent<HTMLElement, MouseEvent>) {
-  const target = (event.currentTarget as HTMLElement)
-    .parentElement as HTMLDetailsElement;
-
-  const isOpen = target.hasAttribute('open');
+function onGroupClicked({ target, isOpen }: DisclosureToggleEvent) {
   const key = getGroupOpenId(target.dataset.group!);
 
   console.debug(`> ${key}: ${!isOpen}`);

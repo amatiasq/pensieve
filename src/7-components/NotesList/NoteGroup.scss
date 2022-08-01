@@ -9,10 +9,6 @@
     background-color: var(--group-active-color);
   }
 
-  .fav-counter {
-    color: var(--favorite-color);
-  }
-
   .group-title {
     display: flex;
     align-items: center;
@@ -28,10 +24,6 @@
       flex: 1;
     }
 
-    .fav-counter,
-    .counter {
-      font-size: 0.8rem;
-    }
 
     &::-webkit-details-marker,
     &::marker {

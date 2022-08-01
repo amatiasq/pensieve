@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createStore } from '../4-storage';
 import { AppStorage } from '../4-storage/AppStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
