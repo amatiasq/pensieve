@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import { Button, ButtonProps } from './Button';
 import { Icon } from './Icon';
-import { iconContainerStyles } from './icons';
+import { interactiveIconStyles } from './icons';
 
 export interface IconButtonProps extends ButtonProps {
   icon: JSX.Element | string;
@@ -11,7 +11,7 @@ export function IconButton(props: IconButtonProps) {
   const { icon, ...buttonProps } = props;
 
   const styles = css`
-    ${iconContainerStyles}
+    ${interactiveIconStyles}
     color: #b7b7b7;
   `;
 

@@ -1,8 +1,30 @@
-import React, { createRef, useState } from 'react';
+import styled from '@emotion/styled';
+import { createRef, useState } from 'react';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
 import { IconButton } from '../atoms/IconButton';
+import { CrossIcon, iconStyles, LoupeIcon } from '../atoms/icons';
+
+const FormControl = styled.div`
+  flex: 1;
+  display: flex;
+  background-color: var(--bg-color-control);
+  color: var(--fg-color);
+  padding: var(--spacing);
+  // border-right: 1px solid var(--border-color);
+
+  &:focus-within {
+    padding: calc(var(--spacing) - 1px);
+    border: 1px solid var(--border-color-active);
+  }
+`;
+
+const Input = styled.input`
+  background-color: var(--bg-color-control);
+  color: var(--fg-color);
+  padding: var(--spacing);
+`;
 
 export function FilterBox({
   onChange,
@@ -18,8 +40,12 @@ export function FilterBox({
   useShortcut('clearFilter', () => process(''));
 
   return (
-    <>
-      <input
+    <FormControl>
+      <div css={iconStyles}>
+        <LoupeIcon title="Filter" />
+      </div>
+
+      <Input
         ref={ref}
         className="filter-box"
         type="text"
@@ -28,8 +54,13 @@ export function FilterBox({
         onChange={e => process(e.target.value)}
       />
 
-      {term ? <IconButton icon="times" onClick={() => process('')} /> : null}
-    </>
+      {term ? (
+        <IconButton
+          icon={<CrossIcon title="Clear filter" />}
+          onClick={() => process('')}
+        />
+      ) : null}
+    </FormControl>
   );
 
   function process(value: string) {

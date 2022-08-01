@@ -1,4 +1,6 @@
-import React, { useCallback, useState } from 'react';
+import styled from '@emotion/styled';
+import { useCallback, useState } from 'react';
+import { hideScrollbar } from '../../0-dom/hideScrollbar';
 import { Note } from '../../2-entities/Note';
 import { useCreateNote } from '../../6-hooks/useCreateNote';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
@@ -7,16 +9,66 @@ import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
 import { IconButton } from '../atoms/IconButton';
+import { PlusIcon } from '../atoms/icons';
 import { Loader } from '../atoms/Loader';
 import { PresenceDetector } from '../atoms/PresenceDetector';
 import { Resizer } from '../atoms/Resizer';
 import { FilterBox } from './FilterBox';
 import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
-import './NotesList.scss';
 
 const INITIAL_ITEMS_COUNT = 50;
 const ITEMS_COUNT_INCREASE = 50;
+
+const NotesListContainer = styled.aside`
+  grid-area: list;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-color-sidebar);
+  transition: width 0.5s ease-in-out;
+  max-height: 100%;
+`;
+
+const Header = styled.h4`
+  --spacing: calc(var(--sidebar-gap) * 1.5);
+
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+  padding-right: var(--spacing);
+  // border-bottom: 1px solid var(--border-color);
+`;
+
+const ListWrapper = styled.div`
+  ${hideScrollbar}
+
+  flex: 1;
+  overflow-y: auto;
+  font-size: var(--sidebar-font-size);
+
+  &:empty {
+    position: relative;
+
+    &::after {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      content: 'Empty';
+      opacity: 0.7;
+      inset: 0;
+    }
+  }
+
+  &[data-filter]:empty::after {
+    content: 'No results';
+  }
+
+  &__end {
+    text-align: center;
+    padding: 8em 1em;
+  }
+`;
 
 export function NotesList() {
   const createNote = useCreateNote();
@@ -45,18 +97,21 @@ export function NotesList() {
   const listProps = filter ? { 'data-filter': true } : {};
 
   return (
-    <aside>
-      <h4 className="filter">
+    <NotesListContainer>
+      <Header>
         <FilterBox onChange={setFilter} />
-        <IconButton icon="plus" onClick={createNote} />
-      </h4>
+        <IconButton
+          icon={<PlusIcon title="Create note" />}
+          onClick={createNote}
+        />
+      </Header>
 
-      <div className="notes-list" {...listProps}>
+      <ListWrapper {...listProps}>
         {loading ? <Loader /> : renderList()}
-      </div>
+      </ListWrapper>
 
       <Resizer size={size} onChange={setSize} />
-    </aside>
+    </NotesListContainer>
   );
 
   function renderList() {

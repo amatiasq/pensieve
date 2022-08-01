@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import { AnchorHTMLAttributes } from 'react';
-import { iconContainerStyles } from './icons';
+import { interactiveIconStyles } from './icons';
 
 export interface IconLinkProps extends AnchorHTMLAttributes<any> {
   icon: JSX.Element;
@@ -10,7 +10,7 @@ export function IconLink(props: IconLinkProps) {
   const { icon, ...linkProps } = props;
 
   const styles = css`
-    ${iconContainerStyles}
+    ${interactiveIconStyles}
     text-decoration: none;
     color: hsl(0, 0%, 70%);
   `;
