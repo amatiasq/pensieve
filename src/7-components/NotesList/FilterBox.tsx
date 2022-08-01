@@ -21,6 +21,7 @@ const FormControl = styled.div`
 `;
 
 const Input = styled.input`
+  flex: 1;
   background-color: var(--bg-color-control);
   color: var(--fg-color);
   padding: var(--spacing);
