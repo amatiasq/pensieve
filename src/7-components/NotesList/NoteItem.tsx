@@ -1,20 +1,11 @@
 import styled from '@emotion/styled';
-import React, { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NoteId } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
-import { useUsername } from '../../6-hooks/useUsername';
-import { IconButton } from '../atoms/IconButton';
-import { IconLink } from '../atoms/IconLink';
-import { GithubIcon, TrashIcon } from '../atoms/icons';
 import { FavoriteButton } from './FavoriteButton';
-
-const Actions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: var(--sidebar-gap);
-`;
+import { NoteActions } from './NoteActions';
 
 const Title = styled.h5`
   flex: 1;
@@ -43,7 +34,7 @@ const NoteItemContainer = styled(Link)`
   }
 
   &:not(:hover) {
-    ${Actions} {
+    .actions {
       display: none;
     }
 
@@ -65,8 +56,8 @@ export interface NoteItemProps {
 
 export function NoteItem({ id, className = '' }: NoteItemProps) {
   const navigator = useNavigator();
-  const username = useUsername();
-  const [note, { remove }] = useNote(id);
+
+  const [note] = useNote(id);
   const [active, setActive] = useState<boolean>(navigator.isNote(id));
 
   useEffect(() =>
@@ -79,26 +70,7 @@ export function NoteItem({ id, className = '' }: NoteItemProps) {
     }),
   );
 
-  const handleRemove = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      if (!confirm(`Delete ${note!.title}?`)) {
-        return;
-      }
-
-      event.preventDefault();
-
-      if (navigator.isNote(id)) {
-        navigator.goRoot();
-      }
-
-      return remove();
-    },
-    [navigator, note, remove],
-  );
-
   if (!note) return null;
-
-  const githubUrl = `https://github.com/${username}/pensieve-data/blob/main/note/${note.id}`;
 
   return (
     <NoteItemContainer
@@ -109,17 +81,7 @@ export function NoteItem({ id, className = '' }: NoteItemProps) {
     >
       <FavoriteButton id={note.id} className="star" />
       <Title>{note.title}</Title>
-
-      <Actions>
-        <IconLink
-          icon={<GithubIcon title="Open note in Github" />}
-          href={githubUrl}
-        />
-        <IconButton
-          icon={<TrashIcon title="Remove note" />}
-          onClick={handleRemove}
-        />
-      </Actions>
+      <NoteActions id={note.id} className="actions" />
     </NoteItemContainer>
   );
 }
