@@ -17,8 +17,6 @@ const Content = styled.ul`
 `;
 
 const NoteGroupItem = styled(NoteItem)`
-  color: red;
-
   &:not(.active) {
     --status-line-width: 0;
   }

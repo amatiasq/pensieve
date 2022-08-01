@@ -5,7 +5,7 @@ import React, {
   PropsWithChildren,
   useCallback,
 } from 'react';
-import { CaretIcon } from '../atoms/icons';
+import { CaretIcon, iconContainerStyles } from '../atoms/icons';
 
 const Details = styled.details`
   summary svg:first-of-type {
@@ -43,6 +43,14 @@ const Summary = styled.summary`
   }
 `;
 
+const CaretContainer = styled.div`
+  ${iconContainerStyles}
+
+  :hover {
+    background: transparent;
+  }
+`;
+
 export interface DisclosureToggleEvent {
   target: HTMLDetailsElement;
   isOpen: boolean;
@@ -77,7 +85,9 @@ export function Disclosure({
   return (
     <Details {...props} open={isOpen}>
       <Summary onClick={handleClick}>
-        <CaretIcon title="Open / close group" />
+        <CaretContainer>
+          <CaretIcon title="Open / close group" />
+        </CaretContainer>
         {summary}
       </Summary>
       {content}

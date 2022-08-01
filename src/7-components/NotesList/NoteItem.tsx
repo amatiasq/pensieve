@@ -31,7 +31,7 @@ const NoteItemContainer = styled(Link)`
   gap: var(--sidebar-gap);
   padding: var(--sidebar-gap);
   font-weight: 500;
-  // border-left: var(--status-line-width) solid var(--status-line-color);
+  border-left: var(--status-line-width) solid var(--status-line-color);
   border-bottom: 1px solid transparent;
   background-color: var(--note-item-color);
   user-select: none;
@@ -58,7 +58,12 @@ const NoteItemContainer = styled(Link)`
   }
 `;
 
-export function NoteItem({ id }: { id: NoteId }) {
+export interface NoteItemProps {
+  id: NoteId;
+  className?: string;
+}
+
+export function NoteItem({ id, className = '' }: NoteItemProps) {
   const navigator = useNavigator();
   const username = useUsername();
   const [note, { remove }] = useNote(id);
@@ -98,7 +103,9 @@ export function NoteItem({ id }: { id: NoteId }) {
   return (
     <NoteItemContainer
       to={navigator.toNote(note)}
-      className={`${active ? 'active' : ''} ${note.favorite ? 'favorite' : ''}`}
+      className={`${className} ${active ? 'active' : ''} ${
+        note.favorite ? 'favorite' : ''
+      }`}
     >
       <FavoriteButton id={note.id} className="star" />
       <Title>{note.title}</Title>

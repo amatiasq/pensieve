@@ -1,7 +1,27 @@
-import { jsx } from '@emotion/react';
+import { css, jsx } from '@emotion/react';
 import { Children } from 'react';
 
 // const humanizePath = x => copy(x.replace(/([a-z])/ig, '\n$1 '))
+
+export const iconContainerStyles = css`
+  --size: 2rem;
+  line-height: var(--size);
+  height: var(--size);
+  width: var(--size);
+  border-radius: 100%;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  :hover {
+    background: rgb(255 255 255 / 0.2);
+  }
+
+  svg {
+    fill: var(--fg-color);
+  }
+`;
 
 export interface IconProps {
   title: string;
@@ -57,21 +77,21 @@ export const StarIcon = icon(
 export const CaretIcon = icon(
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="16"
-    height="16"
+    width="24"
+    height="24"
     fill="currentColor"
-    viewBox="0 0 16 16"
+    viewBox="0 0 24 24"
   >
     <path
       fillRule="evenodd"
       d="
-        M 4.646 1.646
+        M 8.646 5.646
         a .5.5 0 0 1 .708 0
         l 6 6
         a .5.5 0 0 1 0 .708
         l -6 6
         a .5.5 0 0 1-.708-.708
-        L 10.293 8 4.646 2.354
+        L 14.293 12 8.646 6.354
         a .5.5 0 0 1 0-.708
         z
       "

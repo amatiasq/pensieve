@@ -27,7 +27,11 @@ export interface FavoriteButtonProps
   id: NoteId;
 }
 
-export function FavoriteButton({ id, ...props }: FavoriteButtonProps) {
+export function FavoriteButton({
+  id,
+  className = '',
+  ...props
+}: FavoriteButtonProps) {
   const [note, { toggleFavorite }] = useNote(id);
 
   const handleClick = useCallback(
@@ -50,7 +54,7 @@ export function FavoriteButton({ id, ...props }: FavoriteButtonProps) {
     <FavouriteButtonContainer
       {...props}
       icon={icon}
-      className={note.favorite ? 'on' : 'off'}
+      className={`${className} ${note.favorite ? 'on' : 'off'}`}
       onClick={handleClick}
     />
   );
