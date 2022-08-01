@@ -36,7 +36,7 @@ const Header = styled.h4`
   align-items: center;
   gap: var(--spacing);
   padding-right: var(--spacing);
-  // border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
 `;
 
 const ListWrapper = styled.div`

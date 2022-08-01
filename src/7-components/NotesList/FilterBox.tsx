@@ -12,7 +12,7 @@ const FormControl = styled.div`
   background-color: var(--bg-color-control);
   color: var(--fg-color);
   padding: var(--spacing);
-  // border-right: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
 
   &:focus-within {
     padding: calc(var(--spacing) - 1px);
