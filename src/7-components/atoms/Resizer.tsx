@@ -1,7 +1,16 @@
+import styled from '@emotion/styled';
 import React, { useState } from 'react';
-import './Resizer.css';
 
-interface ResizerProps {
+const Main = styled.div`
+  width: 5px;
+  cursor: ew-resize;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+`;
+
+export interface ResizerProps {
   size: number;
   onChange: (newSize: number) => void;
 }
@@ -29,12 +38,12 @@ export function Resizer(props: ResizerProps) {
   };
 
   return (
-    <div
+    <Main
       className="resizer"
       draggable={true}
       onDragStart={dragStart}
       onDrag={dragMove}
       onDragEnd={dragEnd}
-    ></div>
+    />
   );
 }

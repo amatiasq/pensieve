@@ -3,8 +3,8 @@ import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { Note } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
-import { Disclosure, DisclosureToggleEvent } from '../molecule/Disclosure';
-import { GroupCounter } from '../molecule/GroupCounter';
+import { Disclosure, DisclosureToggleEvent } from '../atoms/Disclosure';
+import { GroupCounter } from './GroupCounter';
 import { NoteItem } from './NoteItem';
 
 const Title = styled.span`

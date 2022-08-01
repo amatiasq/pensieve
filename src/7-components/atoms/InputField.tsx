@@ -1,6 +1,20 @@
+import styled from '@emotion/styled';
 import React, { createRef, useEffect, useState } from 'react';
 import { selectElementContents } from '../../0-dom/selectElementContents';
-import './InputField.scss';
+
+const Field = styled.span`
+  cursor: default;
+  border: 1px solid transparent;
+
+  &:not(.editing) {
+    user-select: none;
+  }
+
+  &.editing {
+    outline: none;
+    border-color: #0071d2;
+  }
+`;
 
 export function InputField({
   className,
@@ -50,7 +64,7 @@ export function InputField({
   }, [!readonly && isEditing]);
 
   return (
-    <span
+    <Field
       ref={ref}
       role="textbox"
       className={cn}

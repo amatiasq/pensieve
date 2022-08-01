@@ -5,7 +5,7 @@ import React, {
   PropsWithChildren,
   useCallback,
 } from 'react';
-import { CaretIcon, iconStyles } from '../atoms/icons';
+import { CaretIcon, iconStyles } from './icons';
 
 const Details = styled.details`
   summary svg:first-of-type {

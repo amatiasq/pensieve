@@ -8,7 +8,7 @@ import { useUsername } from '../../6-hooks/useUsername';
 import { IconButton } from '../atoms/IconButton';
 import { IconLink } from '../atoms/IconLink';
 import { GithubIcon, TrashIcon } from '../atoms/icons';
-import { FavoriteButton } from '../molecule/FavoriteButton';
+import { FavoriteButton } from './FavoriteButton';
 
 const Actions = styled.div`
   display: flex;
