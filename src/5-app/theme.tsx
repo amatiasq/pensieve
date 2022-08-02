@@ -1,22 +1,23 @@
 import { css } from '@emotion/react';
 import Color from 'colorjs.io';
-import { desktopOnly } from '../0-dom/responsive';
+import { desktopOnly, mobileOnly } from '../0-dom/responsive';
 
-const fg = new Color('#c4c4c4').to('lch');
-const bg = new Color('#1c1c1c').to('lch');
-const sidebar = new Color('#252526').to('lch');
-const border = new Color('#343637').to('lch');
-const primary = new Color('#669bd1').to('lch');
-const secondary = new Color('#f2f230').to('lch');
-// const secondary = new Color('#d16014');
-// const secondary = new Color('#c9866e');
+const color =
+  (hex: string) =>
+  (l = 0) => {
+    const color = new Color(hex).to('lch');
+    color.set('l', color.l + l);
+    return color.to('sRGB').toString();
+  };
 
-const rgba = (color: Color, l = 0) =>
-  color
-    .clone()
-    .set('l', color.l + l)
-    .to('sRGB')
-    .toString();
+const fg = color('#c4c4c4');
+const bg = color('#1c1c1c');
+const sidebar = color('#252526');
+const border = color('#343637');
+const primary = color('#669bd1');
+const secondary = color('#f2f230');
+// const secondary = color('#d16014');
+// const secondary = color('#c9866e');
 
 export const globalStyles = css`
   #app-container {
@@ -34,7 +35,7 @@ export const globalStyles = css`
     --status-line-width: var(--group-border-width);
     --status-line-color: transparent;
 
-    {mobileOnly} {
+    ${mobileOnly} {
       --sidebar-font-size: 1rem;
       --sidebar-gap: 0.5rem;
     }
@@ -44,25 +45,23 @@ export const globalStyles = css`
       --sidebar-gap: 0.4rem;
     }
 
-    --fg-color: ${rgba(fg)};
-    --fg-color-active: ${rgba(fg, 100)};
+    --fg-color: ${fg()};
+    --fg-color-active: ${fg(100)};
 
-    --bg-color: ${rgba(bg)};
-    --bg-color-sidebar: ${rgba(sidebar)};
-    --bg-color-control: ${rgba(bg, -2)};
-    --bg-color-hover: ${rgba(bg, 10)};
-    --border-color: ${rgba(border)};
+    --bg-color: ${bg()};
+    --bg-color-sidebar: ${sidebar()};
+    --bg-color-control: ${bg(-2)};
+    --bg-color-hover: ${bg(10)};
+    --border-color: ${border()};
 
-    --bg-color-active: ${rgba(primary, -20)};
-    --border-color-active: ${rgba(primary, 0)};
+    --bg-color-active: ${primary(-20)};
+    --border-color-active: ${primary(0)};
 
-    --note-item-color: ${rgba(bg, 2)};
-    --favorite-color: ${rgba(secondary)};
+    --note-item-color: ${bg(2)};
+    --favorite-color: ${secondary()};
 
     --group-color: var(--bg-color-sidebar);
-    --group-active-color: ${rgba(primary, -30)};
-    --group-border-color: ${rgba(secondary, -30)};
-
-    // }
+    --group-active-color: ${primary(-30)};
+    --group-border-color: ${secondary(-30)};
   }
 `;
