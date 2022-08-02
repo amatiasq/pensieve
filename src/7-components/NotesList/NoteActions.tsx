@@ -13,7 +13,7 @@ const IconContainer = styled.div`
   ${iconStyles}
 `;
 
-const Menu2 = styled(Menu)`
+const StyledMenu = styled(Menu)`
   --menu-gap: calc(--sidebar-gap * 2);
 
   ul {
@@ -23,7 +23,7 @@ const Menu2 = styled(Menu)`
   }
 `;
 
-const MenuItem2 = styled(MenuItem)`
+const StyledMenuItem = styled(MenuItem)`
   background-color: var(--bg-color-control);
   border-bottom: 1px solid var(--border-color);
 
@@ -83,21 +83,21 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
   const button = <IconButton {...divProps} icon={<MenuIcon title="asdf" />} />;
 
   return (
-    <Menu2 menuButton={button}>
-      <MenuItem2>
+    <StyledMenu menuButton={button}>
+      <StyledMenuItem>
         <a href={githubUrl} css={realMenuItem} target="_blank">
           <IconContainer>
             <GithubIcon title="Open note in Github" />
           </IconContainer>
           View in GitHub
         </a>
-      </MenuItem2>
-      <MenuItem2 onClick={handleRemove} css={realMenuItem}>
+      </StyledMenuItem>
+      <StyledMenuItem onClick={handleRemove} css={realMenuItem}>
         <IconContainer>
           <TrashIcon title="Remove note" />
         </IconContainer>
         Remove {note.title}
-      </MenuItem2>
-    </Menu2>
+      </StyledMenuItem>
+    </StyledMenu>
   );
 }
