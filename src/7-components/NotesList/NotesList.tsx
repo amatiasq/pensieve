@@ -1,21 +1,18 @@
 import styled from '@emotion/styled';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { hideScrollbar } from '../../0-dom/hideScrollbar';
 import { Note } from '../../2-entities/Note';
-import { useCreateNote } from '../../6-hooks/useCreateNote';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
 import { useNoteList } from '../../6-hooks/useNoteList';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
-import { IconButton } from '../atoms/IconButton';
-import { PlusIcon } from '../atoms/icons';
 import { Loader } from '../atoms/Loader';
 import { PresenceDetector } from '../atoms/PresenceDetector';
 import { Resizer } from '../atoms/Resizer';
-import { FilterBox } from './FilterBox';
 import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
+import { SidebarHeader } from './SidebarHeader';
 
 const INITIAL_ITEMS_COUNT = 50;
 const ITEMS_COUNT_INCREASE = 50;
@@ -27,18 +24,6 @@ const NotesListContainer = styled.aside`
   background-color: var(--bg-color-sidebar);
   transition: width 0.5s ease-in-out;
   max-height: 100%;
-`;
-
-const Header = styled.h4`
-  --spacing: calc(var(--sidebar-gap) * 1.5);
-
-  display: flex;
-  align-items: center;
-  gap: var(--spacing);
-  padding: 0 var(--spacing) 0 0;
-
-  z-index: 1;
-  box-shadow: rgba(0 0 0 / 0.16) 0px 3px 6px, rgba(0 0 0 / 0.23) 0px 3px 6px;
 `;
 
 const ListWrapper = styled.div`
@@ -66,6 +51,11 @@ const ListWrapper = styled.div`
     content: 'No results';
   }
 
+  &[data-scrolled] {
+    box-shadow: rgba(0 0 0 / 0.16) 0px 3px 6px inset,
+      rgba(0 0 0 / 0.23) 0px 3px 6px inset;
+  }
+
   &__end {
     text-align: center;
     padding: 8em 1em;
@@ -73,18 +63,29 @@ const ListWrapper = styled.div`
 `;
 
 export function NotesList() {
-  const createNote = useCreateNote();
-
-  const [itemsCount, setItemsCount] = useState(INITIAL_ITEMS_COUNT);
   const [list, loading] = useNoteList();
+  const [itemsCount, setItemsCount] = useState(INITIAL_ITEMS_COUNT);
   const [filter, setFilter] = useState<StringComparer | null>(null);
   const filtered = useFilteredNotes(list, filter);
 
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
   const [size, setSize] = useSetting('sidebarWidth');
 
-  useShortcut('newNote', createNote);
   useShortcut('hideSidebar', () => setIsVisible(!isVisible));
+
+  const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
+    const target = event.currentTarget;
+    const isScrolledNow = Boolean(target.scrollTop);
+    const wasScrolled = target.hasAttribute('data-scrolled');
+
+    if (isScrolledNow !== wasScrolled) {
+      if (isScrolledNow) {
+        target.setAttribute('data-scrolled', 'true');
+      } else {
+        target.removeAttribute('data-scrolled');
+      }
+    }
+  }, []);
 
   const renderMoreItems = useCallback(() => {
     const newCount = itemsCount + ITEMS_COUNT_INCREASE;
@@ -100,15 +101,9 @@ export function NotesList() {
 
   return (
     <NotesListContainer>
-      <Header>
-        <FilterBox onChange={setFilter} />
-        <IconButton
-          icon={<PlusIcon title="Create note" />}
-          onClick={createNote}
-        />
-      </Header>
+      <SidebarHeader onFilterChange={setFilter} />
 
-      <ListWrapper {...listProps}>
+      <ListWrapper {...listProps} onScroll={handleScroll}>
         {loading ? <Loader /> : renderList()}
       </ListWrapper>
 

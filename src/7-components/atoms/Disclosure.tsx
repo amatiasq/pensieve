@@ -26,7 +26,6 @@ const Summary = styled.summary`
   padding: var(--sidebar-gap);
   padding-right: calc(var(--sidebar-gap) * 2);
   cursor: default;
-  background-color: var(--group-color);
   border-left: var(--group-border-width) solid transparent;
   border-top: var(--group-border-width) solid transparent;
 

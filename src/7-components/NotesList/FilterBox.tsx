@@ -11,11 +11,12 @@ const FormControl = styled.div`
   display: flex;
   background-color: var(--bg-color-control);
   color: var(--fg-color);
-  padding: var(--spacing);
-  border-right: 1px solid var(--border-color);
+  margin: var(--sidebar-gap);
+  padding: var(--sidebar-gap);
+  margin-right: 0;
+  border: 1px solid var(--border-color);
 
   &:focus-within {
-    padding: calc(var(--spacing) - 1px);
     border: 1px solid var(--border-color-active);
   }
 `;
