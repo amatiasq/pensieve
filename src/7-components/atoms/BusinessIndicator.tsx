@@ -18,7 +18,7 @@ const Container = styled.div`
 `;
 
 const Icon = styled(LoadingIcon)`
-  fill: #6060f891;
+  fill: var(--bg-color-active);
 
   animation-name: rotate;
   animation-duration: 6s;

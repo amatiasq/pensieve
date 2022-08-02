@@ -1,4 +1,4 @@
-import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
 import { isMobile } from '../../0-dom/isMobile';
@@ -8,7 +8,7 @@ import { MobileFallback } from './MobileFallback';
 import { extendMonaco } from './monaco/extendMonaco';
 import * as hardcodedConfig from './monacoConfiguration';
 
-const StyledEditor = styled(Editor)`
+const styles = css`
   .monaco-editor {
     overflow: hidden;
   }
@@ -49,8 +49,8 @@ export function MonacoEditor({
   }
 
   return (
-    <StyledEditor
-      className="editor"
+    <Editor
+      css={styles}
       height={gap ? `calc(100vh - ${gap}` : '100vh'}
       theme={hardcodedConfig.theme}
       language={language}
