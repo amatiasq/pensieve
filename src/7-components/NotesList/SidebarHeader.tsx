@@ -3,7 +3,7 @@ import { useCreateNote } from '../../6-hooks/useCreateNote';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
 import { IconButton } from '../atoms/IconButton';
-import { PlusIcon } from '../atoms/icons';
+import { PlusIcon } from '../icons/PlusIcon';
 import { FilterBox } from './FilterBox';
 
 const Header = styled.h4`

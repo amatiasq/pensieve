@@ -4,7 +4,9 @@ import { useScheduler } from '../../6-hooks/useScheduler';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
 import { IconButton } from '../atoms/IconButton';
-import { CrossIcon, iconStyles, LoupeIcon } from '../atoms/icons';
+import { CrossIcon } from '../icons/CrossIcon';
+import { IconContainer } from '../icons/IconContainer';
+import { LoupeIcon } from '../icons/LoupeIcon';
 
 const FormControl = styled.div`
   flex: 1;
@@ -27,8 +29,7 @@ const Input = styled.input`
   color: var(--fg-color);
 `;
 
-const LoupeContainer = styled.div`
-  ${iconStyles};
+const LoupeContainer = styled(IconContainer)`
   transform: scale(0.8);
 `;
 

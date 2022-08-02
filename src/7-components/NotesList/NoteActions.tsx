@@ -7,11 +7,10 @@ import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
 import { useUsername } from '../../6-hooks/useUsername';
 import { IconButton } from '../atoms/IconButton';
-import { GithubIcon, iconStyles, MenuIcon, TrashIcon } from '../atoms/icons';
-
-const IconContainer = styled.div`
-  ${iconStyles}
-`;
+import { GithubIcon } from '../icons/GithubIcon';
+import { IconContainer } from '../icons/IconContainer';
+import { MenuIcon } from '../icons/MenuIcon';
+import { TrashIcon } from '../icons/TrashIcon';
 
 const StyledMenu = styled(Menu)`
   --menu-gap: calc(--sidebar-gap * 2);
@@ -69,8 +68,6 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
     if (!confirm(`Delete ${note!.title}?`)) {
       return;
     }
-
-    // event.preventDefault();
 
     if (navigator.isNote(id)) {
       navigator.goRoot();

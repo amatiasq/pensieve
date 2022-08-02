@@ -5,7 +5,8 @@ import React, {
   PropsWithChildren,
   useCallback,
 } from 'react';
-import { CaretIcon, iconStyles } from './icons';
+import { CaretIcon } from '../icons/CaretIcon';
+import { IconContainer } from '../icons/IconContainer';
 
 const Details = styled.details`
   summary svg:first-of-type {
@@ -76,9 +77,9 @@ export function Disclosure({
   return (
     <Details {...props} open={isOpen}>
       <Summary onClick={handleClick}>
-        <div css={iconStyles}>
+        <IconContainer>
           <CaretIcon title="Open / close group" />
-        </div>
+        </IconContainer>
         {summary}
       </Summary>
       {content}

@@ -3,7 +3,7 @@ import { forwardRef, useCallback } from 'react';
 import { NoteId } from '../../2-entities/Note';
 import { useNote } from '../../6-hooks/useNote';
 import { IconButton, IconButtonProps } from '../atoms/IconButton';
-import { StarIcon } from '../atoms/icons';
+import { StarIcon } from '../icons/StarIcont';
 
 type ClickEvent = React.MouseEvent<HTMLButtonElement, MouseEvent>;
 

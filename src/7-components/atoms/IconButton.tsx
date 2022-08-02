@@ -1,7 +1,16 @@
-import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { forwardRef } from 'react';
+import { iconContainerStyles } from '../icons/IconContainer';
 import { Button, ButtonProps } from './Button';
-import { interactiveIconStyles } from './icons';
+
+const StyledButton = styled(Button)`
+  ${iconContainerStyles};
+  color: #b7b7b7;
+
+  :hover {
+    background: rgb(255 255 255 / 0.2);
+  }
+`;
 
 export interface IconButtonProps extends ButtonProps {
   icon: JSX.Element;
@@ -13,14 +22,9 @@ export const IconButton = forwardRef(function IconButton(
 ) {
   const { icon, ...buttonProps } = props;
 
-  const styles = css`
-    ${interactiveIconStyles}
-    color: #b7b7b7;
-  `;
-
   return (
-    <Button {...buttonProps} ref={ref} css={styles}>
+    <StyledButton {...buttonProps} ref={ref}>
       {icon}
-    </Button>
+    </StyledButton>
   );
 });
