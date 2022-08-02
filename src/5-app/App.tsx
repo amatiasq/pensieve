@@ -1,13 +1,65 @@
+import { Global } from '@emotion/react';
+import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
+import { desktopOnly, mobileOnly } from '../0-dom/responsive';
 import { createStore } from '../4-storage';
 import { AppStorage } from '../4-storage/AppStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
 import { NotesList } from '../7-components/NotesList/NotesList';
-import './App.scss';
 import { StorageContext } from './contexts';
 import { Router } from './Router';
+import { globalStyles } from './theme';
 import { useGithubAuth } from './useGithubAuth';
+
+const StyledAppContainer = styled.div`
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+
+  font-family: Arial, Helvetica, sans-serif;
+
+  display: grid;
+  align-items: stretch;
+  align-content: stretch;
+  justify-items: stretch;
+  grid-template-rows: minmax(0, 1fr);
+
+  --gist-item-height: 28px;
+
+  > main {
+    grid-area: editor;
+    z-index: 1;
+  }
+
+  ${mobileOnly} {
+    grid-template-columns: 100vw;
+
+    &.page-home {
+      grid-template-areas: 'list';
+    }
+
+    &.page-note {
+      grid-template-areas: 'editor';
+
+      > aside {
+        display: none;
+      }
+    }
+  }
+
+  ${desktopOnly} {
+    &:not(.page-home) {
+      --sidebar-width: calc(
+        calc(var(--setting-sidebarWidth, 400) * var(--setting-sidebarVisible)) *
+          1px
+      );
+    }
+
+    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-areas: 'list editor';
+  }
+`;
 
 export function App() {
   const [store, setStore] = useState<AppStorage>(null!);
@@ -43,12 +95,13 @@ export function App() {
 
   return (
     <StorageContext.Provider value={store}>
-      <div className={`app page-${pageName}`}>
+      <Global styles={globalStyles} />
+      <StyledAppContainer className={`page-${pageName}`}>
         <NotesList />
         <main>
           <Router />
         </main>
-      </div>
+      </StyledAppContainer>
     </StorageContext.Provider>
   );
 }

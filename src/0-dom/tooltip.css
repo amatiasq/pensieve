@@ -30,20 +30,20 @@
 
   animation-name: tooltip-show-hide;
   animation-duration: 3s;
+}
 
-  &.top {
-    transform: translate(-50%, calc(-100% - 16px));
-  }
+.tooltip.top {
+  transform: translate(-50%, calc(-100% - 16px));
+}
 
-  &.bottom {
-    transform: translate(-50%, 16px);
-  }
+.tooltip.bottom {
+  transform: translate(-50%, 16px);
+}
 
-  &.left {
-    transform: translate(calc(-100% - 16px), -50%);
-  }
+.tooltip.left {
+  transform: translate(calc(-100% - 16px), -50%);
+}
 
-  &.right {
-    transform: translate(16px, -50%);
-  }
+.tooltip.right {
+  transform: translate(16px, -50%);
 }

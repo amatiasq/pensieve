@@ -24,9 +24,8 @@ const NoteItemContainer = styled.h5`
   cursor: pointer;
   gap: var(--sidebar-gap);
   padding: var(--sidebar-gap);
+  border: 1px solid transparent;
   border-left: var(--status-line-width) solid var(--status-line-color);
-  border-bottom: 1px solid transparent;
-  background-color: var(--note-item-color);
   user-select: none;
 
   &:hover {

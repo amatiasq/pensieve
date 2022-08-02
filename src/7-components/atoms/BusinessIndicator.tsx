@@ -40,9 +40,9 @@ export function BusinessIndicator() {
 
   useEffect(() => onBusinessChange(setIsBusy) as () => void);
 
-  // if (!isBusy) {
-  //   return null;
-  // }
+  if (!isBusy) {
+    return null;
+  }
 
   return (
     <Container>

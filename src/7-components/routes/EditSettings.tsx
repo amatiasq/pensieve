@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import styled from '@emotion/styled';
+import { useEffect, useState } from 'react';
 import { DEFAULT_SETTINGS } from '../../2-entities/Settings';
 import { DEFAULT_SHORTCUTS } from '../../2-entities/Shortcuts';
 import { RemoteJson } from '../../4-storage/helpers/RemoteJson';
@@ -7,7 +8,38 @@ import { useStore } from '../../6-hooks/useStore';
 import { isDeserializable, serialize } from '../../util/serialization';
 import { Loader } from '../atoms/Loader';
 import { Editor } from '../Editor/Editor';
-import './EditSettings.scss';
+
+const SettingsEditor = styled.div`
+  flex: 1;
+`;
+
+const TabContainer = styled.nav`
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-height: 2rem;
+  border-left: 1px solid var(--border-color);
+  background-color: var(--bg-color-sidebar);
+  padding: var(--sidebar-gap);
+  gap: calc(var(--sidebar-gap) * 2);
+`;
+
+const Tab = styled.div`
+  --spacing: calc(var(--sidebar-gap) * 1.6);
+
+  cursor: default;
+  border: 1px solid var(--border-color);
+  padding: var(--spacing);
+
+  &:first-of-type {
+    border-left: 1px solid var(--border-color);
+  }
+
+  &.active,
+  &:hover {
+    background-color: var(--bg-color-hover);
+  }
+`;
 
 function useRemoteJson<T>(remote: RemoteJson<T>) {
   const [loading, setLoading] = useState(true);
@@ -71,20 +103,24 @@ export function EditSettings() {
   const { loading, ...selected } = tabs[tab];
 
   return (
-    <div className="settings-editor">
-      <nav>
+    <SettingsEditor>
+      <TabContainer>
         {tabs.map((x, i) => (
-          <div key={x.title} className="tab" onClick={() => setTab(i)}>
+          <Tab
+            key={x.title}
+            className={tab === i ? 'active' : undefined}
+            onClick={() => setTab(i)}
+          >
             {x.title}
-          </div>
+          </Tab>
         ))}
-      </nav>
+      </TabContainer>
 
       {loading ? (
         <Loader />
       ) : (
         <Editor key={selected.title} gap="33px" ext=".json" {...selected} />
       )}
-    </div>
+    </SettingsEditor>
   );
 }

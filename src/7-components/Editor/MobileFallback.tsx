@@ -1,11 +1,40 @@
+import { css } from '@emotion/react';
+import styled from '@emotion/styled';
 import { useMonaco } from '@monaco-editor/react';
 import { createRef, useEffect, useState } from 'react';
+import { hideScrollbar } from '../../0-dom/hideScrollbar';
 import { useSetting } from '../../6-hooks/useSetting';
-import './MobileFallback.scss';
 import { extendMonaco } from './monaco/extendMonaco';
 import { theme } from './monacoConfiguration';
 
-// import MarkdownPreview from '@uiw/react-markdown-preview';
+const Fallback = css`
+  box-sizing: border-box;
+  padding: 24px;
+  height: 100vh;
+  --toolbar-height: 0;
+`;
+
+const Preview = styled.pre`
+  ${Fallback}
+  ${hideScrollbar}
+  font-size: 13px;
+  line-height: 1.15rem;
+  overflow: auto;
+`;
+
+const Textarea = styled.textarea`
+  ${Fallback}
+  appearance: none;
+  border: none;
+  outline: none;
+  padding: 8px;
+  background-color: #1c1c1c;
+  color: inherit;
+  width: 100%;
+  height: calc(100vh - var(--toolbar-height));
+  padding: 32px;
+  box-sizing: border-box;
+`;
 
 export interface MobileFallbackProps {
   language: string;
@@ -46,37 +75,22 @@ export function MobileFallback({
 
   if (!isPreview) {
     return (
-      <textarea
+      <Textarea
         ref={x => x?.style.setProperty('--toolbar-height', `${gap || 0}px`)}
-        className="mobile-fallback mobile-fallback--textarea"
         defaultValue={value}
         readOnly={readonly}
         autoFocus={autofocus}
         autoComplete=""
         onChange={e => onChange(e.target.value)}
-      ></textarea>
+      />
     );
   }
 
-  // if (language === 'markdown') {
-  //   return (
-  //     <div
-  //       className="mobile-fallback mobile-fallback--markdown"
-  //       onClick={() => setIsPreview(false)}
-  //     >
-  //       <MarkdownPreview className="mobile-fallback--renderer" source={value} />
-  //     </div>
-  //   );
-  // }
-
   return (
-    <pre
-      className="mobile-fallback mobile-fallback--code"
-      onClick={() => setIsPreview(false)}
-    >
+    <Preview onClick={() => setIsPreview(false)}>
       <code ref={ref} lang={language} data-lang={language}>
         {value}
       </code>
-    </pre>
+    </Preview>
   );
 }
