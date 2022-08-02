@@ -62,7 +62,6 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
 
   const navigator = useNavigator();
   const username = useUsername();
-  const githubUrl = `https://github.com/${username}/pensieve-data/blob/main/note/${note.id}`;
 
   const handleRemove = useCallback(() => {
     if (!confirm(`Delete ${note!.title}?`)) {
@@ -80,6 +79,7 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
 
   if (!note) return null;
 
+  const githubUrl = `https://github.com/${username}/pensieve-data/blob/main/note/${note.id}`;
   const button = <IconButton {...divProps} icon={<MenuIcon title="asdf" />} />;
 
   return (

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { useCallback } from 'react';
+import { forwardRef, useCallback } from 'react';
 import { NoteId } from '../../2-entities/Note';
 import { useNote } from '../../6-hooks/useNote';
 import { IconButton, IconButtonProps } from '../atoms/IconButton';
@@ -27,11 +27,10 @@ export interface FavoriteButtonProps
   id: NoteId;
 }
 
-export function FavoriteButton({
-  id,
-  className = '',
-  ...props
-}: FavoriteButtonProps) {
+export const FavoriteButton = forwardRef(function FavoriteButton(
+  { id, className = '', ...props }: FavoriteButtonProps,
+  ref: any,
+) {
   const [note, { toggleFavorite }] = useNote(id);
 
   const handleClick = useCallback(
@@ -53,9 +52,10 @@ export function FavoriteButton({
   return (
     <FavouriteButtonContainer
       {...props}
+      ref={ref}
       icon={icon}
       className={`${className} ${note.favorite ? 'on' : 'off'}`}
       onClick={handleClick}
     />
   );
-}
+});
