@@ -10,7 +10,7 @@ const color = (hex: string) => (l?: number) => {
 };
 
 const fg = color('#c4c4c4');
-const bg = color('#1c1c1c');
+const bg = color('rgb(30, 30, 30)');
 const sidebar = color('#252526');
 const border = color('#343637');
 const primary = color('#669bd1');

@@ -12,7 +12,6 @@ import { PresenceDetector } from '../atoms/PresenceDetector';
 import { Resizer } from '../atoms/Resizer';
 import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
-import { SidebarHeader } from './SidebarHeader';
 
 const INITIAL_ITEMS_COUNT = 50;
 const ITEMS_COUNT_INCREASE = 50;
@@ -62,10 +61,14 @@ const ListWrapper = styled.div`
   }
 `;
 
-export function NotesList() {
+export interface NotesListProps {
+  filter: StringComparer | null;
+}
+
+export function NotesList({ filter }: NotesListProps) {
   const [list, loading] = useNoteList();
   const [itemsCount, setItemsCount] = useState(INITIAL_ITEMS_COUNT);
-  const [filter, setFilter] = useState<StringComparer | null>(null);
+
   const filtered = useFilteredNotes(list, filter);
 
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
@@ -101,8 +104,6 @@ export function NotesList() {
 
   return (
     <NotesListContainer>
-      <SidebarHeader onFilterChange={setFilter} />
-
       <ListWrapper {...listProps} onScroll={handleScroll}>
         {loading ? <Loader /> : renderList()}
       </ListWrapper>

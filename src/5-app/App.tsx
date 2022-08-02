@@ -7,6 +7,8 @@ import { AppStorage } from '../4-storage/AppStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
 import { Loader } from '../7-components/atoms/Loader';
 import { NotesList } from '../7-components/NotesList/NotesList';
+import { SidebarHeader } from '../7-components/NotesList/SidebarHeader';
+import StringComparer from '../util/StringComparer';
 import { StorageContext } from './contexts';
 import { Router } from './Router';
 import { globalStyles } from './theme';
@@ -23,7 +25,8 @@ const StyledAppContainer = styled.div`
   align-items: stretch;
   align-content: stretch;
   justify-items: stretch;
-  grid-template-rows: minmax(0, 1fr);
+
+  grid-template-rows: auto 1fr;
 
   --gist-item-height: 28px;
 
@@ -36,15 +39,26 @@ const StyledAppContainer = styled.div`
     grid-template-columns: 100vw;
 
     &.page-home {
-      grid-template-areas: 'list';
+      grid-template-areas:
+        'sidebar-header'
+        'list';
     }
 
     &.page-note {
-      grid-template-areas: 'editor';
+      grid-template-rows: minmax(0, 1fr);
+      grid-template-areas:
+        'editor'
+        'editor';
 
       > aside {
         display: none;
       }
+    }
+
+    &.page-settings {
+      grid-template-areas:
+        'settings-header'
+        'editor';
     }
   }
 
@@ -57,7 +71,15 @@ const StyledAppContainer = styled.div`
     }
 
     grid-template-columns: var(--sidebar-width) 1fr;
-    grid-template-areas: 'list editor';
+    grid-template-areas:
+      'sidebar-header editor'
+      'list editor';
+
+    &.page-settings {
+      grid-template-areas:
+        'sidebar-header settings-header'
+        'list editor';
+    }
   }
 `;
 
@@ -66,6 +88,7 @@ export function App() {
   const { token, username } = useGithubAuth();
   const navigator = useNavigator();
   const [pageName, setPageName] = useState(navigator.getPageName());
+  const [filter, setFilter] = useState<StringComparer | null>(null);
 
   useEffect(() => {
     if (!token || !username) return;
@@ -97,10 +120,9 @@ export function App() {
     <StorageContext.Provider value={store}>
       <Global styles={globalStyles} />
       <StyledAppContainer className={`page-${pageName}`}>
-        <NotesList />
-        <main>
-          <Router />
-        </main>
+        <SidebarHeader onFilterChange={setFilter} />
+        <NotesList filter={filter} />
+        <Router />
       </StyledAppContainer>
     </StorageContext.Provider>
   );

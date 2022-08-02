@@ -9,10 +9,12 @@ import { FilterBox } from './FilterBox';
 const Header = styled.h4`
   --sidebar-header-gap: calc(var(--sidebar-gap) * 2);
 
+  grid-area: sidebar-header;
   display: flex;
   align-items: center;
   gap: var(--sidebar-header-gap);
-  padding: 0 var(--sidebar-header-gap) 0 0;
+  padding: 0 var(--sidebar-header-gap);
+  background-color: var(--bg-color-sidebar);
 `;
 
 const NewNoteButton = styled(IconButton)`

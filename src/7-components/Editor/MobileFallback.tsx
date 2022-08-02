@@ -11,7 +11,7 @@ const Fallback = css`
   box-sizing: border-box;
   padding: 24px;
   height: 100vh;
-  --toolbar-height: 0;
+  --toolbar-height: 0px;
 `;
 
 const Preview = styled.pre`
@@ -31,7 +31,7 @@ const Textarea = styled.textarea`
   background-color: #1c1c1c;
   color: inherit;
   width: 100%;
-  height: calc(100vh - var(--toolbar-height));
+  // height: calc(100vh - var(--toolbar-height));
   padding: 32px;
   box-sizing: border-box;
 `;

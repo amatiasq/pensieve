@@ -1,4 +1,5 @@
 import { emitter } from '@amatiasq/emitter';
+import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { debounceTime, map, mergeWith } from 'rxjs/operators';
@@ -26,6 +27,10 @@ type EditableEditorProps = BaseEditorProps & {
   onChange?(unsaved: string): void;
   onSave(newValue: string, options: { urgent: boolean }): void;
 };
+
+const EditorContainer = styled.div`
+  grid-area: editor;
+`;
 
 export type EditorProps = ReadonlyEditorProps | EditableEditorProps;
 
@@ -88,13 +93,13 @@ export function Editor(props: EditorProps) {
     .subscribe(options => hasUnsavedChanges && forceSave(options || {}));
 
   return (
-    <div>
+    <EditorContainer>
       <MonacoEditor
         {...{ ext, gap, value, readonly }}
         onChange={onEditorChange}
       />
       <BusinessIndicator />
-    </div>
+    </EditorContainer>
   );
 
   function onEditorChange(value = '') {

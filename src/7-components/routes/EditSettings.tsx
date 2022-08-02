@@ -9,18 +9,18 @@ import { isDeserializable, serialize } from '../../util/serialization';
 import { Loader } from '../atoms/Loader';
 import { Editor } from '../Editor/Editor';
 
-const SettingsEditor = styled.div`
-  flex: 1;
+const EditorLoader = styled(Loader)`
+  grid-area: editor;
 `;
 
 const TabContainer = styled.nav`
+  grid-area: settings-header;
   display: flex;
-  align-items: stretch;
+  align-items: center;
   justify-content: center;
   min-height: 2rem;
   padding: var(--sidebar-gap);
   gap: calc(var(--sidebar-gap) * 2);
-  border-left: 1px solid var(--border-color);
   background-color: var(--bg-color);
 `;
 
@@ -104,7 +104,7 @@ export function EditSettings() {
   const { loading, ...selected } = tabs[tab];
 
   return (
-    <SettingsEditor>
+    <>
       <TabContainer>
         {tabs.map((x, i) => (
           <Tab
@@ -118,10 +118,10 @@ export function EditSettings() {
       </TabContainer>
 
       {loading ? (
-        <Loader />
+        <EditorLoader />
       ) : (
         <Editor key={selected.title} gap="33px" ext=".json" {...selected} />
       )}
-    </SettingsEditor>
+    </>
   );
 }
