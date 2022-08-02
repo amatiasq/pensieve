@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { createRef, useState } from 'react';
+import { createRef, useCallback, useState } from 'react';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
@@ -27,11 +27,16 @@ const Input = styled.input`
   padding: var(--spacing);
 `;
 
-export function FilterBox({
-  onChange,
-}: {
+const LoupeContainer = styled.div`
+  ${iconStyles};
+  transform: scale(0.8);
+`;
+
+export interface FilterBoxProps {
   onChange: (comparer: StringComparer | null) => void;
-}) {
+}
+
+export function FilterBox({ onChange }: FilterBoxProps) {
   const ref = createRef<HTMLInputElement>();
   const [term, setTerm] = useState('');
   const scheduler = useScheduler(50, () =>
@@ -40,11 +45,29 @@ export function FilterBox({
 
   useShortcut('clearFilter', () => process(''));
 
+  const process = useCallback(
+    (value: string) => {
+      if (ref.current) {
+        ref.current.value = value;
+      }
+
+      setTerm(value);
+      scheduler.restart();
+    },
+    [ref, scheduler],
+  );
+
+  const handleInputChange = useCallback(
+    e => process(e.target.value),
+    [process],
+  );
+  const handleClearButton = useCallback(() => process(''), [process]);
+
   return (
     <FormControl>
-      <div css={iconStyles}>
+      <LoupeContainer>
         <LoupeIcon title="Filter" />
-      </div>
+      </LoupeContainer>
 
       <Input
         ref={ref}
@@ -52,24 +75,15 @@ export function FilterBox({
         type="text"
         placeholder="Filter..."
         defaultValue={term}
-        onChange={e => process(e.target.value)}
+        onChange={handleInputChange}
       />
 
       {term ? (
         <IconButton
           icon={<CrossIcon title="Clear filter" />}
-          onClick={() => process('')}
+          onClick={handleClearButton}
         />
       ) : null}
     </FormControl>
   );
-
-  function process(value: string) {
-    if (ref.current) {
-      ref.current.value = value;
-    }
-
-    setTerm(value);
-    scheduler.restart();
-  }
 }

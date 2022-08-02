@@ -20,6 +20,7 @@ const StyledMenu = styled(Menu)`
     border-radius: 5px;
     overflow: hidden;
     border: 1px solid var(--border-color);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   }
 `;
 
