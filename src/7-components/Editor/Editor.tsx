@@ -1,5 +1,5 @@
 import { emitter } from '@amatiasq/emitter';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { debounceTime, map, mergeWith } from 'rxjs/operators';
 import { onPageActive } from '../../0-dom/page-lifecycle';

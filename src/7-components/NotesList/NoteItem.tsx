@@ -7,27 +7,27 @@ import { useNote } from '../../6-hooks/useNote';
 import { FavoriteButton } from './FavoriteButton';
 import { NoteActions } from './NoteActions';
 
-const Title = styled.h5`
+const Title = styled(Link)`
   flex: 1;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   line-height: 1.5em;
+  font-weight: 500;
+  color: var(--fg-color);
+  text-decoration: none;
 `;
 
-const NoteItemContainer = styled(Link)`
+const NoteItemContainer = styled.h5`
   display: flex;
   align-items: center;
   cursor: pointer;
   gap: var(--sidebar-gap);
   padding: var(--sidebar-gap);
-  font-weight: 500;
   border-left: var(--status-line-width) solid var(--status-line-color);
   border-bottom: 1px solid transparent;
   background-color: var(--note-item-color);
   user-select: none;
-  color: var(--fg-color);
-  text-decoration: none;
 
   &:hover {
     background-color: var(--bg-color-hover);
@@ -72,15 +72,16 @@ export function NoteItem({ id, className = '' }: NoteItemProps) {
 
   if (!note) return null;
 
+  const cn = [
+    className,
+    active ? 'active' : '',
+    note.favorite ? 'favorite' : '',
+  ].join(' ');
+
   return (
-    <NoteItemContainer
-      to={navigator.toNote(note)}
-      className={`${className} ${active ? 'active' : ''} ${
-        note.favorite ? 'favorite' : ''
-      }`}
-    >
+    <NoteItemContainer className={cn}>
       <FavoriteButton id={note.id} className="star" />
-      <Title>{note.title}</Title>
+      <Title to={navigator.toNote(note)}>{note.title}</Title>
       <NoteActions id={note.id} className="actions" />
     </NoteItemContainer>
   );

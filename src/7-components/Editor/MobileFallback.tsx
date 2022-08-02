@@ -1,5 +1,5 @@
 import { useMonaco } from '@monaco-editor/react';
-import React, { createRef, useEffect, useState } from 'react';
+import { createRef, useEffect, useState } from 'react';
 import { useSetting } from '../../6-hooks/useSetting';
 import './MobileFallback.scss';
 import { extendMonaco } from './monaco/extendMonaco';

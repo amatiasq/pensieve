@@ -1,4 +1,5 @@
 import { css } from '@emotion/react';
+import { forwardRef } from 'react';
 import { Button, ButtonProps } from './Button';
 import { interactiveIconStyles } from './icons';
 
@@ -6,7 +7,10 @@ export interface IconButtonProps extends ButtonProps {
   icon: JSX.Element;
 }
 
-export function IconButton(props: IconButtonProps) {
+export const IconButton = forwardRef(function IconButton(
+  props: IconButtonProps,
+  ref: any,
+) {
   const { icon, ...buttonProps } = props;
 
   const styles = css`
@@ -15,8 +19,8 @@ export function IconButton(props: IconButtonProps) {
   `;
 
   return (
-    <Button {...buttonProps} css={styles}>
+    <Button {...buttonProps} ref={ref} css={styles}>
       {icon}
     </Button>
   );
-}
+});

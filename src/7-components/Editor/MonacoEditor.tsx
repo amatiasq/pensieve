@@ -1,6 +1,5 @@
 import Editor, { useMonaco } from '@monaco-editor/react';
 import { editor } from 'monaco-editor';
-import React from 'react';
 import { isMobile } from '../../0-dom/isMobile';
 import { getMetadataFromContent } from '../../2-entities/Note';
 import { useSetting } from '../../6-hooks/useSetting';
