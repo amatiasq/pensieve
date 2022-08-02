@@ -1,4 +1,4 @@
-import { icon } from './icons';
+import { icon } from './icon';
 
 export const GithubIcon = icon(
   <svg
