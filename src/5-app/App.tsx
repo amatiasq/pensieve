@@ -28,8 +28,6 @@ const StyledAppContainer = styled.div`
 
   grid-template-rows: auto 1fr;
 
-  --gist-item-height: 28px;
-
   > main {
     grid-area: editor;
     z-index: 1;
@@ -63,14 +61,13 @@ const StyledAppContainer = styled.div`
   }
 
   ${desktopOnly} {
-    &:not(.page-home) {
-      --sidebar-width: calc(
-        calc(var(--setting-sidebarWidth, 400) * var(--setting-sidebarVisible)) *
-          1px
-      );
-    }
+    --sidebar-width: calc(
+      calc(var(--setting-sidebarWidth, 400) * var(--setting-sidebarVisible)) *
+        1px
+    );
 
     grid-template-columns: var(--sidebar-width) 1fr;
+
     grid-template-areas:
       'sidebar-header editor'
       'list editor';
