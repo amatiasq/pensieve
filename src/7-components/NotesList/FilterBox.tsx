@@ -30,7 +30,10 @@ const Input = styled.input`
 `;
 
 const LoupeContainer = styled(IconContainer)`
-  transform: scale(0.8);
+  svg {
+    fill: transparent;
+    stroke: var(--fg-color);
+  }
 `;
 
 export interface FilterBoxProps {
