@@ -18,18 +18,19 @@ const TabContainer = styled.nav`
   align-items: stretch;
   justify-content: center;
   min-height: 2rem;
-  border-left: 1px solid var(--border-color);
-  background-color: var(--bg-color-sidebar);
   padding: var(--sidebar-gap);
   gap: calc(var(--sidebar-gap) * 2);
+  border-left: 1px solid var(--border-color);
+  background-color: var(--bg-color);
 `;
 
 const Tab = styled.div`
   --spacing: calc(var(--sidebar-gap) * 1.6);
 
   cursor: default;
-  border: 1px solid var(--border-color);
   padding: var(--spacing);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-color-sidebar);
 
   &:first-of-type {
     border-left: 1px solid var(--border-color);

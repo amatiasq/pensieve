@@ -2,13 +2,12 @@ import { css } from '@emotion/react';
 import Color from 'colorjs.io';
 import { desktopOnly, mobileOnly } from '../0-dom/responsive';
 
-const color =
-  (hex: string) =>
-  (l = 0) => {
-    const color = new Color(hex).to('lch');
-    color.set('l', color.l + l);
-    return color.to('sRGB').toString();
-  };
+const color = (hex: string) => (l?: number) => {
+  if (!l) return hex;
+  const color = new Color(hex).to('lch');
+  color.set('l', color.l + l);
+  return color.to('sRGB').toString();
+};
 
 const fg = color('#c4c4c4');
 const bg = color('#1c1c1c');
