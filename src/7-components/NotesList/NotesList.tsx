@@ -35,7 +35,7 @@ const Header = styled.h4`
   display: flex;
   align-items: center;
   gap: var(--spacing);
-  padding-right: var(--spacing);
+  padding: var(--spacing);
   border-bottom: 1px solid var(--border-color);
 `;
 
