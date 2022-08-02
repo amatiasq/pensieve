@@ -35,8 +35,10 @@ const Header = styled.h4`
   display: flex;
   align-items: center;
   gap: var(--spacing);
-  padding: var(--spacing);
-  border-bottom: 1px solid var(--border-color);
+  padding: 0 var(--spacing) 0 0;
+
+  z-index: 1;
+  box-shadow: rgba(0 0 0 / 0.16) 0px 3px 6px, rgba(0 0 0 / 0.23) 0px 3px 6px;
 `;
 
 const ListWrapper = styled.div`

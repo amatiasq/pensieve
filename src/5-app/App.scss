@@ -114,5 +114,6 @@ body {
 
   > main {
     grid-area: editor;
+    z-index: 1;
   }
 }

@@ -17,6 +17,7 @@ const StyledMenu = styled(Menu)`
   --menu-gap: calc(--sidebar-gap * 2);
 
   ul {
+    z-index: 10;
     border-radius: 5px;
     overflow: hidden;
     border: 1px solid var(--border-color);
