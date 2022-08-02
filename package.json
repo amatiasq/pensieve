@@ -52,6 +52,7 @@
     "dotenv": "^10.0.0",
     "eslint": "^7.19.0",
     "husky": "^7.0.1",
+    "rollup-plugin-visualizer": "^5.7.1",
     "typescript": "^4.3.5",
     "vite": "^3.0.4",
     "vite-plugin-pwa": "^0.12.3"
