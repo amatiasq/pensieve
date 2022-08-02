@@ -7,23 +7,16 @@ import { useNote } from '../../6-hooks/useNote';
 import { FavoriteButton } from './FavoriteButton';
 import { NoteActions } from './NoteActions';
 
-const Title = styled(Link)`
-  flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  line-height: 1.5em;
-  font-weight: 500;
-  color: var(--fg-color);
-  text-decoration: none;
-`;
+const StyledFavouriteButton = styled(FavoriteButton)``;
+
+const StyledActions = styled(NoteActions)``;
 
 const NoteItemContainer = styled.h5`
   display: flex;
   align-items: center;
   cursor: pointer;
   gap: var(--sidebar-gap);
-  padding: var(--sidebar-gap);
+  padding: 0 var(--sidebar-gap);
   border: 1px solid transparent;
   border-left: var(--status-line-width) solid var(--status-line-color);
   user-select: none;
@@ -33,11 +26,11 @@ const NoteItemContainer = styled.h5`
   }
 
   &:not(:hover) {
-    .actions {
+    ${StyledActions} {
       display: none;
     }
 
-    &:not(.favorite) .star {
+    &:not(.favorite) ${StyledFavouriteButton} {
       visibility: hidden;
     }
   }
@@ -46,6 +39,18 @@ const NoteItemContainer = styled.h5`
     color: var(--fg-color-active);
     background-color: var(--bg-color-active);
   }
+`;
+
+const Title = styled(Link)`
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.5em;
+  font-weight: 500;
+  color: var(--fg-color);
+  text-decoration: none;
+  padding: calc(var(--sidebar-gap) + 5.2px) 0;
 `;
 
 export interface NoteItemProps {
@@ -79,9 +84,9 @@ export function NoteItem({ id, className = '' }: NoteItemProps) {
 
   return (
     <NoteItemContainer className={cn}>
-      <FavoriteButton id={note.id} className="star" />
+      <StyledFavouriteButton id={note.id} />
       <Title to={navigator.toNote(note)}>{note.title}</Title>
-      <NoteActions id={note.id} className="actions" />
+      <StyledActions id={note.id} />
     </NoteItemContainer>
   );
 }
