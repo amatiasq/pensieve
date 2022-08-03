@@ -101,8 +101,8 @@ export function App() {
 
     document.body.addEventListener(
       'click',
-      (e: MouseEvent) =>
-        handleLinkClick(e, e.target as HTMLAnchorElement, navigator.go),
+      event =>
+        handleLinkClick(event, event.target as HTMLAnchorElement, navigator.go),
       { capture: true, signal: abort.signal } as AddEventListenerOptions,
     );
 
@@ -126,7 +126,7 @@ export function App() {
 }
 
 function handleLinkClick(
-  e: MouseEvent,
+  event: MouseEvent,
   link: HTMLAnchorElement,
   go: (url: string) => unknown,
 ) {
@@ -140,8 +140,8 @@ function handleLinkClick(
     return;
   }
 
-  e.preventDefault();
-  e.stopImmediatePropagation();
+  event.preventDefault();
+  event.stopImmediatePropagation();
 
   go(href.replace(location.origin, ''));
 }
