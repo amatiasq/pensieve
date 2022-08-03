@@ -1,18 +1,13 @@
-import { Global } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { desktopOnly, mobileOnly } from '../0-dom/responsive';
-import { createStore } from '../4-storage';
-import { AppStorage } from '../4-storage/AppStorage';
 import { useNavigator } from '../6-hooks/useNavigator';
-import { Loader } from '../7-components/atoms/Loader';
+import { useSetting } from '../6-hooks/useSetting';
+import { Resizer } from '../7-components/atoms/Resizer';
 import { NotesList } from '../7-components/NotesList/NotesList';
-import { SidebarHeader } from '../7-components/NotesList/SidebarHeader';
+import { SidebarHeader } from '../7-components/SidebarHeader/SidebarHeader';
 import StringComparer from '../util/StringComparer';
-import { StorageContext } from './contexts';
 import { Router } from './Router';
-import { globalStyles } from './theme';
-import { useGithubAuth } from './useGithubAuth';
 
 const StyledAppContainer = styled.div`
   height: 100vh;
@@ -26,7 +21,8 @@ const StyledAppContainer = styled.div`
   align-content: stretch;
   justify-items: stretch;
 
-  grid-template-rows: auto 1fr;
+  --header-height: calc(var(--note-item-height) * 1.3);
+  grid-template-rows: var(--header-height) 1fr;
 
   > main {
     grid-area: editor;
@@ -42,20 +38,16 @@ const StyledAppContainer = styled.div`
         'list';
     }
 
+    &.page-settings {
+      grid-template-areas:
+        'settings-header'
+        'editor';
+    }
+
     &.page-note {
       grid-template-rows: minmax(0, 1fr);
       grid-template-areas:
         'editor'
-        'editor';
-
-      > aside {
-        display: none;
-      }
-    }
-
-    &.page-settings {
-      grid-template-areas:
-        'settings-header'
         'editor';
     }
   }
@@ -66,31 +58,29 @@ const StyledAppContainer = styled.div`
         1px
     );
 
-    grid-template-columns: var(--sidebar-width) 1fr;
+    grid-template-columns: var(--sidebar-width) 5px 1fr;
 
     grid-template-areas:
-      'sidebar-header editor'
-      'list editor';
+      'sidebar-header resizer editor'
+      'list resizer editor';
 
     &.page-settings {
       grid-template-areas:
-        'sidebar-header settings-header'
-        'list editor';
+        'sidebar-header resizer settings-header'
+        'list resizer editor';
     }
   }
 `;
 
+const GridResizer = styled(Resizer)`
+  grid-area: resizer;
+`;
+
 export function App() {
-  const [store, setStore] = useState<AppStorage>(null!);
-  const { token, username } = useGithubAuth();
   const navigator = useNavigator();
   const [pageName, setPageName] = useState(navigator.getPageName());
   const [filter, setFilter] = useState<StringComparer | null>(null);
-
-  useEffect(() => {
-    if (!token || !username) return;
-    createStore(token, username, 'pensieve-data').then(setStore);
-  }, [token]);
+  const [size, setSize] = useSetting('sidebarWidth');
 
   useEffect(() =>
     navigator.onNavigate(next => setPageName(next.getPageName())),
@@ -109,19 +99,13 @@ export function App() {
     return () => abort.abort();
   }, [navigator.go]);
 
-  if (!store) {
-    return <Loader />;
-  }
-
   return (
-    <StorageContext.Provider value={store}>
-      <Global styles={globalStyles} />
-      <StyledAppContainer className={`page-${pageName}`}>
-        <SidebarHeader onFilterChange={setFilter} />
-        <NotesList filter={filter} />
-        <Router />
-      </StyledAppContainer>
-    </StorageContext.Provider>
+    <StyledAppContainer className={`page-${pageName}`}>
+      <SidebarHeader onFilterChange={setFilter} />
+      <NotesList filter={filter} />
+      <GridResizer size={size} onChange={setSize} />
+      <Router />
+    </StyledAppContainer>
   );
 }
 

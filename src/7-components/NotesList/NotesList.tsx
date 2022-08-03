@@ -8,7 +8,6 @@ import { useShortcut } from '../../6-hooks/useShortcut';
 import StringComparer from '../../util/StringComparer';
 import { Loader } from '../atoms/Loader';
 import { PresenceDetector } from '../atoms/PresenceDetector';
-import { Resizer } from '../atoms/Resizer';
 import { hideScrollbar } from '../styles';
 import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
@@ -17,20 +16,13 @@ const INITIAL_ITEMS_COUNT = 50;
 const ITEMS_COUNT_INCREASE = 50;
 
 const NotesListContainer = styled.aside`
-  grid-area: list;
-  display: flex;
-  flex-direction: column;
-  background-color: var(--bg-color-sidebar);
-  transition: width 0.5s ease-in-out;
-  max-height: 100%;
-`;
-
-const ListWrapper = styled.div`
   ${hideScrollbar};
 
-  flex: 1;
-  overflow-y: auto;
+  grid-area: list;
+  background-color: var(--bg-color-sidebar);
+  transition: width 0.5s ease-in-out;
   font-size: var(--sidebar-font-size);
+  overflow-y: auto;
 
   &:empty {
     position: relative;
@@ -72,7 +64,6 @@ export function NotesList({ filter }: NotesListProps) {
   const filtered = useFilteredNotes(list, filter);
 
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
-  const [size, setSize] = useSetting('sidebarWidth');
 
   useShortcut('hideSidebar', () => setIsVisible(!isVisible));
 
@@ -103,12 +94,8 @@ export function NotesList({ filter }: NotesListProps) {
   const listProps = filter ? { 'data-filter': true } : {};
 
   return (
-    <NotesListContainer>
-      <ListWrapper {...listProps} onScroll={handleScroll}>
-        {loading ? <Loader /> : renderList()}
-      </ListWrapper>
-
-      <Resizer size={size} onChange={setSize} />
+    <NotesListContainer {...listProps} onScroll={handleScroll}>
+      {loading ? <Loader /> : renderList()}
     </NotesListContainer>
   );
 

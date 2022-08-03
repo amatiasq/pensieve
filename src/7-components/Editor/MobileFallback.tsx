@@ -81,7 +81,7 @@ export function MobileFallback({
         readOnly={readonly}
         autoFocus={autofocus}
         autoComplete=""
-        onChange={e => onChange(e.target.value)}
+        onResize={e => onChange(e.target.value)}
       />
     );
   }

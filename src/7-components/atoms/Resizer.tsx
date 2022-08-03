@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
-import React, { useState } from 'react';
+import React, { HTMLAttributes, useCallback, useState } from 'react';
 
-const Main = styled.div`
-  width: 5px;
+const Draggable = styled.div`
+  height: 100vh;
   cursor: ew-resize;
 
   &:hover {
@@ -10,37 +10,41 @@ const Main = styled.div`
   }
 `;
 
-export interface ResizerProps {
+export interface ResizerProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
   size: number;
   onChange: (newSize: number) => void;
 }
 
-export function Resizer(props: ResizerProps) {
+export function Resizer({ size, onChange, ...divProps }: ResizerProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const [initialPosition, setInitialPosition] = useState(props.size);
+  const [initialPosition, setInitialPosition] = useState(size);
   const [delta, setDelta] = useState([0, 0]);
 
-  const dragStart = (event: React.DragEvent<HTMLDivElement>) => {
+  const dragStart = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     setIsDragging(true);
     setInitialPosition(event.clientX);
     setDelta([0, 0]);
-  };
+  }, []);
 
-  const dragMove = (event: React.DragEvent<HTMLDivElement>) => {
-    isDragging && setDelta([delta[1], event.clientX - initialPosition]);
-  };
+  const dragMove = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      isDragging && setDelta([delta[1], event.clientX - initialPosition]);
+    },
+    [isDragging, initialPosition, delta],
+  );
 
-  const dragEnd = () => {
+  const dragEnd = useCallback(() => {
     const pos = initialPosition + delta[0];
     setIsDragging(false);
     setInitialPosition(pos);
-    props.onChange(pos);
-  };
+    onChange(pos);
+  }, [initialPosition, delta, onChange]);
 
   return (
-    <Main
-      className="resizer"
-      draggable={true}
+    <Draggable
+      {...divProps}
+      draggable
       onDragStart={dragStart}
       onDrag={dragMove}
       onDragEnd={dragEnd}

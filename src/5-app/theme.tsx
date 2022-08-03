@@ -25,12 +25,11 @@ export const globalStyles = css`
     width: 100vw;
     height: 100vh;
 
-    --note-item-height: 3rem;
-
     &.is-virtual-keyboard-open .mobile-fallback {
       height: 50%;
     }
 
+    --note-item-height: 3rem;
     --animation-speed: 0.25s;
     --group-border-width: 2px;
     --status-line-width: var(--group-border-width);

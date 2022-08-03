@@ -27,7 +27,7 @@ function useSettings() {
     return store.settings.onChange(initialize);
   }, []);
 
-  return [value, set, { loading }] as const;
+  return [value, set, loading] as const;
 
   function initialize(newValue: Settings) {
     if (!areSettingsIdentical(newValue, value)) {
