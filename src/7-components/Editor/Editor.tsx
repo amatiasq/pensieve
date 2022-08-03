@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { debounceTime, map, mergeWith } from 'rxjs/operators';
 import { onPageActive } from '../../0-dom/page-lifecycle';
-import { ghRepository } from '../../3-github/gh-utils';
+import { usePageTitle } from '../../6-hooks/usePageTitle';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
@@ -29,16 +29,6 @@ type EditableEditorProps = BaseEditorProps & {
   onSave(newValue: string, options: { urgent: boolean }): void;
 };
 
-const appTitle =
-  ghRepository
-    .replace(/\W+/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .replace(/(?<= )(\w)/g, x => x[0].toUpperCase())
-    .replace(/^(\w)/g, x => x[0].toUpperCase())
-    .replace('Pensieve', '')
-    .replace('Data', '')
-    .trim() || 'Pensieve';
-
 const EditorContainer = styled.div`
   grid-area: editor;
 `;
@@ -51,6 +41,7 @@ export function Editor(props: EditorProps) {
   const requestSave = emitter<void>();
   const requestUrgentSave = emitter<void>();
 
+  const updateTitle = usePageTitle();
   const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
   const [saved, addSaved] = useStack<string>(5, content);
@@ -66,8 +57,7 @@ export function Editor(props: EditorProps) {
   useShortcut('save', forceSave);
 
   useEffect(() => {
-    // eslint-disable-next-line no-irregular-whitespace
-    document.title = `${title}  ✏️  ${appTitle}`;
+    updateTitle(title);
   }, [title]);
 
   useEffect(() => {
