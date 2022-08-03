@@ -7,39 +7,31 @@ import React, {
 } from 'react';
 import { CaretIcon } from '../icons/CaretIcon';
 import { IconContainer } from '../icons/IconContainer';
+import { hStack } from '../styles';
+
+const AnimatedIcon = styled(IconContainer)`
+  transform: rotate(0);
+  transform-origin: 50% 50%;
+  transition: var(--animation-speed) transform ease;
+`;
 
 const Details = styled.details`
-  summary svg:first-of-type {
-    transform: rotate(0);
-    transform-origin: 50% 50%;
-    transition: var(--animation-speed) transform ease;
-  }
-
-  &[open] summary svg:first-of-type {
+  &[open] ${AnimatedIcon} {
     transform: rotate(90deg);
   }
 `;
 
 const Summary = styled.summary`
-  display: flex;
-  align-items: center;
-  gap: var(--sidebar-gap);
-  padding: var(--sidebar-gap);
-  padding-right: calc(var(--sidebar-gap) * 2);
+  ${hStack};
+  --gap: var(--sidebar-gap);
+
   cursor: default;
-  border-left: var(--group-border-width) solid transparent;
-  border-top: var(--group-border-width) solid transparent;
 
   list-style: none;
   &::-webkit-details-marker,
   &::marker {
     display: none;
     content: '';
-  }
-
-  svg:first-of-type {
-    width: 2em;
-    fill: var(--fg-color);
   }
 `;
 
@@ -77,9 +69,9 @@ export function Disclosure({
   return (
     <Details {...props} open={isOpen}>
       <Summary onClick={handleClick}>
-        <IconContainer>
+        <AnimatedIcon>
           <CaretIcon title="Open / close group" />
-        </IconContainer>
+        </AnimatedIcon>
         {summary}
       </Summary>
       {content}

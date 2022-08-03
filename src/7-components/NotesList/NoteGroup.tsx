@@ -30,6 +30,14 @@ const NoteGroupItem = styled(NoteItem)`
 const styles = css`
   --status-line-color: var(--group-color);
 
+  summary {
+    height: var(--note-item-height);
+    user-select: none;
+    padding-right: calc(var(--sidebar-gap) * 2);
+    border-left: var(--group-border-width) solid transparent;
+    border-top: var(--group-border-width) solid transparent;
+  }
+
   &:hover summary {
     background-color: var(--bg-color-hover);
   }

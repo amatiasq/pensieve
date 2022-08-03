@@ -29,13 +29,6 @@ const Input = styled.input`
   color: var(--fg-color);
 `;
 
-const LoupeContainer = styled(IconContainer)`
-  svg {
-    fill: transparent;
-    stroke: var(--fg-color);
-  }
-`;
-
 export interface FilterBoxProps {
   onChange: (comparer: StringComparer | null) => void;
 }
@@ -69,9 +62,9 @@ export function FilterBox({ onChange }: FilterBoxProps) {
 
   return (
     <FormControl>
-      <LoupeContainer>
+      <IconContainer>
         <LoupeIcon title="Filter" />
-      </LoupeContainer>
+      </IconContainer>
 
       <Input
         ref={ref}

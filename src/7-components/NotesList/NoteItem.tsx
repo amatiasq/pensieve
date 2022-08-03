@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { NoteId } from '../../2-entities/Note';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
+import { ellipsis, hStack } from '../styles';
 import { FavoriteButton } from './FavoriteButton';
 import { NoteActions } from './NoteActions';
 
@@ -12,14 +13,13 @@ const StyledFavouriteButton = styled(FavoriteButton)``;
 const StyledActions = styled(NoteActions)``;
 
 const NoteItemContainer = styled.h5`
-  display: flex;
-  align-items: center;
+  ${hStack};
+  --gap: var(--sidebar-gap);
+
+  height: var(--note-item-height);
   cursor: pointer;
-  gap: var(--sidebar-gap);
-  padding: 0 var(--sidebar-gap);
-  border: 1px solid transparent;
-  border-left: var(--status-line-width) solid var(--status-line-color);
   user-select: none;
+  border-left: var(--status-line-width) solid var(--status-line-color);
 
   &:hover {
     background-color: var(--bg-color-hover);
@@ -42,15 +42,12 @@ const NoteItemContainer = styled.h5`
 `;
 
 const Title = styled(Link)`
+  ${ellipsis};
   flex: 1;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  line-height: 1.5em;
   font-weight: 500;
   color: var(--fg-color);
   text-decoration: none;
-  padding: calc(var(--sidebar-gap) + 5.2px) 0;
+  line-height: var(--note-item-height);
 `;
 
 export interface NoteItemProps {

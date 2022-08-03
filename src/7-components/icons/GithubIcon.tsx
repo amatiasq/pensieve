@@ -1,7 +1,7 @@
 import { icon } from './icon';
 
 export const GithubIcon = icon(
-  <svg viewBox="0 0 24 24">
+  <svg viewBox="0 0 24 24" className="fill">
     <path
       d="
         M 12 0

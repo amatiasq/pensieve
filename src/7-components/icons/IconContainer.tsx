@@ -7,13 +7,18 @@ export const iconContainerStyles = css`
   height: var(--size);
   width: var(--size);
   border-radius: 100%;
-  text-align: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  svg {
+  svg.fill {
+    stroke: transparent;
     fill: var(--fg-color);
+  }
+
+  svg.stroke {
+    fill: transparent;
+    stroke: var(--fg-color);
   }
 `;
 

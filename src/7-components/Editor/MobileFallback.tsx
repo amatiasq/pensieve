@@ -2,8 +2,8 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useMonaco } from '@monaco-editor/react';
 import { createRef, useEffect, useState } from 'react';
-import { hideScrollbar } from '../../0-dom/hideScrollbar';
 import { useSetting } from '../../6-hooks/useSetting';
+import { hideScrollbar } from '../styles';
 import { extendMonaco } from './monaco/extendMonaco';
 import { theme } from './monacoConfiguration';
 

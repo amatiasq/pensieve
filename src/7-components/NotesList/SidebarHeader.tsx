@@ -19,9 +19,6 @@ const Header = styled.h4`
 
 const NewNoteButton = styled(IconButton)`
   --size: 2.5rem;
-
-  fill: transparent;
-  stroke: var(--fg-color);
   stroke-width: 1.5px;
 `;
 

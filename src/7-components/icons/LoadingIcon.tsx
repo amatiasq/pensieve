@@ -1,7 +1,7 @@
 import { icon } from './icon';
 
 export const LoadingIcon = icon(
-  <svg viewBox="0 0 24 24">
+  <svg viewBox="0 0 24 24" className="fill">
     <path
       d="
         M 18.312 5.595

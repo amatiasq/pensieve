@@ -25,6 +25,8 @@ export const globalStyles = css`
     width: 100vw;
     height: 100vh;
 
+    --note-item-height: 3rem;
+
     &.is-virtual-keyboard-open .mobile-fallback {
       height: 50%;
     }

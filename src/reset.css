@@ -143,3 +143,6 @@ input[type='text'] {
   color: inherit;
   font-size: 1rem;
 }
+* {
+  box-sizing: border-box;
+}

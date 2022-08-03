@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import React, { useCallback, useState } from 'react';
-import { hideScrollbar } from '../../0-dom/hideScrollbar';
 import { Note } from '../../2-entities/Note';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
 import { useNoteList } from '../../6-hooks/useNoteList';
@@ -10,6 +9,7 @@ import StringComparer from '../../util/StringComparer';
 import { Loader } from '../atoms/Loader';
 import { PresenceDetector } from '../atoms/PresenceDetector';
 import { Resizer } from '../atoms/Resizer';
+import { hideScrollbar } from '../styles';
 import { NoteGroup } from './NoteGroup';
 import { NoteItem } from './NoteItem';
 
@@ -26,7 +26,7 @@ const NotesListContainer = styled.aside`
 `;
 
 const ListWrapper = styled.div`
-  ${hideScrollbar}
+  ${hideScrollbar};
 
   flex: 1;
   overflow-y: auto;
