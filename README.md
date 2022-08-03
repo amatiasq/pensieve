@@ -5,6 +5,7 @@ Notes saved in your private Github repository.
 ## Features
 
 - [Configurable](https://pensieve.amatiasq.com/settings) for settings and shortcuts (`CMD+,`)
+- use [`?repo=` query parameter](https://pensieve.amatiasq.com/?repo=my-repository) to change the private Github (default `pensieve-data`).
 - Installable from Chrome. This is required for some shortcuts to work
 - Works offline for notes opened in the past
 

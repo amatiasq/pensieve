@@ -1,6 +1,7 @@
 import localforage from 'localforage';
 import { GHRepository } from '../3-github/GHRepository';
 import { GithubToken } from '../3-github/GithubAuth';
+import { GithubUsername } from '../3-github/models/GHApiUser';
 import { AppStorage } from './AppStorage';
 import { CachedStore } from './middleware/CachedStore';
 import { ForageStore } from './middleware/ForageStore';
@@ -12,7 +13,7 @@ Object.assign(window, { localforage });
 
 export async function createStore(
   token: GithubToken,
-  username: string,
+  username: GithubUsername,
   repoName: string,
 ) {
   const repo = new GHRepository(token, username, repoName);

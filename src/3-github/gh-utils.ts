@@ -1,4 +1,6 @@
+import { Note } from '../2-entities/Note';
 import { GithubToken } from './GithubAuth';
+import { GithubUsername } from './models/GHApiUser';
 
 const GH_API = 'https://api.github.com';
 
@@ -11,3 +13,10 @@ export function ghUrl(path: string) {
 export function ghAuthHeaders(token: GithubToken) {
   return { Authorization: `token ${token}` };
 }
+
+export function ghPublicPage(username: GithubUsername, note: Note) {
+  return `https://github.com/${username}/pensieve-data/blob/main/note/${note.id}`;
+}
+
+export const ghRepository =
+  new URLSearchParams(location.search).get('repo') || 'pensieve-data';

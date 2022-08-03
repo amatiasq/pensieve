@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { Menu, MenuItem } from '@szhsin/react-menu';
 import { ButtonHTMLAttributes, useCallback } from 'react';
 import { NoteId } from '../../2-entities/Note';
+import { ghPublicPage } from '../../3-github/gh-utils';
 import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
 import { useUsername } from '../../6-hooks/useUsername';
@@ -78,7 +79,7 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
 
   if (!note) return null;
 
-  const githubUrl = `https://github.com/${username}/pensieve-data/blob/main/note/${note.id}`;
+  const githubUrl = ghPublicPage(username, note);
   const button = <IconButton {...divProps} icon={<MenuIcon title="asdf" />} />;
 
   return (

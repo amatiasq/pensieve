@@ -2,6 +2,7 @@ import { Global } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
+import { ghRepository } from '../3-github/gh-utils';
 import { createStore } from '../4-storage';
 import { AppStorage } from '../4-storage/AppStorage';
 import { Loader } from '../7-components/atoms/Loader';
@@ -20,7 +21,7 @@ function Scaffold() {
 
   useEffect(() => {
     if (!token || !username) return;
-    createStore(token, username, 'pensieve-data').then(setStore);
+    createStore(token, username, ghRepository).then(setStore);
   }, [token]);
 
   if (!store) {
