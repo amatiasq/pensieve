@@ -1,14 +1,7 @@
 import { icon } from './icon';
 
 export const CrossIcon = icon(
-  <svg
-    clipRule="evenodd"
-    fillRule="evenodd"
-    strokeLinejoin="round"
-    strokeMiterlimit="2"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <svg viewBox="0 0 24 24">
     <path
       d="
         m 12 10.93 5.719-5.72

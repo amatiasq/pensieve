@@ -1,22 +1,8 @@
 import { icon } from './icon';
 
 export const PlusIcon = icon(
-  <svg
-    clipRule="evenodd"
-    fillRule="evenodd"
-    strokeLinejoin="round"
-    strokeMiterlimit="2"
-    viewBox="0 0 24 24"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      fillRule="nonzero"
-      d="
-        M 12 3
-        v 18
-        M 3 12
-        h 18
-      "
-    />
+  <svg viewBox="0 0 24 24">
+    <line x1="12" y1="3" x2="12" y2="21" />
+    <line x1="3" y1="12" x2="21" y2="12" />
   </svg>,
 );
