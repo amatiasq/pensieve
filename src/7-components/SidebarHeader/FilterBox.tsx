@@ -72,7 +72,7 @@ export function FilterBox({ onChange }: FilterBoxProps) {
         type="text"
         placeholder="Filter..."
         defaultValue={term}
-        onResize={handleInputChange}
+        onInput={handleInputChange}
       />
 
       {term ? (

@@ -1,13 +1,13 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useMonaco } from '@monaco-editor/react';
-import { createRef, useEffect, useState } from 'react';
+import { createRef, useCallback, useEffect, useState } from 'react';
 import { useSetting } from '../../6-hooks/useSetting';
 import { hideScrollbar } from '../styles';
 import { extendMonaco } from './monaco/extendMonaco';
 import { theme } from './monacoConfiguration';
 
-const Fallback = css`
+const fallback = css`
   box-sizing: border-box;
   padding: 24px;
   height: 100vh;
@@ -15,15 +15,17 @@ const Fallback = css`
 `;
 
 const Preview = styled.pre`
-  ${Fallback}
-  ${hideScrollbar}
+  ${fallback};
+  ${hideScrollbar};
+
   font-size: 13px;
   line-height: 1.15rem;
   overflow: auto;
 `;
 
 const Textarea = styled.textarea`
-  ${Fallback}
+  ${fallback};
+
   appearance: none;
   border: none;
   outline: none;
@@ -31,7 +33,6 @@ const Textarea = styled.textarea`
   background-color: #1c1c1c;
   color: inherit;
   width: 100%;
-  // height: calc(100vh - var(--toolbar-height));
   padding: 32px;
   box-sizing: border-box;
 `;
@@ -73,6 +74,8 @@ export function MobileFallback({
     }
   }, [monaco, ref.current]);
 
+  const handleChange = useCallback(e => onChange(e.target.value), [onChange]);
+
   if (!isPreview) {
     return (
       <Textarea
@@ -81,7 +84,7 @@ export function MobileFallback({
         readOnly={readonly}
         autoFocus={autofocus}
         autoComplete=""
-        onResize={e => onChange(e.target.value)}
+        onInput={handleChange}
       />
     );
   }
