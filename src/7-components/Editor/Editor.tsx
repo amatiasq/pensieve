@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { debounceTime, map, mergeWith } from 'rxjs/operators';
 import { onPageActive } from '../../0-dom/page-lifecycle';
+import { ghRepository } from '../../3-github/gh-utils';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
 import { useShortcut } from '../../6-hooks/useShortcut';
@@ -27,6 +28,16 @@ type EditableEditorProps = BaseEditorProps & {
   onChange?(unsaved: string): void;
   onSave(newValue: string, options: { urgent: boolean }): void;
 };
+
+const appTitle =
+  ghRepository
+    .replace(/\W+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/(?<= )(\w)/g, x => x[0].toUpperCase())
+    .replace(/^(\w)/g, x => x[0].toUpperCase())
+    .replace('Pensieve', '')
+    .replace('Data', '')
+    .trim() || 'Pensieve';
 
 const EditorContainer = styled.div`
   grid-area: editor;
@@ -56,7 +67,7 @@ export function Editor(props: EditorProps) {
 
   useEffect(() => {
     // eslint-disable-next-line no-irregular-whitespace
-    document.title = `${title}  ✏️  Pensieve`;
+    document.title = `${title}  ✏️  ${appTitle}`;
   }, [title]);
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+import { getQueryParameter } from '../0-dom/getQueryParameter';
 import { Note } from '../2-entities/Note';
 import { GithubToken } from './GithubAuth';
 import { GithubUsername } from './models/GHApiUser';
@@ -18,5 +19,4 @@ export function ghPublicPage(username: GithubUsername, note: Note) {
   return `https://github.com/${username}/pensieve-data/blob/main/note/${note.id}`;
 }
 
-export const ghRepository =
-  new URLSearchParams(location.search).get('repo') || 'pensieve-data';
+export const ghRepository = getQueryParameter('repo', 'pensieve-data');
