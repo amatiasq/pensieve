@@ -1,24 +1,21 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 import { useState } from 'react';
 import { parseParams } from '../1-core/url';
+import {
+  appOrigin,
+  ghAuthEndpoint,
+  ghClientId,
+  ghScope,
+} from '../3-github/gh-utils';
 import { GithubAuth, GithubToken } from '../3-github/GithubAuth';
 import { GithubUsers } from '../3-github/GithubUsers';
 import { GithubUsername } from '../3-github/models/GHApiUser';
-import {
-  APP_ROOT,
-  AUTH_ENDPOINT,
-  CLIENT_ID_DEV,
-  CLIENT_ID_PROD,
-  GH_SCOPE,
-} from '../config.json';
-
-const isLocalHost = location.hostname === 'localhost';
 
 const auth = new GithubAuth({
-  scope: GH_SCOPE,
-  endpoint: AUTH_ENDPOINT,
-  clientId: isLocalHost ? CLIENT_ID_DEV : CLIENT_ID_PROD,
-  redirectUri: isLocalHost ? location.origin : APP_ROOT,
+  scope: ghScope,
+  endpoint: ghAuthEndpoint,
+  clientId: ghClientId,
+  redirectUri: appOrigin,
 });
 
 const user = new ClientStorage<GithubUsername | null>('notes.gh-user', {

@@ -1,5 +1,5 @@
 import { POST } from '../1-core/http';
-import { COMMIT_ENDPOINT } from '../config.json';
+import { ghCommitEndpoint } from './gh-utils';
 import { GithubToken } from './GithubAuth';
 import { GithubGraphQlApi } from './GithubGraphQlApi';
 import { GithubRestApi, MediaType } from './GithubRestApi';
@@ -160,7 +160,7 @@ export class GHRepository {
 
     this.commiting = true;
 
-    return POST<void>(COMMIT_ENDPOINT, body, { keepalive: isUrgent }).finally(
+    return POST<void>(ghCommitEndpoint, body, { keepalive: isUrgent }).finally(
       () => (this.commiting = false),
     );
   }
