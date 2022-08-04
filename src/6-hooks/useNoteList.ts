@@ -72,7 +72,6 @@ function listAreIdentical(a: Note[], b: Note[]) {
 }
 
 function sort(list: Note[]) {
-  return list.sort(
-    (a, b) => Number(parseDate(b.created)) - Number(parseDate(a.created)),
-  );
+  const date = (x: Note) => Number(parseDate(x.bumped || x.created));
+  return list.sort((a, b) => date(b) - date(a));
 }

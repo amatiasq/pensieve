@@ -9,6 +9,10 @@ import { SidebarHeader } from '../7-components/SidebarHeader/SidebarHeader';
 import StringComparer from '../util/StringComparer';
 import { Router } from './Router';
 
+const GridResizer = styled(Resizer)`
+  grid-area: resizer;
+`;
+
 const StyledAppContainer = styled.div`
   height: 100vh;
   width: 100vw;
@@ -31,6 +35,10 @@ const StyledAppContainer = styled.div`
 
   ${mobileOnly} {
     grid-template-columns: 100vw;
+
+    ${GridResizer} {
+      display: none;
+    }
 
     &.page-home {
       grid-template-areas:
@@ -70,10 +78,6 @@ const StyledAppContainer = styled.div`
         'list resizer editor';
     }
   }
-`;
-
-const GridResizer = styled(Resizer)`
-  grid-area: resizer;
 `;
 
 export function App() {

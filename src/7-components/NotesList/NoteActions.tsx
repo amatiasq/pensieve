@@ -8,10 +8,19 @@ import { useNavigator } from '../../6-hooks/useNavigator';
 import { useNote } from '../../6-hooks/useNote';
 import { useUsername } from '../../6-hooks/useUsername';
 import { IconButton } from '../atoms/IconButton';
+import { ArrowIcon } from '../icons/ArrowIcon';
 import { GithubIcon } from '../icons/GithubIcon';
 import { IconContainer } from '../icons/IconContainer';
 import { MenuIcon } from '../icons/MenuIcon';
 import { TrashIcon } from '../icons/TrashIcon';
+
+const StyledIcon = styled(IconContainer)`
+  transform: scale(0.8);
+`;
+
+const ArrowUp = styled(IconContainer)`
+  transform: rotate(-90deg);
+`;
 
 const StyledMenu = styled(Menu)`
   --menu-gap: calc(--sidebar-gap * 2);
@@ -60,10 +69,12 @@ export interface NoteActionsProps
 }
 
 export function NoteActions({ id, ...divProps }: NoteActionsProps) {
-  const [note, { remove }] = useNote(id);
+  const [note, { remove, bump }] = useNote(id);
 
   const navigator = useNavigator();
   const username = useUsername();
+
+  const handleMoveUp = useCallback(bump, [bump]);
 
   const handleRemove = useCallback(() => {
     if (!confirm(`Delete ${note!.title}?`)) {
@@ -84,18 +95,24 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
 
   return (
     <StyledMenu menuButton={button}>
+      <StyledMenuItem onClick={handleMoveUp} css={realMenuItem}>
+        <ArrowUp>
+          <ArrowIcon title="Move up" />
+        </ArrowUp>
+        Move to top
+      </StyledMenuItem>
       <StyledMenuItem>
         <a href={githubUrl} css={realMenuItem} target="_blank">
-          <IconContainer>
+          <StyledIcon>
             <GithubIcon title="Open note in Github" />
-          </IconContainer>
+          </StyledIcon>
           View in GitHub
         </a>
       </StyledMenuItem>
       <StyledMenuItem onClick={handleRemove} css={realMenuItem}>
-        <IconContainer>
+        <StyledIcon>
           <TrashIcon title="Remove note" />
-        </IconContainer>
+        </StyledIcon>
         Remove {note.title}
       </StyledMenuItem>
     </StyledMenu>

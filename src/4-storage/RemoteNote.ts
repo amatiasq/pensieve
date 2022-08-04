@@ -101,6 +101,11 @@ export class RemoteNote {
     this.emitDraft({ ...current, title, group });
   }
 
+  bump(options?: WriteOptions) {
+    const opts = setDefaultReason(options, `Bump note to top "${this.title}"`);
+    return this.update(x => ({ ...x, bumped: datestr() }), opts);
+  }
+
   async readFromCache() {
     if (await this.content.isCached) {
       return this.content.readCache();

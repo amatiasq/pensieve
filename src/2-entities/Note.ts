@@ -10,6 +10,7 @@ export interface Note {
   readonly group: string | null;
   readonly created: SerializedDate;
   readonly modified: SerializedDate;
+  readonly bumped?: SerializedDate;
 }
 
 export function isNoteIdentical(a: Note | null, b: Note | null) {

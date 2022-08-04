@@ -19,6 +19,7 @@ export const iconContainerStyles = css`
   svg.stroke {
     fill: transparent;
     stroke: var(--fg-color);
+    stroke-linejoin: round;
   }
 `;
 

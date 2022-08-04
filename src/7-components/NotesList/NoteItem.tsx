@@ -82,7 +82,7 @@ export function NoteItem({ id, className = '' }: NoteItemProps) {
   return (
     <NoteItemContainer className={cn}>
       <StyledFavouriteButton id={note.id} />
-      <Title to={navigator.toNote(note)}>{note.title}</Title>
+      <Title to={navigator.toNote(note)}>{note.title || '(untitled)'}</Title>
       <StyledActions id={note.id} />
     </NoteItemContainer>
   );
