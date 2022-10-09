@@ -2,6 +2,7 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { Menu, MenuItem } from '@szhsin/react-menu';
 import { ButtonHTMLAttributes, useCallback } from 'react';
+import { copyToClipboard } from '../../0-dom/copyToClipboard';
 import { NoteId } from '../../2-entities/Note';
 import { ghPublicPage } from '../../3-github/gh-utils';
 import { useNavigator } from '../../6-hooks/useNavigator';
@@ -9,6 +10,7 @@ import { useNote } from '../../6-hooks/useNote';
 import { useUsername } from '../../6-hooks/useUsername';
 import { IconButton } from '../atoms/IconButton';
 import { ArrowIcon } from '../icons/ArrowIcon';
+import { ClipboardIcon } from '../icons/ClipboardIcon';
 import { GithubIcon } from '../icons/GithubIcon';
 import { IconContainer } from '../icons/IconContainer';
 import { MenuIcon } from '../icons/MenuIcon';
@@ -76,6 +78,11 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
 
   const handleMoveUp = useCallback(bump, [bump]);
 
+  const copyUrlToClipboard = useCallback(
+    () => copyToClipboard(navigator.toNote(note!)),
+    [note],
+  );
+
   const handleRemove = useCallback(() => {
     if (!confirm(`Delete ${note!.title}?`)) {
       return;
@@ -95,6 +102,12 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
 
   return (
     <StyledMenu menuButton={button}>
+      <StyledMenuItem onClick={copyUrlToClipboard} css={realMenuItem}>
+        <StyledIcon>
+          <ClipboardIcon title="Copy to clipboard" />
+        </StyledIcon>
+        Copy to clipboard
+      </StyledMenuItem>
       <StyledMenuItem onClick={handleMoveUp} css={realMenuItem}>
         <ArrowUp>
           <ArrowIcon title="Move up" />
