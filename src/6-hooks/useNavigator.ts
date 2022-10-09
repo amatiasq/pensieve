@@ -1,5 +1,9 @@
+import { emitter } from '@amatiasq/emitter';
 import { useHistory } from 'react-router-dom';
 import { Note, NoteId } from '../2-entities/Note';
+
+const onNavigate = emitter<Navigator>();
+const listeningTo = new Set();
 
 class Navigator {
   readonly root = '/';
@@ -26,11 +30,22 @@ class Navigator {
   constructor(
     private readonly history: ReturnType<typeof useHistory>,
     readonly path: string,
-  ) {}
+  ) {
+    if (!listeningTo.has(history)) {
+      history.listen(x => onNavigate(new Navigator(history, x.pathname)));
+      listeningTo.add(history);
+    }
+  }
 
-  readonly go = (target: string) => this.history.push(target);
-  readonly goRoot = () => this.history.push(this._root);
-  readonly goSettings = () => this.history.push(this._settings);
+  readonly go = (target: string) => this._go(target);
+  readonly goRoot = () => this._go(this._root);
+  readonly goSettings = () => this._go(this._settings);
+
+  private _go(target: string) {
+    // history.push() doesn't trigger history.listen()
+    onNavigate(new Navigator(this.history, target));
+    this.history.push(target);
+  }
 
   readonly toNote = acceptNoteOrId(id => this._note.replace(':noteId', id));
 
@@ -43,9 +58,7 @@ class Navigator {
   );
 
   onNavigate(listener: (next: Navigator) => void) {
-    return this.history.listen(x =>
-      listener(new Navigator(this.history, x.pathname)),
-    );
+    return onNavigate.subscribe(listener) as () => void;
   }
 
   getPageName() {

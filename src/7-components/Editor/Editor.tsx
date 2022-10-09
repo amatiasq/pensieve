@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { debounceTime, map, mergeWith } from 'rxjs/operators';
 import { onPageActive } from '../../0-dom/page-lifecycle';
+import { useNavigator } from '../../6-hooks/useNavigator';
 import { usePageTitle } from '../../6-hooks/usePageTitle';
 import { useScheduler } from '../../6-hooks/useScheduler';
 import { useSetting } from '../../6-hooks/useSetting';
@@ -53,6 +54,20 @@ export function Editor(props: EditorProps) {
       requestSave();
     }
   });
+
+  const navigator = useNavigator();
+
+  useEffect(() =>
+    navigator.onNavigate(() => {
+      // Stop the scheduler when unmounting
+      if (scheduler.isRunning) {
+        scheduler.stop();
+        if (hasUnsavedChanges) {
+          forceSave();
+        }
+      }
+    }),
+  );
 
   useShortcut('save', forceSave);
 
