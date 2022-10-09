@@ -9,6 +9,12 @@ import { SidebarHeader } from '../7-components/SidebarHeader/SidebarHeader';
 import StringComparer from '../util/StringComparer';
 import { Router } from './Router';
 
+import { VALID_ORIGINS } from '../config.json';
+
+const validOrigins = location.origin.includes('localhost')
+  ? [location.origin, ...VALID_ORIGINS]
+  : VALID_ORIGINS;
+
 const GridResizer = styled(Resizer)`
   grid-area: resizer;
 `;
@@ -124,12 +130,18 @@ function handleLinkClick(
 
   const { href } = link.dataset;
 
-  if (!href?.startsWith(location.origin)) {
+  if (!href) {
+    return;
+  }
+
+  const match = validOrigins.find(x => href.startsWith(x));
+
+  if (!match) {
     return;
   }
 
   event.preventDefault();
   event.stopImmediatePropagation();
 
-  go(href.replace(location.origin, ''));
+  go(href.replace(match, ''));
 }
