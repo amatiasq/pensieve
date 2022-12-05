@@ -1,32 +1,64 @@
-const axios = require('axios');
-const pipeAxiosToExpress = require('./_proxyAxiosToExpress');
-const { GH_API } = require('../config.json');
+import { GH_API } from '../config.json';
 
-module.exports = async (req, res) => {
-  const { token, owner, repo, branch, files, message } = req.body;
-  const promise = githubCommit({ token, owner, repo, branch, files, message });
-  pipeAxiosToExpress(promise, req, res);
+/**
+ * @param {Request} request
+ * @returns {Promise<Response>}
+ */
+export default async request => {
+  const body = await request.json();
+  const userAgent = request.headers.get('User-Agent');
+  const { token, owner, repo, branch, files, message } = body;
+
+  await githubCommit({
+    token,
+    owner,
+    repo,
+    branch,
+    files,
+    message,
+    userAgent,
+  });
 };
 
-async function githubCommit({ token, owner, repo, branch, files, message }) {
+async function githubCommit({
+  token,
+  owner,
+  repo,
+  branch,
+  files,
+  message,
+  userAgent,
+}) {
   const key = `${owner}/${repo}:${branch}`;
+  const baseURL = `${GH_API}/repos/${owner}/${repo}`;
+  const headers = { Authorization: `token ${token}`, 'User-Agent': userAgent };
 
   console.log(`${key} - Commit requests`);
 
-  const request = axios.create({
-    baseURL: `${GH_API}/repos/${owner}/${repo}`,
-    headers: { Authorization: `token ${token}` },
-  });
+  async function request(method, url, json) {
+    const response = await fetch(`${baseURL}${url}`, {
+      method,
+      headers,
+      body: JSON.stringify(json),
+    });
+
+    try {
+      return await response.json();
+    } catch (err) {
+      console.log(`[Error from Github] ${await response.text()}`);
+      throw err;
+    }
+  }
 
   const items = prepareFilesForRequest(files);
 
   console.log(`${key} - Requesting ref...`);
-  const { data: ref } = await request.get(`/git/refs/heads/${branch}`);
+  const ref = await request('GET', `/git/refs/heads/${branch}`);
   console.log(`${key} - Creating tree...`);
 
   // Create tree
   // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-tree
-  const { data: tree } = await request.post(`/git/trees`, {
+  const tree = await request('POST', `/git/trees`, {
     tree: items,
     base_tree: ref.object.sha,
   });
@@ -35,7 +67,7 @@ async function githubCommit({ token, owner, repo, branch, files, message }) {
 
   // Create commit
   // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-commit
-  const { data: commit } = await request.post(`/git/commits`, {
+  const commit = await request('POST', `/git/commits`, {
     message,
     tree: tree.sha,
     parents: [ref.object.sha],
@@ -45,14 +77,12 @@ async function githubCommit({ token, owner, repo, branch, files, message }) {
 
   // Update a reference
   // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#update-a-reference
-  return request
-    .post(`/git/refs/heads/${branch}`, {
-      sha: commit.sha,
-      force: true,
-    })
-    .finally(() => {
-      console.log(`${key} - Complete`);
-    });
+  return request('POST', `/git/refs/heads/${branch}`, {
+    sha: commit.sha,
+    force: true,
+  }).finally(() => {
+    console.log(`${key} - Complete`);
+  });
 }
 
 function prepareFilesForRequest(files) {

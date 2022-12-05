@@ -1,24 +1,62 @@
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-const cors = require('cors');
+import { VALID_ORIGINS } from '../config.json';
+import auth from './auth.js';
+import commit from './commit.js';
 
-const port = process.env.PORT;
+const handlers = { auth, commit };
 
-if (!port) {
-  throw new Error('Environment variables not set');
+addEventListener('fetch', event =>
+  event.respondWith(handleCorsRequest(event.request)),
+);
+
+/**
+ * @param {Request} request
+ * @returns {Promise<Response>}
+ */
+async function handleCorsRequest(request) {
+  const method = request.method;
+  const { origin } = new URL(request.url);
+
+  console.log({ origin });
+
+  var response = isValidOrigin(origin)
+    ? await handleRequest(request).catch(handleError)
+    : new Response('Who the fck are you?', { status: 403 });
+
+  if (!(response instanceof Response)) {
+    response = new Response(JSON.stringify(response), { status: 200 });
+  }
+
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', method);
+  response.headers.set('Access-Control-Max-Age', '86400');
+
+  return response;
 }
 
-app.use(cors());
+/**
+ * @param {Request} request
+ * @returns {Promise<Response>}
+ */
+async function handleRequest(request) {
+  const { pathname } = new URL(request.url);
+  const [, firstPart] = pathname.split('/');
+  const handler = handlers[firstPart];
 
-app.post('/auth', require('./auth'));
+  console.log(
+    `Request to ${pathname} - ${handler ? handler.name : 'No handler'}`,
+  );
 
-app.post(
-  '/commit',
-  bodyParser.json({ limit: '50mb', type: 'text/plain' }),
-  require('./commit'),
-);
+  if (!handler) {
+    return new Response(`Unknown route ${pathname}`, { status: 404 });
+  }
 
-app.listen(port, () =>
-  console.log(`Hello world app listening on port ${port}!`),
-);
+  return handler(request);
+}
+
+function isValidOrigin(origin) {
+  return origin === 'localhost' || VALID_ORIGINS.includes(origin);
+}
+
+function handleError(err) {
+  return new Response(err.stack, { status: 500 });
+}
