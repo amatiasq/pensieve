@@ -5,5 +5,6 @@
   "COMMIT_ENDPOINT": "/commit",
   "CLIENT_ID_DEV": "c55d2c46c215f9a4c3cb",
   "CLIENT_ID_PROD": "09580e62d66243b6b09d",
+  "API_ORIGIN": "https://pensieve-api.amatiasq.workers.dev",
   "VALID_ORIGINS": ["https://pensieve.amatiasq.com"]
 }

@@ -1,6 +1,7 @@
 import { getQueryParameter } from '../0-dom/getQueryParameter';
 import { Note } from '../2-entities/Note';
 import {
+  API_ORIGIN,
   AUTH_ENDPOINT,
   CLIENT_ID_DEV,
   CLIENT_ID_PROD,
@@ -10,6 +11,7 @@ import {
 } from '../config.json';
 import { GithubToken } from './GithubAuth';
 import { GithubUsername } from './models/GHApiUser';
+
 const GH_API = 'https://api.github.com';
 
 export const ghRepository = getQueryParameter('repo', 'pensieve-data');
@@ -34,10 +36,11 @@ export const appOrigin = getOrigin();
 export const ghScope = GH_SCOPE;
 export const ghClientId = isLocalHost ? CLIENT_ID_DEV : CLIENT_ID_PROD;
 
-const endpointOrigin = isLocalHost ? VALID_ORIGINS[0] : appOrigin;
+// TODO: we can't proxy the API calls since we moved to Cloudflare Workers
+// const endpointOrigin = isLocalHost ? VALID_ORIGINS[0] : appOrigin;
 
-export const ghAuthEndpoint = `${endpointOrigin}${AUTH_ENDPOINT}`;
-export const ghCommitEndpoint = `${endpointOrigin}${COMMIT_ENDPOINT}`;
+export const ghAuthEndpoint = `${API_ORIGIN}${AUTH_ENDPOINT}`;
+export const ghCommitEndpoint = `${API_ORIGIN}${COMMIT_ENDPOINT}`;
 
 function getOrigin() {
   const { origin } = location;

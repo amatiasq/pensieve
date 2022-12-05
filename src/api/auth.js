@@ -1,26 +1,22 @@
-const axios = require('axios');
-const pipeAxiosToExpress = require('./_proxyAxiosToExpress');
+import { CLIENT_ID_DEV, CLIENT_ID_PROD } from '../config.json';
 
-const { CLIENT_ID_PROD, CLIENT_ID_DEV } = require('../config.json');
-const { CLIENT_SECRET_PROD, CLIENT_SECRET_DEV } = process.env;
-
-module.exports = async (req, res) => {
-  const { code, redirect_uri, state } = req.query;
+/**
+ * @param {Request} request
+ * @returns {Promise<Response>}
+ */
+export default async request => {
+  const { searchParams } = new URL(request.url);
+  const redirect_uri = searchParams.get('redirect_uri');
   const isDev = redirect_uri.startsWith('http://localhost');
 
-  const params = {
+  const url = 'https://github.com/login/oauth/access_token';
+  const params = new URLSearchParams({
     client_id: isDev ? CLIENT_ID_DEV : CLIENT_ID_PROD,
     client_secret: isDev ? CLIENT_SECRET_DEV : CLIENT_SECRET_PROD,
     redirect_uri,
-    state,
-    code,
-  };
-
-  console.log(params);
-
-  const response = axios.get('https://github.com/login/oauth/access_token', {
-    params,
+    state: searchParams.get('state'),
+    code: searchParams.get('code'),
   });
 
-  return pipeAxiosToExpress(response, req, res);
+  return fetch(`${url}?${params}`);
 };

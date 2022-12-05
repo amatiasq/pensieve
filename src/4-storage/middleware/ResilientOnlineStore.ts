@@ -4,6 +4,8 @@ import { debugMethods } from '../../util/debugMethods';
 import { AsyncStore } from '../AsyncStore';
 import { WriteOptions } from '../helpers/WriteOptions';
 
+const MAX_ATTEMPTS = 2;
+
 interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   method: T;
   params: Parameters<AsyncStore[T]>;
@@ -99,7 +101,7 @@ export class ResilientOnlineStore implements AsyncStore {
     }
 
     for (const { method, params, attempts } of retrievePending()) {
-      if (attempts < 5) {
+      if (attempts < MAX_ATTEMPTS) {
         this.command(method, params, attempts);
       } else {
         console.warn(`Command ${method} failed ${attempts} times`, ...params);
