@@ -1,28 +1,7 @@
-import { mkdirRecursive } from '../fs';
-import { clone } from '../git';
+import { Repository } from '../tools/Repository';
 
 const repositories = new Map<ReturnType<typeof key>, Repository>();
-const key = (user: string, name: string) => `/${user}/${name}` as const;
-
-class Repository {
-  get path() {
-    return key(this.user, this.name);
-  }
-
-  constructor(public readonly user: string, public readonly name: string) {}
-
-  clone() {
-    mkdirRecursive(this.path);
-
-    return clone({
-      dir: this.path,
-      url: `https://github.com${this.path}`,
-      singleBranch: true,
-      depth: 1,
-      onAuth: (url) => getCredentials(this.user) ?? { cancel: true },
-    });
-  }
-}
+export const key = (user: string, name: string) => `/${user}/${name}` as const;
 
 export function useGitRepo(user: string, name: string) {
   const id = key(user, name);
@@ -39,7 +18,7 @@ export function useGitRepo(user: string, name: string) {
   return repo;
 }
 
-function getCredentials(user: string) {
+export function getCredentials(user: string) {
   const key = 'pensieve.auth';
   const stored = localStorage.getItem(key);
 
