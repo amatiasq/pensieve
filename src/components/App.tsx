@@ -1,3 +1,4 @@
+import { DependencyList, useEffect, useState } from 'react';
 import { useGitRepo } from '../hooks/useGitRepo';
 import './App.css';
 
@@ -5,15 +6,31 @@ function useActiveRepo() {
   const url = new URL(location.href);
   const [user, repoName, ...params] = url.pathname.split('/').filter(Boolean);
   const repo = useGitRepo(user, repoName);
-
-  console.log({ user, repoName, params, repo });
   return repo;
 }
 
-function App() {
-  const repo = useActiveRepo();
+function useAsync<T>(
+  callback: () => Promise<T>,
+  deps: DependencyList = []
+): T | undefined {
+  const [value, setValue] = useState<T>();
 
-  return <>Pensieve</>;
+  useEffect(() => {
+    callback().then(setValue);
+  }, deps);
+
+  return value;
 }
 
-export default App;
+export function App() {
+  const repo = useActiveRepo();
+  const files = useAsync(() => repo.getFiles(), []) ?? [];
+
+  return (
+    <ul>
+      {files.map((x) => (
+        <li key={x}>{x}</li>
+      ))}
+    </ul>
+  );
+}

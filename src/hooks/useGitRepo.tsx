@@ -7,13 +7,11 @@ export function useGitRepo(user: string, name: string) {
   const id = key(user, name);
 
   if (repositories.has(id)) {
-    return repositories.get(id);
+    return repositories.get(id)!;
   }
 
   const repo = new Repository(user, name);
-
   repo.clone();
-
   repositories.set(id, repo);
   return repo;
 }
