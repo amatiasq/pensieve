@@ -1,10 +1,9 @@
-import { getCredentials, key } from '../hooks/useGitRepo';
 import { clone } from './git';
 import { getAllFiles, mkdirRecursive } from './git.fs';
 
 export class Repository {
   get path() {
-    return key(this.user, this.name);
+    return `/${this.user}/${this.name}`;
   }
 
   constructor(public readonly user: string, public readonly name: string) {}
@@ -28,4 +27,20 @@ export class Repository {
   getFiles() {
     return getAllFiles(this.path);
   }
+}
+
+function getCredentials(user: string) {
+  const key = 'pensieve.auth';
+  const stored = localStorage.getItem(key);
+
+  if (stored) return JSON.parse(stored);
+
+  const username = prompt('Enter username or Github Access Token', user);
+  const auth = {
+    username,
+    password: username?.startsWith('ghp_') ? '' : prompt('Enter password'),
+  };
+
+  localStorage.setItem(key, JSON.stringify(auth));
+  return auth;
 }

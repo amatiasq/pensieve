@@ -1,11 +1,12 @@
-import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vite';
-import { VitePWA } from 'vite-plugin-pwa';
+import solidPlugin from 'vite-plugin-solid';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    VitePWA({ injectRegister: 'auto', registerType: 'autoUpdate' }),
-  ],
+  plugins: [solidPlugin()],
+  server: {
+    port: 3000,
+  },
+  build: {
+    target: 'esnext',
+  },
 });
