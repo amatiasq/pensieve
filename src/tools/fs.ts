@@ -45,3 +45,22 @@ export async function getAllFiles(path: string): Promise<string[]> {
     throw error;
   }
 }
+
+export async function fileExists(path: string) {
+  try {
+    const stat = await fs.lstat(path);
+    return stat.isFile();
+  } catch {
+    return false;
+  }
+}
+
+export async function getFileContent(path: string) {
+  if (!(await fileExists(path))) return null;
+
+  const content = await fs.readFile(path, 'utf8');
+
+  return typeof content == 'string'
+    ? content
+    : new TextDecoder().decode(content);
+}

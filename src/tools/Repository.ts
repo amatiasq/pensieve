@@ -1,46 +1,25 @@
-import { clone } from './git';
-import { getAllFiles, mkdirRecursive } from './git.fs';
+import { fileExists, getAllFiles, getFileContent } from './fs';
 
 export class Repository {
   get path() {
     return `/${this.user}/${this.name}`;
   }
 
-  constructor(public readonly user: string, public readonly name: string) {}
-
-  async clone() {
-    console.log('Create dir', this.path);
-    await mkdirRecursive(this.path);
-
-    console.log('Clone', this.path, `https://github.com${this.path}`);
-    await clone({
-      dir: this.path,
-      url: `https://github.com${this.path}`,
-      singleBranch: true,
-      depth: 1,
-      onAuth: (url) => getCredentials(this.user) ?? { cancel: true },
-    });
-
-    console.log('Done', this.path);
+  get url() {
+    return `https://github.com${this.path}`;
   }
+
+  constructor(public readonly user: string, public readonly name: string) {}
 
   getFiles() {
     return getAllFiles(this.path);
   }
-}
 
-function getCredentials(user: string) {
-  const key = 'pensieve.auth';
-  const stored = localStorage.getItem(key);
+  hasFile(path: string) {
+    return fileExists(`${this.path}/${path}`);
+  }
 
-  if (stored) return JSON.parse(stored);
-
-  const username = prompt('Enter username or Github Access Token', user);
-  const auth = {
-    username,
-    password: username?.startsWith('ghp_') ? '' : prompt('Enter password'),
-  };
-
-  localStorage.setItem(key, JSON.stringify(auth));
-  return auth;
+  getFileContent(path: string) {
+    return getFileContent(`${this.path}/${path}`);
+  }
 }

@@ -8,7 +8,7 @@ import type {
   ProgressCallback,
   PromiseFsClient,
 } from 'isomorphic-git';
-import { gitFs } from './git.fs';
+import { gitFs } from './fs';
 
 const git = (window as any).git as Git;
 const http = (window as any).http as HttpClient;
