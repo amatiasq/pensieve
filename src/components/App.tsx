@@ -11,12 +11,13 @@ export function App() {
     return <Homepage />;
   }
 
-  const [route, setRoute] = createSignal('');
+  const [route, setRoute] = createSignal(location.hash.substring(1));
 
-  window.addEventListener('hashchange', () => {
-    console.log(location.hash);
-    return setRoute(location.hash);
-  });
+  window.addEventListener('hashchange', () =>
+    setRoute(location.hash.substring(1))
+  );
+
+  console.log({ route: route() });
 
   return (
     <div class={styles.root}>

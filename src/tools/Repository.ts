@@ -1,8 +1,10 @@
 import { fileExists, getAllFiles, getFileContent } from './fs';
 
+const join = (...paths: string[]) => paths.join('/').replace(/\/+/g, '/');
+
 export class Repository {
   get path() {
-    return `/${this.user}/${this.name}`;
+    return '/' + join(this.user, this.name);
   }
 
   get url() {
@@ -16,10 +18,10 @@ export class Repository {
   }
 
   hasFile(path: string) {
-    return fileExists(`${this.path}/${path}`);
+    return fileExists(join(this.path, path));
   }
 
   getFileContent(path: string) {
-    return getFileContent(`${this.path}/${path}`);
+    return getFileContent(join(this.path, path));
   }
 }

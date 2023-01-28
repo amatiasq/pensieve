@@ -56,6 +56,7 @@ export async function fileExists(path: string) {
 }
 
 export async function getFileContent(path: string) {
+  console.log('READ', path);
   if (!(await fileExists(path))) return null;
 
   const content = await fs.readFile(path, 'utf8');

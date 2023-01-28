@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@isomorphic-git/lightning-fs": "^4.6.0",
+    "monaco-editor": "^0.34.1",
     "solid-js": "^1.6.6"
   }
 }
