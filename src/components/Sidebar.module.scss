@@ -1,5 +1,6 @@
 .sidebar {
   --depth: 0;
+  background-color: #212122;
 
   ul {
     margin: 0;
@@ -30,6 +31,10 @@
 
   details[open] > summary::before {
     transform: rotate(90deg);
+  }
+
+  a {
+    text-decoration: none;
   }
 
   a,

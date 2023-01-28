@@ -18,7 +18,7 @@ export async function mkdirRecursive(path: string) {
 async function mkdirIfDoesntExist(path: string) {
   try {
     const stat = await fs.lstat(path);
-    if (stat.isDirectory()) return console.log('Exists', path);
+    if (stat.isDirectory()) return;
   } catch {}
 
   await fs.mkdir(path);

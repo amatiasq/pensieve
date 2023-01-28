@@ -2,40 +2,39 @@ import { For } from 'solid-js';
 
 interface INode {
   id: string;
+  href: string;
   name: string;
   children: INode[];
 }
 
-interface ILeaf extends INode {
-  href: string;
-  children: [];
-}
-
-function isLeaf(node: INode): node is ILeaf {
+function isLeaf(node: INode) {
+  //: node is ILeaf {
   return node.children.length == 0;
 }
 
-export function createTree(files: string[]) {
+export function createTree(files: string[], root: string) {
   const tree = [] as INode[];
 
   for (const file of files) {
     let node = tree;
-    let id = '';
+    let path = '';
 
     for (const part of file.split('/')) {
       let child = node.find((n) => n.name === part);
 
       if (!child) {
         child = {
-          id: `${id}/${part}`,
+          id: `${path}/${part}`,
           name: part,
+          href: `${root}${path}/${part}`,
           children: [],
         };
+
         node.push(child);
       }
 
       node = child.children;
-      id += `/${part}`;
+      path += `/${part}`;
     }
   }
 

@@ -25,7 +25,6 @@ type OmitDefaults<T extends (...args: any) => any> = Omit<
 >;
 
 export function clone(options: OmitDefaults<Git['clone']>) {
-  console.log(defaultProps, options);
   return git.clone({ ...defaultProps, ...options });
 }
 
