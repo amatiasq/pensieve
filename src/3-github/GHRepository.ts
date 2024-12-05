@@ -183,7 +183,7 @@ export class GHRepository {
 function getFileProperty(keys: string) {
   return `
     repository(owner: $owner, name: $repo) {
-      object(expression: $path) {
+      object(expression: $path, limit: 5000) {
         ... on Blob {
           ${keys}
         }
