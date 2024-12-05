@@ -180,10 +180,12 @@ export class GHRepository {
   }
 }
 
+const requestLimit = localStorage.getItem('gh-req-limit') || 5000;
+
 function getFileProperty(keys: string) {
   return `
     repository(owner: $owner, name: $repo) {
-      object(expression: $path, limit: 5000) {
+      object(expression: $path, limit: ${requestLimit}) {
         ... on Blob {
           ${keys}
         }
