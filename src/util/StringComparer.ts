@@ -1,3 +1,5 @@
+import { matchSorter } from 'match-sorter';
+
 const WHITESPACE = /\s+/g;
 
 export default class StringComparer {
@@ -19,9 +21,11 @@ export default class StringComparer {
     return cleanString(target).includes(this.clean);
   }
 
-  matchesAny(list: (string | null | undefined)[]) {
-    const clean = list.filter(Boolean) as string[];
-    return clean.some(x => this.matches(x));
+  matchesList<T>(list: T[], keys: (keyof T & string)[]) {
+    return matchSorter(list, this.clean, {
+      keys,
+      threshold: matchSorter.rankings.ACRONYM,
+    });
   }
 }
 

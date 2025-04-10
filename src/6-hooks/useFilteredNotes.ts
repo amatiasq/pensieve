@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Note } from '../2-entities/Note.ts';
-import StringComparer from '../util/StringComparer.ts';
+import type StringComparer from '../util/StringComparer.ts';
 import { useStore } from './useStore.ts';
-
-const uniq = <T>(list: T[]) => Array.from(new Set(list));
 
 let lastIteration = 0;
 
@@ -18,50 +16,38 @@ export function useFilteredNotes(
   useEffect(() => {
     if (!comparer) return;
 
-    const title = list.filter(note => comparer.matches(note.title));
-    const group = list.filter(
-      note => note.group && comparer.matches(note.group),
-    );
-    const id = list.filter(note => comparer.matches(note.id));
+    const found = comparer.matchesList(list, ['title', 'group']);
 
     setCursor(0);
-    setValue(uniq([...title, ...group, ...id]));
+    setValue(found);
   }, [list, comparer]);
 
-  if (!comparer) return list;
-
   const currentIteration = ++lastIteration;
-
-  // not awaited, this happens in the background
+  if (!comparer) return list;
   setTimeout(searchInContent, 10);
-
   return value;
 
   // read notes one by one from cache
   // sequentially asynchronously
   async function searchInContent() {
-    // if the counter is different ABORT!
-    // that means another setTimeout is running after this one
-    if (currentIteration !== lastIteration) {
-      return;
-    }
+    const isAnotherSearchRunning = () => currentIteration !== lastIteration;
+    if (isAnotherSearchRunning()) return;
 
-    const ids = new Set(value.map(x => x.id));
+    const shownIds = new Set(value.map(x => x.id));
 
     for (let i = cursor; i < list.length; i++) {
       const note = list[i];
 
-      if (ids.has(note.id)) {
-        continue;
-      }
+      if (shownIds.has(note.id)) continue;
 
       const remote = store.note(note.id);
       const content = await remote.readFromCache();
+      if (isAnotherSearchRunning()) return;
 
       if (content && comparer!.matches(content)) {
         setCursor(i + 1);
         setValue([...value, note]);
-        break;
+        return;
       }
     }
   }

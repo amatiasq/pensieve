@@ -5,7 +5,7 @@ import { useFilteredNotes } from '../../6-hooks/useFilteredNotes.ts';
 import { useNoteList } from '../../6-hooks/useNoteList.ts';
 import { useSetting } from '../../6-hooks/useSetting.ts';
 import { useShortcut } from '../../6-hooks/useShortcut.ts';
-import StringComparer from '../../util/StringComparer.ts';
+import type StringComparer from '../../util/StringComparer.ts';
 import { Loader } from '../atoms/Loader.tsx';
 import { PresenceDetector } from '../atoms/PresenceDetector.tsx';
 import { hideScrollbar } from '../styles.ts';

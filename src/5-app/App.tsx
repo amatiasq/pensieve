@@ -6,7 +6,7 @@ import { useSetting } from '../6-hooks/useSetting.ts';
 import { Resizer } from '../7-components/atoms/Resizer.tsx';
 import { NotesList } from '../7-components/NotesList/NotesList.tsx';
 import { SidebarHeader } from '../7-components/SidebarHeader/SidebarHeader.tsx';
-import StringComparer from '../util/StringComparer.ts';
+import type StringComparer from '../util/StringComparer.ts';
 import { Router } from './Router.tsx';
 
 import { VALID_ORIGINS } from '../config.json' with { type: 'json' };

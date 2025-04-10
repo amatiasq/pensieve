@@ -36,6 +36,7 @@
     "express": "^4.17.1",
     "json5": "^2.2.3",
     "localforage": "^1.9.0",
+    "match-sorter": "^8.0.0",
     "monaco-editor": "^0.25.2",
     "monaco-mermaid": "^1.1.0",
     "react": "^17.0.1",
