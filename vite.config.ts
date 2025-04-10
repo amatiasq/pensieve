@@ -16,6 +16,7 @@ export default defineConfig({
       manifest,
       workbox: {
         importScripts: [],
+        maximumFileSizeToCacheInBytes: 5 * 1024 ** 2, // 5MB
       },
     }),
     react({
