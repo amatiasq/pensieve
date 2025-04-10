@@ -1,6 +1,6 @@
-import { GithubToken } from './GithubAuth';
-import { GithubRestApi } from './GithubRestApi';
-import { GHApiUser } from './models/GHApiUser';
+import { GithubToken } from './GithubAuth.ts';
+import { GithubRestApi } from './GithubRestApi.ts';
+import { GHApiUser } from './models/GHApiUser.ts';
 
 export class GithubUsers {
   private readonly rest: GithubRestApi;

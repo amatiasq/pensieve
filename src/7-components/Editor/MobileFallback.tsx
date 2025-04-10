@@ -2,10 +2,10 @@ import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useMonaco } from '@monaco-editor/react';
 import { createRef, useCallback, useEffect, useState } from 'react';
-import { useSetting } from '../../6-hooks/useSetting';
-import { hideScrollbar } from '../styles';
-import { extendMonaco } from './monaco/extendMonaco';
-import { theme } from './monacoConfiguration';
+import { useSetting } from '../../6-hooks/useSetting.ts';
+import { hideScrollbar } from '../styles.ts';
+import { extendMonaco } from './monaco/extendMonaco.ts';
+import { theme } from './monacoConfiguration.ts';
 
 const fallback = css`
   box-sizing: border-box;

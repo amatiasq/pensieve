@@ -1,7 +1,7 @@
-import { MixedStore } from '../middleware/MixedStore';
-import { fetchAndUpdate } from './fetchAndUpdate';
-import { setDefaultReason } from './setDefaultReason';
-import { WriteOptions } from './WriteOptions';
+import { MixedStore } from '../middleware/MixedStore.ts';
+import { fetchAndUpdate } from './fetchAndUpdate.ts';
+import { setDefaultReason } from './setDefaultReason.ts';
+import { WriteOptions } from './WriteOptions.ts';
 
 export class RemoteValue {
   get isCached() {

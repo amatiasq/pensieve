@@ -5,9 +5,9 @@ import React, {
   PropsWithChildren,
   useCallback,
 } from 'react';
-import { CaretIcon } from '../icons/CaretIcon';
-import { IconContainer } from '../icons/IconContainer';
-import { hStack } from '../styles';
+import { CaretIcon } from '../icons/CaretIcon.tsx';
+import { IconContainer } from '../icons/IconContainer.tsx';
+import { hStack } from '../styles.ts';
 
 const AnimatedIcon = styled(IconContainer)`
   transform: rotate(0);

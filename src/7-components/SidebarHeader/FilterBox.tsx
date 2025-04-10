@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 import { createRef, useCallback, useState } from 'react';
-import { useScheduler } from '../../6-hooks/useScheduler';
-import { useShortcut } from '../../6-hooks/useShortcut';
-import StringComparer from '../../util/StringComparer';
-import { IconButton } from '../atoms/IconButton';
-import { CrossIcon } from '../icons/CrossIcon';
-import { IconContainer } from '../icons/IconContainer';
-import { LoupeIcon } from '../icons/LoupeIcon';
+import { useScheduler } from '../../6-hooks/useScheduler.ts';
+import { useShortcut } from '../../6-hooks/useShortcut.ts';
+import StringComparer from '../../util/StringComparer.ts';
+import { IconButton } from '../atoms/IconButton.tsx';
+import { CrossIcon } from '../icons/CrossIcon.tsx';
+import { IconContainer } from '../icons/IconContainer.tsx';
+import { LoupeIcon } from '../icons/LoupeIcon.tsx';
 
 const FormControl = styled.div`
   flex: 1;

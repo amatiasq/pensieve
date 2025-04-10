@@ -1,9 +1,9 @@
 import { Monaco } from '@monaco-editor/react';
 import { editor, Uri } from 'monaco-editor';
-import { errorFor } from '../../../util/errorFor';
-import { getMatchesForRegex } from './getMatchesForRegex';
-import ITextModel = editor.ITextModel;
+import { errorFor } from '../../../util/errorFor.ts';
+import { getMatchesForRegex } from './getMatchesForRegex.ts';
 
+type ITextModel = editor.ITextModel;
 type LinkCreator = Record<string, string>;
 
 export function provideCustomLinks(monaco: Monaco, definition: LinkCreator) {

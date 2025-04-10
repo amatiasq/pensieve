@@ -1,4 +1,4 @@
-import { busyWhile } from './busy-indicator';
+import { busyWhile } from './busy-indicator.ts';
 
 export type RequestBody = Record<string, unknown> | string | null;
 

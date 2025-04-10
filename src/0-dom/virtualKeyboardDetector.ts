@@ -1,5 +1,5 @@
 import { emitter } from '@amatiasq/emitter';
-import { isMobile } from './isMobile';
+import { isMobile } from './isMobile.ts';
 
 type Size = { w: number; h: number };
 const isSameSize = (a: Size, b: Size) => a.w === b.w && a.h === b.h;

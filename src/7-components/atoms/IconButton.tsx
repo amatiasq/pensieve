@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { forwardRef } from 'react';
-import { iconContainerStyles } from '../icons/IconContainer';
-import { Button, ButtonProps } from './Button';
+import { iconContainerStyles } from '../icons/IconContainer.tsx';
+import { Button, ButtonProps } from './Button.tsx';
 
 const StyledButton = styled(Button)`
   ${iconContainerStyles};

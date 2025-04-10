@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Note } from '../2-entities/Note';
-import StringComparer from '../util/StringComparer';
-import { useStore } from './useStore';
+import { Note } from '../2-entities/Note.ts';
+import StringComparer from '../util/StringComparer.ts';
+import { useStore } from './useStore.ts';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
 

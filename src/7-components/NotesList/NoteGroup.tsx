@@ -1,11 +1,11 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
-import { Note } from '../../2-entities/Note';
-import { useNavigator } from '../../6-hooks/useNavigator';
-import { Disclosure, DisclosureToggleEvent } from '../atoms/Disclosure';
-import { GroupCounter } from './GroupCounter';
-import { NoteItem } from './NoteItem';
+import { Note } from '../../2-entities/Note.ts';
+import { useNavigator } from '../../6-hooks/useNavigator.ts';
+import { Disclosure, DisclosureToggleEvent } from '../atoms/Disclosure.tsx';
+import { GroupCounter } from './GroupCounter.tsx';
+import { NoteItem } from './NoteItem.tsx';
 
 const Title = styled.span`
   flex: 1;

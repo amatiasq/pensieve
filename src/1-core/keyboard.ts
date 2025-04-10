@@ -1,5 +1,5 @@
 import { emitter } from '@amatiasq/emitter';
-import { isMobile } from '../0-dom/isMobile';
+import { isMobile } from '../0-dom/isMobile.ts';
 
 const CONTROL_KEYS = {
   Meta: 'META',

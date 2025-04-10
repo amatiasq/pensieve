@@ -1,10 +1,10 @@
-import { CLIENT_ID_DEV, CLIENT_ID_PROD } from '../config.json';
+import { CLIENT_ID_DEV, CLIENT_ID_PROD } from '../config.json' with { type: 'json' };
 
 /**
  * @param {Request} request
  * @returns {Promise<Response>}
  */
-export default async request => {
+export default request => {
   const { searchParams } = new URL(request.url);
   const redirect_uri = searchParams.get('redirect_uri');
   const isDev = redirect_uri.startsWith('http://localhost');

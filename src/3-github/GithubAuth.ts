@@ -1,6 +1,6 @@
 import { ClientStorage } from '@amatiasq/client-storage';
-import { POST } from '../1-core/http';
-import { parseParams, withParams } from '../1-core/url';
+import { POST } from '../1-core/http.ts';
+import { parseParams, withParams } from '../1-core/url.ts';
 
 const AUTH_ROOT = 'https://github.com/login/oauth';
 

@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { forwardRef, useCallback } from 'react';
-import { NoteId } from '../../2-entities/Note';
-import { useNote } from '../../6-hooks/useNote';
-import { IconButton, IconButtonProps } from '../atoms/IconButton';
-import { StarIcon } from '../icons/StarIcont';
+import { NoteId } from '../../2-entities/Note.ts';
+import { useNote } from '../../6-hooks/useNote.ts';
+import { IconButton, IconButtonProps } from '../atoms/IconButton.tsx';
+import { StarIcon } from '../icons/StarIcont.tsx';
 
 type ClickEvent = React.MouseEvent<HTMLButtonElement, MouseEvent>;
 

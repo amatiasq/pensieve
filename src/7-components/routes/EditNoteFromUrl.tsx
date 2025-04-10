@@ -1,10 +1,10 @@
 import { useParams } from 'react-router-dom';
-import { NoteId } from '../../2-entities/Note';
-import { useNavigator } from '../../6-hooks/useNavigator';
-import { useNote } from '../../6-hooks/useNote';
-import { useNoteContent } from '../../6-hooks/useNoteContent';
-import { Loader } from '../atoms/Loader';
-import { Editor } from '../Editor/Editor';
+import { NoteId } from '../../2-entities/Note.ts';
+import { useNavigator } from '../../6-hooks/useNavigator.ts';
+import { useNote } from '../../6-hooks/useNote.ts';
+import { useNoteContent } from '../../6-hooks/useNoteContent.ts';
+import { Loader } from '../atoms/Loader.tsx';
+import { Editor } from '../Editor/Editor.tsx';
 
 export function EditNoteFromUrl() {
   const { noteId } = useParams() as { noteId: NoteId };

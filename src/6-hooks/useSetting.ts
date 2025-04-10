@@ -4,9 +4,9 @@ import {
   areSettingsIdentical,
   DEFAULT_SETTINGS,
   Settings,
-} from '../2-entities/Settings';
-import { serialize } from '../util/serialization';
-import { useStore } from './useStore';
+} from '../2-entities/Settings.ts';
+import { serialize } from '../util/serialization.ts';
+import { useStore } from './useStore.ts';
 
 const localCache = new ClientStorage<Settings | null>(
   'pensieve.settings-hook',

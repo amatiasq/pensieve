@@ -1,16 +1,16 @@
 import styled from '@emotion/styled';
-import React, { useCallback, useState } from 'react';
-import { Note } from '../../2-entities/Note';
-import { useFilteredNotes } from '../../6-hooks/useFilteredNotes';
-import { useNoteList } from '../../6-hooks/useNoteList';
-import { useSetting } from '../../6-hooks/useSetting';
-import { useShortcut } from '../../6-hooks/useShortcut';
-import StringComparer from '../../util/StringComparer';
-import { Loader } from '../atoms/Loader';
-import { PresenceDetector } from '../atoms/PresenceDetector';
-import { hideScrollbar } from '../styles';
-import { NoteGroup } from './NoteGroup';
-import { NoteItem } from './NoteItem';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Note } from '../../2-entities/Note.ts';
+import { useFilteredNotes } from '../../6-hooks/useFilteredNotes.ts';
+import { useNoteList } from '../../6-hooks/useNoteList.ts';
+import { useSetting } from '../../6-hooks/useSetting.ts';
+import { useShortcut } from '../../6-hooks/useShortcut.ts';
+import StringComparer from '../../util/StringComparer.ts';
+import { Loader } from '../atoms/Loader.tsx';
+import { PresenceDetector } from '../atoms/PresenceDetector.tsx';
+import { hideScrollbar } from '../styles.ts';
+import { NoteGroup } from './NoteGroup.tsx';
+import { NoteItem } from './NoteItem.tsx';
 
 const INITIAL_ITEMS_COUNT = 50;
 const ITEMS_COUNT_INCREASE = 50;
@@ -64,6 +64,17 @@ export function NotesList({ filter }: NotesListProps) {
   const filtered = useFilteredNotes(list, filter);
 
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
+  const [folders] = useSetting('folders');
+
+  const getUnifiedFolderName = useMemo(() => {
+    if (!folders) return (group: string) => group;
+
+    const folderKeys = Object.fromEntries(
+      Object.keys(folders).map(x => [x.toLocaleLowerCase(), x]),
+    );
+
+    return (group: string) => folderKeys[group.toLocaleLowerCase()] || group;
+  }, [folders]);
 
   useShortcut('hideSidebar', () => setIsVisible(!isVisible));
 
@@ -109,8 +120,9 @@ export function NotesList({ filter }: NotesListProps) {
 
     const finalList = notes
       .map(x => {
-        const { group } = x;
-        if (!group) return x;
+        if (!x.group) return x;
+
+        const group = getUnifiedFolderName(x.group);
 
         if (groups.has(group)) {
           groups.get(group)?.push(x);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { NoteContent, NoteId } from '../2-entities/Note';
-import { WriteOptions } from '../4-storage/helpers/WriteOptions';
-import { useStore } from './useStore';
+import { NoteContent, NoteId } from '../2-entities/Note.ts';
+import { WriteOptions } from '../4-storage/helpers/WriteOptions.ts';
+import { useStore } from './useStore.ts';
 
 export function useNoteContent(id: NoteId) {
   const store = useStore();

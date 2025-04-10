@@ -1,9 +1,9 @@
 import { Scheduler } from '@amatiasq/scheduler';
-import { GHRepository, StagedFiles } from '../../3-github/GHRepository';
-import { debugMethods } from '../../util/debugMethods';
-import { AsyncStore } from '../AsyncStore';
-import { setDefaultReason } from '../helpers/setDefaultReason';
-import { WriteOptions } from '../helpers/WriteOptions';
+import { GHRepository, StagedFiles } from '../../3-github/GHRepository.ts';
+import { debugMethods } from '../../util/debugMethods.ts';
+import { AsyncStore } from '../AsyncStore.ts';
+import { setDefaultReason } from '../helpers/setDefaultReason.ts';
+import { WriteOptions } from '../helpers/WriteOptions.ts';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
 

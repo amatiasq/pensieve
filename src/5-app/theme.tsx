@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 import Color from 'colorjs.io';
-import { desktopOnly, mobileOnly } from '../0-dom/responsive';
+import { desktopOnly, mobileOnly } from '../0-dom/responsive.ts';
 
 const color = (hex: string) => (l?: number) => {
   if (!l) return hex;

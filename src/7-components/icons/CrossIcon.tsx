@@ -1,4 +1,4 @@
-import { icon } from './icon';
+import { icon } from './icon.tsx';
 
 const padding = 4;
 const opposite = 24 - padding;

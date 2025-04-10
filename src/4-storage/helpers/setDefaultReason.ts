@@ -1,4 +1,4 @@
-import { WriteOptions } from './WriteOptions';
+import { WriteOptions } from './WriteOptions.ts';
 
 export function setDefaultReason(
   options: WriteOptions | undefined,

@@ -2,14 +2,14 @@ import { Global } from '@emotion/react';
 import { useEffect, useState } from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import { ghRepository } from '../3-github/gh-utils';
-import { createStore } from '../4-storage';
-import { AppStorage } from '../4-storage/AppStorage';
-import { Loader } from '../7-components/atoms/Loader';
-import { App } from './App';
-import { StorageContext } from './contexts';
-import { globalStyles } from './theme';
-import { useGithubAuth } from './useGithubAuth';
+import { ghRepository } from '../3-github/gh-utils.ts';
+import { AppStorage } from '../4-storage/AppStorage.ts';
+import { createStore } from '../4-storage/index.ts';
+import { Loader } from '../7-components/atoms/Loader.tsx';
+import { App } from './App.tsx';
+import { StorageContext } from './contexts.ts';
+import { globalStyles } from './theme.tsx';
+import { useGithubAuth } from './useGithubAuth.ts';
 
 export function renderApp(container: HTMLElement): void {
   render(<Scaffold />, container);

@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import React, { createRef, useEffect, useState } from 'react';
-import { selectElementContents } from '../../0-dom/selectElementContents';
+import { selectElementContents } from '../../0-dom/selectElementContents.ts';
 
 const Field = styled.span`
   cursor: default;

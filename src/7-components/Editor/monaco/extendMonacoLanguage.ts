@@ -1,6 +1,7 @@
 import { Monaco } from '@monaco-editor/react';
 import { languages } from 'monaco-editor';
-import IMonarchLanguage = languages.IMonarchLanguage;
+
+type IMonarchLanguage = languages.IMonarchLanguage;
 
 export async function extendMonacoLanguage(
   monaco: Monaco,
@@ -18,7 +19,7 @@ export async function extendMonacoLanguage(
   const { tokenizer, ...rest } = definition;
 
   for (const [category, tokenDefs] of Object.entries(tokenizer)) {
-    if (!language.tokenizer.hasOwnProperty(category)) {
+    if (!Object.prototype.hasOwnProperty.call(language.tokenizer, category)) {
       language.tokenizer[category] = [];
     }
 
@@ -29,7 +30,7 @@ export async function extendMonacoLanguage(
 
   for (const [key, value] of Object.keys(rest)) {
     if (Array.isArray(value)) {
-      if (!language.hasOwnProperty(key)) {
+      if (!Object.prototype.hasOwnProperty.call(language, key)) {
         language[key] = [];
       }
 

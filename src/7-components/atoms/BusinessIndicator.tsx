@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
-import { onBusinessChange } from '../../1-core/busy-indicator';
-import { LoadingIcon } from '../icons/LoadingIcon';
+import { onBusinessChange } from '../../1-core/busy-indicator.ts';
+import { LoadingIcon } from '../icons/LoadingIcon.tsx';
 
 const Container = styled.div`
   position: fixed;

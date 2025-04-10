@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
-import { useCreateNote } from '../../6-hooks/useCreateNote';
-import { useShortcut } from '../../6-hooks/useShortcut';
-import StringComparer from '../../util/StringComparer';
-import { IconButton } from '../atoms/IconButton';
-import { PlusIcon } from '../icons/PlusIcon';
-import { FilterBox } from './FilterBox';
+import { useCreateNote } from '../../6-hooks/useCreateNote.ts';
+import { useShortcut } from '../../6-hooks/useShortcut.ts';
+import StringComparer from '../../util/StringComparer.ts';
+import { IconButton } from '../atoms/IconButton.tsx';
+import { PlusIcon } from '../icons/PlusIcon.tsx';
+import { FilterBox } from './FilterBox.tsx';
 
 const Header = styled.h4`
   --sidebar-header-gap: calc(var(--sidebar-gap) * 2);

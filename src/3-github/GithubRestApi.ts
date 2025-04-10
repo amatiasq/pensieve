@@ -1,6 +1,6 @@
-import { DELETE, GET, PATCH, POST, PUT, RequestBody } from '../1-core/http';
-import { ghAuthHeaders, ghUrl } from './gh-utils';
-import { GithubToken } from './GithubAuth';
+import { DELETE, GET, PATCH, POST, PUT, RequestBody } from '../1-core/http.ts';
+import { ghAuthHeaders, ghUrl } from './gh-utils.ts';
+import { GithubToken } from './GithubAuth.ts';
 
 export enum MediaType {
   Json = 'application/vnd.github.v3+json',

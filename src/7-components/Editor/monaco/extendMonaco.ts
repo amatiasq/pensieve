@@ -1,13 +1,14 @@
 import { Monaco } from '@monaco-editor/react';
 import { editor, languages } from 'monaco-editor';
-import { errorFor } from '../../../util/errorFor';
-import { extendMonacoLanguage } from './extendMonacoLanguage';
-import { provideCustomLinks } from './extendMonacoLinks';
-import { extendMonacoTheme } from './extendMonacoTheme';
+import initEditor from 'monaco-mermaid';
+import { errorFor } from '../../../util/errorFor.ts';
+import { extendMonacoLanguage } from './extendMonacoLanguage.ts';
+import { provideCustomLinks } from './extendMonacoLinks.ts';
+import { extendMonacoTheme } from './extendMonacoTheme.ts';
 
-// import IMonarchLanguage = languages.IMonarchLanguage;
-import IMonarchLanguageRule = languages.IMonarchLanguageRule;
-import ITokenThemeRule = editor.ITokenThemeRule;
+// type IMonarchLanguage = languages.IMonarchLanguage;
+type IMonarchLanguageRule = languages.IMonarchLanguageRule;
+type ITokenThemeRule = editor.ITokenThemeRule;
 
 export function extendMonaco(
   monaco: Monaco,
@@ -29,6 +30,14 @@ export function extendMonaco(
   const theme: ITokenThemeRule[] = [];
   const root: IMonarchLanguageRule[] = [];
   let counter = 0;
+
+  errorFor(() => {
+    initEditor(monaco as any);
+    const allLangs = monaco.languages.getLanguages();
+    const lang = allLangs.find(({ id }) => id === 'mermaid');
+    if (!lang) throw new Error(`Could not find language mermaid`);
+    lang.extensions = ['.mmd', '.mermaid'];
+  }, 'Error adding mermaid support to monaco');
 
   errorFor(
     () => {

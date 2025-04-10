@@ -1,15 +1,15 @@
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
-import { desktopOnly, mobileOnly } from '../0-dom/responsive';
-import { useNavigator } from '../6-hooks/useNavigator';
-import { useSetting } from '../6-hooks/useSetting';
-import { Resizer } from '../7-components/atoms/Resizer';
-import { NotesList } from '../7-components/NotesList/NotesList';
-import { SidebarHeader } from '../7-components/SidebarHeader/SidebarHeader';
-import StringComparer from '../util/StringComparer';
-import { Router } from './Router';
+import { desktopOnly, mobileOnly } from '../0-dom/responsive.ts';
+import { useNavigator } from '../6-hooks/useNavigator.ts';
+import { useSetting } from '../6-hooks/useSetting.ts';
+import { Resizer } from '../7-components/atoms/Resizer.tsx';
+import { NotesList } from '../7-components/NotesList/NotesList.tsx';
+import { SidebarHeader } from '../7-components/SidebarHeader/SidebarHeader.tsx';
+import StringComparer from '../util/StringComparer.ts';
+import { Router } from './Router.tsx';
 
-import { VALID_ORIGINS } from '../config.json';
+import { VALID_ORIGINS } from '../config.json' with { type: 'json' };
 
 const validOrigins = location.origin.includes('localhost')
   ? [location.origin, ...VALID_ORIGINS]

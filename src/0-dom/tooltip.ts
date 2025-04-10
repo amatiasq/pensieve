@@ -1,5 +1,5 @@
-import { getMousePosition } from '../1-core/mouse';
-import { escapeHtml } from './escapeHtml';
+import { getMousePosition } from '../1-core/mouse.ts';
+import { escapeHtml } from './escapeHtml.ts';
 import './tooltip.css';
 
 export function tooltip(

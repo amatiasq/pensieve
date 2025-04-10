@@ -1,4 +1,4 @@
-import { icon } from './icon';
+import { icon } from './icon.tsx';
 
 export const LoupeIcon = icon(
   <svg viewBox="0 0 24 24" className="stroke">

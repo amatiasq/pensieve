@@ -3,17 +3,17 @@ import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { debounceTime, map, mergeWith } from 'rxjs/operators';
-import { onPageActive } from '../../0-dom/page-lifecycle';
-import { useNavigator } from '../../6-hooks/useNavigator';
-import { usePageTitle } from '../../6-hooks/usePageTitle';
-import { useScheduler } from '../../6-hooks/useScheduler';
-import { useSetting } from '../../6-hooks/useSetting';
-import { useShortcut } from '../../6-hooks/useShortcut';
-import { useStack } from '../../6-hooks/useStack';
-import { fromEmitter } from '../../util/rxjs-extensions';
-import { BusinessIndicator } from '../atoms/BusinessIndicator';
-import { Loader } from '../atoms/Loader';
-import { MonacoEditor } from './MonacoEditor';
+import { onPageActive } from '../../0-dom/page-lifecycle.ts';
+import { useNavigator } from '../../6-hooks/useNavigator.ts';
+import { usePageTitle } from '../../6-hooks/usePageTitle.ts';
+import { useScheduler } from '../../6-hooks/useScheduler.ts';
+import { useSetting } from '../../6-hooks/useSetting.ts';
+import { useShortcut } from '../../6-hooks/useShortcut.ts';
+import { useStack } from '../../6-hooks/useStack.ts';
+import { fromEmitter } from '../../util/rxjs-extensions.ts';
+import { BusinessIndicator } from '../atoms/BusinessIndicator.tsx';
+import { Loader } from '../atoms/Loader.tsx';
+import { MonacoEditor } from './MonacoEditor.tsx';
 
 interface BaseEditorProps {
   key: string;

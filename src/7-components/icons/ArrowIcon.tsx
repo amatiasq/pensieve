@@ -1,4 +1,4 @@
-import { icon } from './icon';
+import { icon } from './icon.tsx';
 
 const xPadding = 5;
 const yPadding = 7;

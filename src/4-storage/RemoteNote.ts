@@ -1,16 +1,16 @@
-import { messageBus } from '../1-core/messageBus';
+import { messageBus } from '../1-core/messageBus.ts';
 import {
   getMetadataFromContent,
   isNoteIdentical,
   Note,
   NoteContent,
   NoteId,
-} from '../2-entities/Note';
-import { datestr } from '../util/serialization';
-import { RemoteJson } from './helpers/RemoteJson';
-import { RemoteValue } from './helpers/RemoteValue';
-import { setDefaultReason } from './helpers/setDefaultReason';
-import { WriteOptions } from './helpers/WriteOptions';
+} from '../2-entities/Note.ts';
+import { datestr } from '../util/serialization.ts';
+import { RemoteJson } from './helpers/RemoteJson.ts';
+import { RemoteValue } from './helpers/RemoteValue.ts';
+import { setDefaultReason } from './helpers/setDefaultReason.ts';
+import { WriteOptions } from './helpers/WriteOptions.ts';
 
 const noop = () => {
   // noop

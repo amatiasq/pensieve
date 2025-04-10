@@ -1,4 +1,4 @@
-import { serialize } from '../util/serialization';
+import { serialize } from '../util/serialization.ts';
 
 export const DEFAULT_SETTINGS = {
   autosave: 5,
@@ -22,6 +22,10 @@ export const DEFAULT_SETTINGS = {
   links: {
     '\\[(\\w+/\\w+)]': `https://github.com/$1`,
   } as Record<string, string>,
+
+  folders: {
+    Snippets: {},
+  } as Record<string, Record<string, never>>,
 };
 
 export type Settings = typeof DEFAULT_SETTINGS;

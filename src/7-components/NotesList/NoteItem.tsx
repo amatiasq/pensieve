@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { NoteId } from '../../2-entities/Note';
-import { useNavigator } from '../../6-hooks/useNavigator';
-import { useNote } from '../../6-hooks/useNote';
-import { ellipsis, hStack } from '../styles';
-import { FavoriteButton } from './FavoriteButton';
-import { NoteActions } from './NoteActions';
+import { NoteId } from '../../2-entities/Note.ts';
+import { useNavigator } from '../../6-hooks/useNavigator.ts';
+import { useNote } from '../../6-hooks/useNote.ts';
+import { ellipsis, hStack } from '../styles.ts';
+import { FavoriteButton } from './FavoriteButton.tsx';
+import { NoteActions } from './NoteActions.tsx';
 
 const StyledFavouriteButton = styled(FavoriteButton)``;
 

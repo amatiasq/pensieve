@@ -1,9 +1,9 @@
-import { messageBus } from '../../1-core/messageBus';
-import { deserialize, serialize } from '../../util/serialization';
-import { MixedStore } from '../middleware/MixedStore';
-import { RemoteValue } from './RemoteValue';
-import { setDefaultReason } from './setDefaultReason';
-import { WriteOptions } from './WriteOptions';
+import { messageBus } from '../../1-core/messageBus.ts';
+import { deserialize, serialize } from '../../util/serialization.ts';
+import { MixedStore } from '../middleware/MixedStore.ts';
+import { RemoteValue } from './RemoteValue.ts';
+import { setDefaultReason } from './setDefaultReason.ts';
+import { WriteOptions } from './WriteOptions.ts';
 
 export class RemoteJson<T> extends RemoteValue {
   private readonly emitChange: (data: T) => void;

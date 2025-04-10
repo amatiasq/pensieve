@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { onShortcut } from '../1-core/keyboard';
+import { onShortcut } from '../1-core/keyboard.ts';
 import {
   DEFAULT_SHORTCUTS,
   ShortcutCommand,
   Shortcuts,
-} from '../2-entities/Shortcuts';
-import { NotesStorage } from '../4-storage/NotesStorage';
-import { useStore } from './useStore';
+} from '../2-entities/Shortcuts.ts';
+import { NotesStorage } from '../4-storage/NotesStorage.ts';
+import { useStore } from './useStore.ts';
 
 type Executor = () => void;
 

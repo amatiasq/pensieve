@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": false,
+    "allowUmdGlobalAccess": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": "/",
     "esModuleInterop": true,

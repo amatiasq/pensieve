@@ -1,4 +1,4 @@
-import { ghRepository } from '../3-github/gh-utils';
+import { ghRepository } from '../3-github/gh-utils.ts';
 
 const separator = '  ';
 

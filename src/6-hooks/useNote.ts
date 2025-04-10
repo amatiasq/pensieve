@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
-import { isNoteIdentical, Note, NoteContent, NoteId } from '../2-entities/Note';
-import { useStore } from './useStore';
+import {
+  isNoteIdentical,
+  Note,
+  NoteContent,
+  NoteId,
+} from '../2-entities/Note.ts';
+import { useStore } from './useStore.ts';
 
 export function useNote(id: NoteId) {
   const store = useStore();

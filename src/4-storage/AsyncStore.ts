@@ -1,4 +1,4 @@
-import { WriteOptions } from './helpers/WriteOptions';
+import { WriteOptions } from './helpers/WriteOptions.ts';
 
 export interface AsyncStore {
   has(key: string): Promise<boolean>;

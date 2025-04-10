@@ -1,4 +1,4 @@
-import { GH_API } from '../config.json';
+import { GH_API } from '../config.json' with { type: 'json' };
 
 /**
  * @param {Request} request

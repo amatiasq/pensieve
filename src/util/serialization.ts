@@ -1,3 +1,5 @@
+import JSON5 from 'json5';
+
 export function serialize(x: any) {
   return JSON.stringify(x, null, 2);
 }
@@ -6,7 +8,7 @@ export function deserialize<T = any>(x: string) {
   const clean = x.replace(/[^:]\/\/[^\n]+\n/g, '');
 
   try {
-    return JSON.parse(clean) as T;
+    return JSON5.parse(clean) as T;
   } catch (error) {
     const [position] = error.message.split(/\s/g).reverse();
     console.warn(

@@ -1,4 +1,4 @@
-import { GHCommitSha } from './GHApiCommit';
+import { GHCommitSha } from './GHApiCommit.ts';
 
 export interface GHApiRef {
   ref: string;

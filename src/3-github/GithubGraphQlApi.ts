@@ -1,6 +1,6 @@
-import { POST } from '../1-core/http';
-import { ghAuthHeaders, ghUrl } from './gh-utils';
-import { GithubToken } from './GithubAuth';
+import { POST } from '../1-core/http.ts';
+import { ghAuthHeaders, ghUrl } from './gh-utils.ts';
+import { GithubToken } from './GithubAuth.ts';
 
 export class GithubGraphQlApi {
   constructor(public token: GithubToken) {}

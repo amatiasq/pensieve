@@ -1,5 +1,5 @@
-import React, { PropsWithChildren, useEffect, useRef } from 'react';
-import { useIntersectionObserver } from 'usehooks-ts/dist/useIntersectionObserver';
+import { PropsWithChildren, useEffect, useRef } from 'react';
+import { useIntersectionObserver } from 'usehooks-ts';
 
 interface PresenceDetectorProps {
   className?: string;

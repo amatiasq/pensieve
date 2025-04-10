@@ -1,13 +1,13 @@
 import localforage from 'localforage';
-import { GHRepository } from '../3-github/GHRepository';
-import { GithubToken } from '../3-github/GithubAuth';
-import { GithubUsername } from '../3-github/models/GHApiUser';
-import { AppStorage } from './AppStorage';
-import { CachedStore } from './middleware/CachedStore';
-import { ForageStore } from './middleware/ForageStore';
-import { GHRepoStore } from './middleware/GHRepoStore';
-import { MixedStore } from './middleware/MixedStore';
-import { ResilientOnlineStore } from './middleware/ResilientOnlineStore';
+import { GHRepository } from '../3-github/GHRepository.ts';
+import { GithubToken } from '../3-github/GithubAuth.ts';
+import { GithubUsername } from '../3-github/models/GHApiUser.ts';
+import { AppStorage } from './AppStorage.ts';
+import { CachedStore } from './middleware/CachedStore.ts';
+import { ForageStore } from './middleware/ForageStore.ts';
+import { GHRepoStore } from './middleware/GHRepoStore.ts';
+import { MixedStore } from './middleware/MixedStore.ts';
+import { ResilientOnlineStore } from './middleware/ResilientOnlineStore.ts';
 
 Object.assign(window, { localforage });
 

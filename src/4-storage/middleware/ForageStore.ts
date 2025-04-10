@@ -1,6 +1,6 @@
-import { debugMethods } from '../../util/debugMethods';
-import { AsyncStore } from '../AsyncStore';
-import { patternToRegex } from '../helpers/patternToRegex';
+import { debugMethods } from '../../util/debugMethods.ts';
+import { AsyncStore } from '../AsyncStore.ts';
+import { patternToRegex } from '../helpers/patternToRegex.ts';
 
 export class ForageStore implements AsyncStore {
   private keys: string[] | null = null;

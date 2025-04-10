@@ -1,13 +1,13 @@
-import { POST } from '../1-core/http';
-import { ghCommitEndpoint } from './gh-utils';
-import { GithubToken } from './GithubAuth';
-import { GithubGraphQlApi } from './GithubGraphQlApi';
-import { GithubRestApi, MediaType } from './GithubRestApi';
+import { POST } from '../1-core/http.ts';
+import { ghCommitEndpoint } from './gh-utils.ts';
+import { GithubToken } from './GithubAuth.ts';
+import { GithubGraphQlApi } from './GithubGraphQlApi.ts';
+import { GithubRestApi, MediaType } from './GithubRestApi.ts';
 import {
   GHApiRepositoryNode,
   GHNodeSha,
   GHRepoNodeType,
-} from './models/GHApiRepositoryNode';
+} from './models/GHApiRepositoryNode.ts';
 
 const CREATE_REPO_CONFIG = {
   has_issues: false,
@@ -95,36 +95,16 @@ export class GHRepository {
 
   async readDir(path: string) {
     const clean = path.replace(/^\*|\*$/g, '');
-    const {
-      data: {
-        repository: { files },
-      },
-    } = await this.gql.send(getFilesContent(), this.getFileVars(clean));
+    const response = await this.gql.send<FilesContentResponse>(
+      getFilesContent(),
+      this.getFileVars(clean),
+    );
 
-    if (!files) return [];
-
-    return files.entries.map((x: any) => [x.path, x.object.text]) as [
-      string,
-      string,
-    ][];
+    const { entries } = response.data.repository.files ?? {};
+    return entries?.map(x => [x.path, x.object.text] as const) ?? [];
   }
 
-  // async hasFile(path: string) {
-  //   const url = `${this.url}/contents/${path}`;
-
-  //   try {
-  //     await this.rest.GET<GHApiRepositoryNode>(url);
-  //     return true;
-  //   } catch (error) {
-  //     if (error instanceof HttpError && error.status === 404) {
-  //       return false;
-  //     }
-
-  //     throw error;
-  //   }
-  // }
-
-  async getReadme() {
+  getReadme() {
     return this.rest.GET<string>(`${this.url}/readme`, {
       mediaType: MediaType.Raw,
     });
@@ -147,7 +127,7 @@ export class GHRepository {
     await this.rest.PUT(`${this.url}/contents/${path}`, { message, content });
   }
 
-  commit(message: string, files: StagedFiles, isUrgent = false) {
+  async commit(message: string, files: StagedFiles, isUrgent = false) {
     const { owner: username, name, branch, token } = this;
     const body = {
       token,
@@ -160,15 +140,20 @@ export class GHRepository {
 
     this.commiting = true;
 
-    return POST<void>(ghCommitEndpoint, body, { keepalive: isUrgent }).finally(
-      () => (this.commiting = false),
-    );
+    try {
+      return await POST<void>(ghCommitEndpoint, body, { keepalive: isUrgent });
+    } finally {
+      this.commiting = false;
+    }
   }
 
   async readFileCool(path: string, keys: string) {
-    return this.gql
-      .send(getFileProperty(keys), this.getFileVars(path))
-      .then(x => x.data.repository.file?.text as string);
+    const response = await this.gql.send(
+      getFileProperty(keys),
+      this.getFileVars(path),
+    );
+
+    return response.data.repository.file?.text as string;
   }
 
   private getFileVars(path: string) {
@@ -193,6 +178,19 @@ function getFileProperty(keys: string) {
     }
   `;
 }
+
+type FilesContentResponse = {
+  data: {
+    repository: {
+      files: {
+        entries: {
+          path: string;
+          object: { text: string };
+        }[];
+      };
+    };
+  };
+};
 
 function getFilesContent() {
   return `

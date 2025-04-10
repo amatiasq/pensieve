@@ -1,4 +1,19 @@
-import { serialize, SerializedDate } from '../util/serialization';
+import { serialize, SerializedDate } from '../util/serialization.ts';
+
+const COMMENTS_BY_LANG: Record<string, [string] | [string, string]> = {
+  '.cs': ['//'],
+  '.fs': ['//'],
+  '.html': ['<!--', '-->'],
+  '.js': ['//'],
+  '.md': ['#'],
+  '.mermaid': ['%%'],
+  '.mmd': ['%%'],
+  '.sh': ['#'],
+  '.sql': ['--'],
+  '.ts': ['//'],
+  '.yaml': ['#'],
+  '.yml': ['#'],
+};
 
 export type NoteId = '[string NoteId]';
 export type NoteContent = string;
@@ -27,6 +42,7 @@ export function getMetadataFromContent(content: NoteContent) {
   const firstLine = lineBreak === -1 ? trimmed : trimmed.substr(0, lineBreak);
   const extension = getExtensionFor(firstLine);
   const cleanLine = removeCommentFrom(firstLine, extension);
+
   const [title, group] = cleanLine
     .split('/')
     .reverse()
@@ -36,30 +52,21 @@ export function getMetadataFromContent(content: NoteContent) {
 }
 
 function getExtensionFor(title: string) {
-  const match = title.match(/(\.\w+)+$/);
+  const closing = Object.values(COMMENTS_BY_LANG)
+    .map(x => x[1])
+    .filter(Boolean)
+    .map(x => new RegExp(`${x}$`));
+
+  const cleanTitle = closing
+    .reduce((acc, reg) => acc.replace(reg, ''), title)
+    .trim();
+
+  const match = cleanTitle.match(/(\.\w+)+$/);
   return match ? match[0] : '.md';
 }
 
 function removeCommentFrom(text: string, extension: string) {
-  const remover = getCommentRemover(extension);
-  return text.trim().replace(remover, '').trim();
-}
-
-function getCommentRemover(extension: string) {
-  const comment = getCommentFromExtension(extension);
-  return new RegExp(`^\\s*(${comment})+`);
-}
-
-function getCommentFromExtension(extension: string) {
-  const comments: Record<string, string> = {
-    '.sql': '--',
-    '.md': '#',
-    '.sh': '#',
-    '.js': '//',
-    '.ts': '//',
-    '.cs': '//',
-    '.fs': '//',
-  };
-
-  return comments[extension] || '//';
+  const [open, close] = COMMENTS_BY_LANG[extension] || ['//'];
+  const clean = text.trim().replace(new RegExp(`^${open}`), '');
+  return close ? clean.replace(new RegExp(`${close}$`), '') : clean;
 }

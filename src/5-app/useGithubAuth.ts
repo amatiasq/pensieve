@@ -1,15 +1,15 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 import { useState } from 'react';
-import { parseParams } from '../1-core/url';
+import { parseParams } from '../1-core/url.ts';
 import {
   appOrigin,
   ghAuthEndpoint,
   ghClientId,
   ghScope,
-} from '../3-github/gh-utils';
-import { GithubAuth, GithubToken } from '../3-github/GithubAuth';
-import { GithubUsers } from '../3-github/GithubUsers';
-import { GithubUsername } from '../3-github/models/GHApiUser';
+} from '../3-github/gh-utils.ts';
+import { GithubAuth, GithubToken } from '../3-github/GithubAuth.ts';
+import { GithubUsers } from '../3-github/GithubUsers.ts';
+import { GithubUsername } from '../3-github/models/GHApiUser.ts';
 
 const auth = new GithubAuth({
   scope: ghScope,

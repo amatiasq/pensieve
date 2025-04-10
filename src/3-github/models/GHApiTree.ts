@@ -1,4 +1,4 @@
-import { GHNodeSha, GHRepoNodeType } from './GHApiRepositoryNode';
+import { GHNodeSha, GHRepoNodeType } from './GHApiRepositoryNode.ts';
 
 export type GHTreeSha = '[string GHTreeSha]';
 

@@ -1,6 +1,6 @@
-import { datestr } from '../util/serialization';
-import { useNavigator } from './useNavigator';
-import { useStore } from './useStore';
+import { datestr } from '../util/serialization.ts';
+import { useNavigator } from './useNavigator.ts';
+import { useStore } from './useStore.ts';
 
 export function useCreateNote() {
   const store = useStore();

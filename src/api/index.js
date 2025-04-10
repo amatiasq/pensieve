@@ -1,4 +1,4 @@
-import { VALID_ORIGINS } from '../config.json';
+import { VALID_ORIGINS } from '../config.json' with { type: 'json' };
 import auth from './auth.js';
 import commit from './commit.js';
 

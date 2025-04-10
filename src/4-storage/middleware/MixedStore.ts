@@ -1,6 +1,6 @@
-import { debugMethods } from '../../util/debugMethods';
-import { AsyncStore } from '../AsyncStore';
-import { WriteOptions } from '../helpers/WriteOptions';
+import { debugMethods } from '../../util/debugMethods.ts';
+import { AsyncStore } from '../AsyncStore.ts';
+import { WriteOptions } from '../helpers/WriteOptions.ts';
 
 export class MixedStore implements AsyncStore {
   constructor(

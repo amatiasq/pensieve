@@ -1,7 +1,7 @@
-import { debugMethods } from '../../util/debugMethods';
-import { AsyncStore } from '../AsyncStore';
-import { MemoryCache } from '../helpers/MemoryCache';
-import { WriteOptions } from '../helpers/WriteOptions';
+import { debugMethods } from '../../util/debugMethods.ts';
+import { AsyncStore } from '../AsyncStore.ts';
+import { MemoryCache } from '../helpers/MemoryCache.ts';
+import { WriteOptions } from '../helpers/WriteOptions.ts';
 
 export class CachedStore implements AsyncStore {
   private readonly readAllCache = new MemoryCache<

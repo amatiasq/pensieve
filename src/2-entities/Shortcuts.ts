@@ -1,4 +1,4 @@
-import { serialize } from '../util/serialization';
+import { serialize } from '../util/serialization.ts';
 
 export const DEFAULT_SHORTCUTS: Shortcuts = {
   'CTRL+TAB': 'goBack',

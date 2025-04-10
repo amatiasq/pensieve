@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { AnchorHTMLAttributes } from 'react';
-import { iconContainerStyles } from '../icons/IconContainer';
+import { iconContainerStyles } from '../icons/IconContainer.ts';
 
 const Link = styled.a`
   ${iconContainerStyles};

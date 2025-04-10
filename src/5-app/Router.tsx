@@ -1,10 +1,9 @@
-import React from 'react';
 import { Route } from 'react-router-dom';
-import { useNavigator } from '../6-hooks/useNavigator';
-import { useShortcut } from '../6-hooks/useShortcut';
-import { CreateNote } from '../7-components/routes/CreateNote';
-import { EditNoteFromUrl } from '../7-components/routes/EditNoteFromUrl';
-import { EditSettings } from '../7-components/routes/EditSettings';
+import { useNavigator } from '../6-hooks/useNavigator.ts';
+import { useShortcut } from '../6-hooks/useShortcut.ts';
+import { CreateNote } from '../7-components/routes/CreateNote.tsx';
+import { EditNoteFromUrl } from '../7-components/routes/EditNoteFromUrl.tsx';
+import { EditSettings } from '../7-components/routes/EditSettings.tsx';
 
 export function Router() {
   const navigator = useNavigator();

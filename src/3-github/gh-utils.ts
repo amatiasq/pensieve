@@ -1,5 +1,5 @@
-import { getQueryParameter } from '../0-dom/getQueryParameter';
-import { Note } from '../2-entities/Note';
+import { getQueryParameter } from '../0-dom/getQueryParameter.ts';
+import { Note } from '../2-entities/Note.ts';
 import {
   API_ORIGIN,
   AUTH_ENDPOINT,
@@ -8,9 +8,9 @@ import {
   COMMIT_ENDPOINT,
   GH_SCOPE,
   VALID_ORIGINS,
-} from '../config.json';
-import { GithubToken } from './GithubAuth';
-import { GithubUsername } from './models/GHApiUser';
+} from '../config.json' with { type: 'json' };
+import { GithubToken } from './GithubAuth.ts';
+import { GithubUsername } from './models/GHApiUser.ts';
 
 const GH_API = 'https://api.github.com';
 

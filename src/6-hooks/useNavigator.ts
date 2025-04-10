@@ -1,6 +1,6 @@
 import { emitter } from '@amatiasq/emitter';
 import { useHistory } from 'react-router-dom';
-import { Note, NoteId } from '../2-entities/Note';
+import { Note, NoteId } from '../2-entities/Note.ts';
 
 const onNavigate = emitter<Navigator>();
 const listeningTo = new Set();

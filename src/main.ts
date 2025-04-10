@@ -1,7 +1,7 @@
 import { registerSW } from 'virtual:pwa-register';
-import { isMobile } from './0-dom/isMobile';
-import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector';
-import { renderApp } from './5-app/renderApp';
+import { isMobile } from './0-dom/isMobile.ts';
+import { onVirtualKeyboardDisplayChange } from './0-dom/virtualKeyboardDetector.ts';
+import { renderApp } from './5-app/renderApp.tsx';
 
 const container = document.getElementById('app-container');
 

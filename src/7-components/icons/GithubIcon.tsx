@@ -1,4 +1,4 @@
-import { icon } from './icon';
+import { icon } from './icon.tsx';
 
 export const GithubIcon = icon(
   <svg viewBox="0 0 24 24" className="fill">

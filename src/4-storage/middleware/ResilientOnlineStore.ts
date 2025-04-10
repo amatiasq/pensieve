@@ -1,8 +1,8 @@
 import { ClientStorage } from '@amatiasq/client-storage';
 import { Scheduler } from '@amatiasq/scheduler';
-import { debugMethods } from '../../util/debugMethods';
-import { AsyncStore } from '../AsyncStore';
-import { WriteOptions } from '../helpers/WriteOptions';
+import { debugMethods } from '../../util/debugMethods.ts';
+import { AsyncStore } from '../AsyncStore.ts';
+import { WriteOptions } from '../helpers/WriteOptions.ts';
 
 const MAX_ATTEMPTS = 2;
 

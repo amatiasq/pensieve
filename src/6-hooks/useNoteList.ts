@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { isNoteIdentical, Note, NoteId } from '../2-entities/Note';
-import { parseDate } from '../util/serialization';
-import { useStore } from './useStore';
+import { isNoteIdentical, Note, NoteId } from '../2-entities/Note.ts';
+import { parseDate } from '../util/serialization.ts';
+import { useStore } from './useStore.ts';
 
 export function useNoteList() {
   const store = useStore();

@@ -1,19 +1,19 @@
 import { v4 as uuid } from 'uuid';
-import { messageBus } from '../1-core/messageBus';
+import { messageBus } from '../1-core/messageBus.ts';
 import {
   getMetadataFromContent,
   Note,
   NoteContent,
   NoteId,
-} from '../2-entities/Note';
-import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings';
-import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts';
-import { datestr, deserialize, serialize } from '../util/serialization';
-import { fetchAndUpdate } from './helpers/fetchAndUpdate';
-import { RemoteJson } from './helpers/RemoteJson';
-import { RemoteValue } from './helpers/RemoteValue';
-import { MixedStore } from './middleware/MixedStore';
-import { RemoteNote } from './RemoteNote';
+} from '../2-entities/Note.ts';
+import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings.ts';
+import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts.ts';
+import { datestr, deserialize, serialize } from '../util/serialization.ts';
+import { fetchAndUpdate } from './helpers/fetchAndUpdate.ts';
+import { RemoteJson } from './helpers/RemoteJson.ts';
+import { RemoteValue } from './helpers/RemoteValue.ts';
+import { MixedStore } from './middleware/MixedStore.ts';
+import { RemoteNote } from './RemoteNote.ts';
 
 const getNotesPath = () => 'meta/*';
 const getNotePath = (id: NoteId) => `meta/${id}.json`;
@@ -52,18 +52,18 @@ export class NotesStorage {
       return result;
     };
 
-    return fetchAndUpdate(
+    const values = await fetchAndUpdate(
       this.store.readAllLocal(pattern).then(log('local')),
       this.store.readAllRemote(pattern).then(log('remote')),
       x => this.synchronize(x),
       x => Boolean(Object.keys(x).length),
-    ).then(values =>
-      Object.values(values).map(raw => {
-        const note = deserialize<Note>(cleanJson(raw));
-        this.updateRemote(note.id, note);
-        return note;
-      }),
     );
+
+    return Object.values(values).map(raw => {
+      const note = deserialize<Note>(cleanJson(raw));
+      this.updateRemote(note.id, note);
+      return note;
+    });
   }
 
   private synchronize(notes: Record<NoteId, string>) {
