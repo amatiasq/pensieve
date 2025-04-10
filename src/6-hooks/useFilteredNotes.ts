@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Note } from '../2-entities/Note.ts';
+import type { Note } from '../2-entities/Note.ts';
+import { sleep } from '../util/sleep.ts';
 import type StringComparer from '../util/StringComparer.ts';
 import { useStore } from './useStore.ts';
 
@@ -14,6 +15,7 @@ export function useFilteredNotes(
   const store = useStore();
 
   useEffect(() => {
+    console.log('useFilteredNotes', list.length, comparer);
     if (!comparer) return;
 
     const found = comparer.matchesList(list, ['title', 'group']);
@@ -37,15 +39,38 @@ export function useFilteredNotes(
 
     for (let i = cursor; i < list.length; i++) {
       const note = list[i];
-
       if (shownIds.has(note.id)) continue;
 
       const remote = store.note(note.id);
       const content = await remote.readFromCache();
       if (isAnotherSearchRunning()) return;
 
-      if (content && comparer!.matches(content)) {
+      if (!content) continue;
+
+      if (comparer!.matches(content)) {
         setCursor(i + 1);
+        setValue([...value, note]);
+        return;
+      }
+    }
+
+    let fetchCount = 0;
+    const MAX_FETCH_COUNT = 100;
+
+    for (let i = 0; i < list.length && fetchCount < MAX_FETCH_COUNT; i++) {
+      const note = list[i];
+      const remote = store.note(note.id);
+      if (await remote.isCached) continue;
+
+      fetchCount++;
+      const content = await remote.read();
+
+      if (isAnotherSearchRunning()) return;
+      await sleep(200);
+      if (isAnotherSearchRunning()) return;
+
+      if (content && comparer!.matches(content)) {
+        setCursor(list.length);
         setValue([...value, note]);
         return;
       }

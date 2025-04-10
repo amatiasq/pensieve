@@ -39,6 +39,10 @@ export class RemoteNote {
     return note ? note.title : '(unknown)';
   }
 
+  get isCached() {
+    return this.content.isCached;
+  }
+
   constructor(
     readonly id: NoteId,
     private readonly meta: RemoteJson<Note>,
@@ -163,7 +167,7 @@ export class RemoteNote {
     return this.update(x => ({ ...x, favorite: !x.favorite }), opts);
   }
 
-  async push(note: Note) {
+  push(note: Note) {
     const { id } = this;
 
     if (note.id !== id) {
