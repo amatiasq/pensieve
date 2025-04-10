@@ -3,6 +3,7 @@
     "allowJs": false,
     "allowUmdGlobalAccess": true,
     "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
     "baseUrl": "/",
     "esModuleInterop": true,
     "experimentalDecorators": true,

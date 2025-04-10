@@ -10,10 +10,15 @@ export function deserialize<T = any>(x: string) {
   try {
     return JSON5.parse(clean) as T;
   } catch (error) {
-    const [position] = error.message.split(/\s/g).reverse();
-    console.warn(
-      `Error in JSON (${error.message}):\n${clean.substr(position - 100, 200)}`,
-    );
+    if (error instanceof Error) {
+      const [position] = error.message.split(/\s/g).reverse();
+      console.warn(
+        `Error in JSON (${error.message}):\n${clean.substr(
+          parseInt(position, 10) - 100,
+          200,
+        )}`,
+      );
+    }
     throw error;
   }
 }

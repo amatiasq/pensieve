@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef } from 'react';
+import { PropsWithChildren, useEffect } from 'react';
 import { useIntersectionObserver } from 'usehooks-ts';
 
 interface PresenceDetectorProps {
@@ -11,8 +11,7 @@ export function PresenceDetector({
   onVisible,
   children,
 }: PropsWithChildren<PresenceDetectorProps>) {
-  const ref = useRef<HTMLDivElement | null>(null);
-  const isVisible = Boolean(useIntersectionObserver(ref, {})?.isIntersecting);
+  const [ref, isVisible] = useIntersectionObserver();
 
   useEffect(() => {
     if (isVisible) {
