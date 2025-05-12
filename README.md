@@ -64,3 +64,15 @@ After a year of usage Pensieve has generated in my private repository:
 4.0K    settings.json
 4.0K    shortcuts.json
 ```
+
+#### After 4 years of usage
+
+```sh
+~/pensieve-notes main > du -sh . .* *
+ 91M    .
+ 66M    .git
+ 12M    meta
+ 14M    note
+4.0K    settings.json
+4.0K    shortcuts.json
+```
