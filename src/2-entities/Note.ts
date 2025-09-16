@@ -8,6 +8,7 @@ const COMMENTS_BY_LANG: Record<string, [string] | [string, string]> = {
   '.md': ['#'],
   '.mermaid': ['%%'],
   '.mmd': ['%%'],
+  '.py': ['#'],
   '.sh': ['#'],
   '.sql': ['--'],
   '.ts': ['//'],
