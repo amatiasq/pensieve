@@ -29,11 +29,11 @@
     "@emotion/styled": "^11.9.3",
     "@monaco-editor/react": "^4.3.1",
     "@szhsin/react-menu": "^3.1.2",
-    "axios": "^0.21.2",
+    "axios": "^1.7.7",
     "body-parser": "^1.19.0",
     "colorjs.io": "^0.3.0",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
+    "express": "^4.21.2",
     "json5": "^2.2.3",
     "localforage": "^1.9.0",
     "match-sorter": "^8.0.0",
@@ -44,7 +44,7 @@
     "react-router-dom": "^5.2.0",
     "rxjs": "^7.1.0",
     "usehooks-ts": "^3.1.1",
-    "uuid": "^3.4.0"
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@cloudflare/wrangler": "^1.20.0",
@@ -54,7 +54,7 @@
     "@types/react-router-dom": "^5.1.7",
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.14.2",
-    "@vitejs/plugin-react": "^2.0.0",
+    "@vitejs/plugin-react": "^4.3.3",
     "cypress": "^9.1.1",
     "dotenv": "^10.0.0",
     "eslint": "^7.19.0",
