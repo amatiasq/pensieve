@@ -8,59 +8,49 @@
     "build-ci": "tsc && vite build",
     "serve": "vite preview --port 1234",
     "pwa": "npm run build && npm run serve",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "cloudflare:login": "wrangler login",
     "api": "cd src/api && wrangler dev",
-    "api:deploy": "cd src/api && wrangler publish",
-    "cypress": "cypress open",
-    "e2e": "cypress run"
+    "api:deploy": "cd src/api && wrangler deploy",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui"
   },
   "browserslist": [
     "> 1% and last 2 versions"
   ],
-  "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": true
-  },
   "dependencies": {
     "@amatiasq/client-storage": "^3.0.3",
     "@amatiasq/emitter": "^4.1.2",
     "@amatiasq/scheduler": "^3.0.0",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
-    "@monaco-editor/react": "^4.3.1",
+    "@monaco-editor/react": "^4.7.0",
     "@szhsin/react-menu": "^3.1.2",
-    "axios": "^1.7.7",
-    "body-parser": "^1.19.0",
     "colorjs.io": "^0.3.0",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
     "json5": "^2.2.3",
-    "localforage": "^1.9.0",
+    "idb-keyval": "^6.2.1",
     "match-sorter": "^8.0.0",
-    "monaco-editor": "^0.25.2",
+    "monaco-editor": "^0.52.0",
     "monaco-mermaid": "^1.1.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-router-dom": "^5.2.0",
-    "rxjs": "^7.1.0",
-    "usehooks-ts": "^3.1.1",
-    "uuid": "^11.0.3"
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^6.0.0",
+    "usehooks-ts": "^3.1.1"
   },
   "devDependencies": {
-    "@cloudflare/wrangler": "^1.20.0",
+    "wrangler": "^4.0.0",
     "@emotion/babel-plugin": "^11.9.5",
-    "@types/react": "^17.0.1",
-    "@types/react-dom": "^17.0.0",
-    "@types/react-router-dom": "^5.1.7",
-    "@types/uuid": "^8.3.0",
-    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@eslint/js": "^9.0.0",
+    "typescript-eslint": "^8.0.0",
     "@vitejs/plugin-react": "^4.3.3",
-    "cypress": "^9.1.1",
+    "@playwright/test": "^1.49.0",
     "dotenv": "^10.0.0",
-    "eslint": "^7.19.0",
+    "eslint": "^9.0.0",
     "rollup-plugin-visualizer": "^5.7.1",
     "typescript": "^5.8.3",
     "vite": "^6.2.6",
-    "vite-plugin-pwa": "^1.0.0"
+    "vite-plugin-pwa": "^1.2.0"
   }
 }

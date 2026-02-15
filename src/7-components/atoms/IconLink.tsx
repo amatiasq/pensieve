@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { AnchorHTMLAttributes } from 'react';
+import { AnchorHTMLAttributes, type ReactElement } from 'react';
 import { iconContainerStyles } from '../icons/IconContainer.ts';
 
 const Link = styled.a`
@@ -13,7 +13,7 @@ const Link = styled.a`
 `;
 
 export interface IconLinkProps extends AnchorHTMLAttributes<any> {
-  icon: JSX.Element;
+  icon: ReactElement;
 }
 
 export function IconLink(props: IconLinkProps) {

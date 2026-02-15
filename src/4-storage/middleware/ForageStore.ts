@@ -1,29 +1,37 @@
+import {
+  createStore as createIdbStore,
+  del,
+  get,
+  keys,
+  set,
+  type UseStore,
+} from 'idb-keyval';
 import { debugMethods } from '../../util/debugMethods.ts';
 import { AsyncStore } from '../AsyncStore.ts';
 import { patternToRegex } from '../helpers/patternToRegex.ts';
 
 export class ForageStore implements AsyncStore {
-  private keys: string[] | null = null;
+  private cachedKeys: string[] | null = null;
 
-  constructor(private readonly forage: LocalForage) {
+  constructor(private readonly store: UseStore) {
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
   async has(key: string): Promise<boolean> {
-    const keys = this.keys || (await this.forage.keys());
+    const allKeys = this.cachedKeys || (await keys(this.store)) as string[];
 
-    if (!this.keys) {
-      this.keys = keys;
-      setTimeout(() => (this.keys = null), 3000);
+    if (!this.cachedKeys) {
+      this.cachedKeys = allKeys;
+      setTimeout(() => (this.cachedKeys = null), 3000);
     }
 
-    return keys.includes(key);
+    return allKeys.includes(key);
   }
 
   async readAll(pattern: string) {
     const regex = patternToRegex(pattern);
-    const keys = await this.forage.keys();
-    const match = keys.filter(x => regex.test(x));
+    const allKeys = (await keys(this.store)) as string[];
+    const match = allKeys.filter(x => regex.test(x));
 
     const promises = match.map(async key => {
       const content = await this.read(key);
@@ -36,14 +44,18 @@ export class ForageStore implements AsyncStore {
   }
 
   read(key: string) {
-    return this.forage.getItem<string>(key);
+    return get<string | null>(key, this.store).then(v => v ?? null);
   }
 
   async write(key: string, value: string) {
-    await this.forage.setItem(key, value);
+    await set(key, value, this.store);
   }
 
   async delete(key: string) {
-    await this.forage.removeItem(key);
+    await del(key, this.store);
   }
+}
+
+export function createForageStore(name: string) {
+  return new ForageStore(createIdbStore(name, 'keyval'));
 }

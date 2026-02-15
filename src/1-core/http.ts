@@ -15,6 +15,7 @@ function request<T>(url: string, extras: RequestOptions = {}) {
       : extras.body;
 
   const options = {
+    signal: AbortSignal.timeout(30_000),
     ...extras,
     body,
   } as FetchOptions;

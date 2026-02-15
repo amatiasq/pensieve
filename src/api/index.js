@@ -1,12 +1,14 @@
-import { VALID_ORIGINS } from '../config.json' with { type: 'json' };
+import { VALID_ORIGINS } from '../config.json';
 import auth from './auth.js';
 import commit from './commit.js';
 
 const handlers = { auth, commit };
 
-addEventListener('fetch', event =>
-  event.respondWith(handleCorsRequest(event.request)),
-);
+export default {
+  async fetch(request) {
+    return handleCorsRequest(request);
+  },
+};
 
 /**
  * @param {Request} request

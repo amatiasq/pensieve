@@ -17,9 +17,7 @@ const GH_API = 'https://api.github.com';
 export const ghRepository = getQueryParameter('repo', 'pensieve-data');
 
 export function ghUrl(path: string) {
-  const result = `${GH_API}${path}`;
-  const booster = `p=${Date.now()}`;
-  return result.includes('?') ? `${result}&${booster}` : `${result}?${booster}`;
+  return new URL(`${GH_API}${path}`).toString();
 }
 
 export function ghAuthHeaders(token: GithubToken) {

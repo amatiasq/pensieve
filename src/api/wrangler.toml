@@ -1,6 +1,6 @@
 name = "pensieve-api"
-type = "webpack"
+main = "index.js"
 
 account_id = "a030a3e94508b912c6b31b84fd4b4041"
 workers_dev = true
-compatibility_date = "2022-12-05"
+compatibility_date = "2024-01-01"

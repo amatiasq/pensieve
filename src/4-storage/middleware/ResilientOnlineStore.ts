@@ -1,10 +1,19 @@
-import { ClientStorage } from '@amatiasq/client-storage';
 import { Scheduler } from '@amatiasq/scheduler';
+import {
+  createStore as createIdbStore,
+  del,
+  get,
+  set,
+} from 'idb-keyval';
+import { isLeader } from '../../1-core/tabLeader.ts';
 import { debugMethods } from '../../util/debugMethods.ts';
 import { AsyncStore } from '../AsyncStore.ts';
 import { WriteOptions } from '../helpers/WriteOptions.ts';
+import { setSyncStatus } from '../syncStatus.ts';
 
-const MAX_ATTEMPTS = 2;
+const MAX_ATTEMPTS = 5;
+const MAX_QUEUE_SIZE = 100;
+const BASE_RETRY_MS = 1000;
 
 interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   method: T;
@@ -14,27 +23,68 @@ interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
 
 export class StoreOfflineError extends Error {}
 
-const pending = new ClientStorage<Command[]>('pensieve.pending-commands', {
-  default: [],
-});
+const outboxStore = createIdbStore('pensieve-outbox', 'commands');
 
-const addToPending = (comm: Command) => pending.set([...pending.cache, comm]);
-const retrievePending = () => {
-  const result = [...pending.cache];
-  pending.reset();
-  return result;
-};
+async function addToPending(comm: Command) {
+  const queue = (await get<Command[]>('queue', outboxStore)) ?? [];
+
+  if (queue.length >= MAX_QUEUE_SIZE) {
+    console.warn(
+      `Offline queue full (${MAX_QUEUE_SIZE}). Dropping oldest command.`,
+    );
+    queue.shift();
+  }
+
+  queue.push(comm);
+  await set('queue', queue, outboxStore);
+  registerBackgroundSync();
+}
+
+function registerBackgroundSync() {
+  navigator.serviceWorker?.ready.then(reg => {
+    // @ts-expect-error — SyncManager not in all TS lib typings
+    reg.sync?.register('outbox-flush').catch(() => {
+      // Background Sync not supported or permission denied — ignore
+    });
+  });
+}
+
+async function retrievePending(): Promise<Command[]> {
+  const queue = (await get<Command[]>('queue', outboxStore)) ?? [];
+  await del('queue', outboxStore);
+  return queue;
+}
 
 export class ResilientOnlineStore implements AsyncStore {
   private readonly reading = new Map<string, Promise<string | null>>();
-  private readonly reconnect = new Scheduler(1000, () => this.executePending());
+  private retryDelay = BASE_RETRY_MS;
+  private reconnect = new Scheduler(this.retryDelay, () =>
+    this.executePending(),
+  );
 
   get isOffline() {
     return !navigator.onLine;
   }
 
   constructor(private readonly remote: AsyncStore) {
-    window.addEventListener('online', () => this.executePending());
+    window.addEventListener('online', () => {
+      this.retryDelay = BASE_RETRY_MS;
+      this.executePending();
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !this.isOffline) {
+        this.executePending();
+      }
+    });
+
+    // Listen for Background Sync API messages from service worker
+    navigator.serviceWorker?.addEventListener('message', (event) => {
+      if (event.data?.type === 'flush-outbox') {
+        this.executePending();
+      }
+    });
+
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
@@ -80,27 +130,44 @@ export class ResilientOnlineStore implements AsyncStore {
     attempts = 0,
   ) {
     if (this.isOffline) {
-      addToPending({ method, params, attempts });
-      return Promise.reject(new StoreOfflineError());
+      return addToPending({ method, params, attempts }).then(() => {
+        setSyncStatus('pending');
+        throw new StoreOfflineError();
+      });
     }
 
     // TS doesn't recognize params as valid parameters for method
     const promise: Promise<void> = (this.remote[method] as any)(...params);
 
-    return promise.catch(reason => {
-      addToPending({ method, params, attempts: attempts + 1 });
-      this.reconnect.restart();
+    return promise.catch(async reason => {
+      await addToPending({ method, params, attempts: attempts + 1 });
+      setSyncStatus('pending');
+      this.scheduleRetryWithBackoff();
       throw reason;
     });
   }
 
-  private executePending() {
+  private scheduleRetryWithBackoff() {
+    this.reconnect = new Scheduler(this.retryDelay, () =>
+      this.executePending(),
+    );
+    this.reconnect.restart();
+    const jitter = Math.random() * 1000;
+    this.retryDelay = Math.min(this.retryDelay * 2 + jitter, 30_000);
+  }
+
+  private async executePending() {
     if (this.isOffline) {
-      this.reconnect.restart();
+      this.scheduleRetryWithBackoff();
       return;
     }
 
-    for (const { method, params, attempts } of retrievePending()) {
+    // Only the leader tab flushes the shared outbox
+    if (!isLeader()) return;
+
+    this.retryDelay = BASE_RETRY_MS;
+
+    for (const { method, params, attempts } of await retrievePending()) {
       if (attempts < MAX_ATTEMPTS) {
         this.command(method, params, attempts);
       } else {

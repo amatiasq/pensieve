@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { useMonaco } from '@monaco-editor/react';
-import { createRef, useCallback, useEffect, useState } from 'react';
+import React, { createRef, useCallback, useEffect, useState } from 'react';
 import { useSetting } from '../../6-hooks/useSetting.ts';
 import { hideScrollbar } from '../styles.ts';
 import { extendMonaco } from './monaco/extendMonaco.ts';
@@ -74,7 +74,11 @@ export function MobileFallback({
     }
   }, [monaco, ref.current]);
 
-  const handleChange = useCallback(e => onChange(e.target.value), [onChange]);
+  const handleChange = useCallback(
+    (e: React.FormEvent<HTMLTextAreaElement>) =>
+      onChange((e.target as HTMLTextAreaElement).value),
+    [onChange],
+  );
 
   if (!isPreview) {
     return (

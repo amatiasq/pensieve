@@ -3,6 +3,7 @@ import { useCreateNote } from '../../6-hooks/useCreateNote.ts';
 import { useShortcut } from '../../6-hooks/useShortcut.ts';
 import type StringComparer from '../../util/StringComparer.ts';
 import { IconButton } from '../atoms/IconButton.tsx';
+import { SyncIndicator } from '../atoms/SyncIndicator.tsx';
 import { PlusIcon } from '../icons/PlusIcon.tsx';
 import { FilterBox } from './FilterBox.tsx';
 
@@ -34,6 +35,7 @@ export function SidebarHeader({ onFilterChange }: SidebarHeaderProps) {
   return (
     <Header>
       <FilterBox onChange={onFilterChange} />
+      <SyncIndicator />
       <NewNoteButton
         icon={<PlusIcon title="Create note" />}
         onClick={createNote}

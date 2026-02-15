@@ -1,15 +1,12 @@
-import localforage from 'localforage';
 import { GHRepository } from '../3-github/GHRepository.ts';
 import { GithubToken } from '../3-github/GithubAuth.ts';
 import { GithubUsername } from '../3-github/models/GHApiUser.ts';
 import { AppStorage } from './AppStorage.ts';
 import { CachedStore } from './middleware/CachedStore.ts';
-import { ForageStore } from './middleware/ForageStore.ts';
+import { createForageStore } from './middleware/ForageStore.ts';
 import { GHRepoStore } from './middleware/GHRepoStore.ts';
 import { MixedStore } from './middleware/MixedStore.ts';
 import { ResilientOnlineStore } from './middleware/ResilientOnlineStore.ts';
-
-Object.assign(window, { localforage });
 
 export async function createStore(
   token: GithubToken,
@@ -29,8 +26,7 @@ export async function createStore(
     }
   }
 
-  // const local = new LocalStore(repoName);
-  const local = new ForageStore(localforage.createInstance({ name: repoName }));
+  const local = createForageStore(repoName);
   const repoStore = new GHRepoStore(repo);
 
   // Handles offline

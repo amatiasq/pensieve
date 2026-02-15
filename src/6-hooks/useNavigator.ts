@@ -1,9 +1,11 @@
 import { emitter } from '@amatiasq/emitter';
-import { useHistory } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Note, NoteId } from '../2-entities/Note.ts';
 
 const onNavigate = emitter<Navigator>();
-const listeningTo = new Set();
+
+let currentNavigator: Navigator | null = null;
 
 class Navigator {
   readonly root = '/';
@@ -28,29 +30,23 @@ class Navigator {
   }
 
   constructor(
-    private readonly history: ReturnType<typeof useHistory>,
+    private readonly navigate: ReturnType<typeof useNavigate>,
     readonly path: string,
-  ) {
-    if (!listeningTo.has(history)) {
-      history.listen(x => onNavigate(new Navigator(history, x.pathname)));
-      listeningTo.add(history);
-    }
-  }
+  ) {}
 
   readonly go = (target: string) => this._go(target);
   readonly goRoot = () => this._go(this._root);
   readonly goSettings = () => this._go(this._settings);
 
   private _go(target: string) {
-    // history.push() doesn't trigger history.listen()
-    onNavigate(new Navigator(this.history, target));
-    this.history.push(target);
+    onNavigate(new Navigator(this.navigate, target));
+    this.navigate(target);
   }
 
   readonly toNote = acceptNoteOrId(id => this._note.replace(':noteId', id));
 
   readonly goNote = acceptNoteOrId(id =>
-    this.history.push(this._note.replace(':noteId', id)),
+    this.navigate(this._note.replace(':noteId', id)),
   );
 
   readonly isNote = acceptNoteOrId(
@@ -69,8 +65,18 @@ class Navigator {
 }
 
 export function useNavigator() {
-  const history = useHistory();
-  return new Navigator(history, history.location.pathname);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const nav = new Navigator(navigate, location.pathname);
+
+  useEffect(() => {
+    if (currentNavigator?.path !== location.pathname) {
+      currentNavigator = nav;
+      onNavigate(nav);
+    }
+  }, [location.pathname]);
+
+  return nav;
 }
 
 function acceptNoteOrId(op: (id: NoteId) => any) {

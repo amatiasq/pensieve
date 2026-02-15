@@ -1,7 +1,0 @@
-{
-  "baseUrl": "https://pensieve.amatiasq.com",
-  "clientRoute": "/halt",
-  "viewportWidth": 1920,
-  "viewportHeight": 1080,
-  "chromeWebSecurity": false
-}

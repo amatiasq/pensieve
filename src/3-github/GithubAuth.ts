@@ -49,7 +49,7 @@ export class GithubAuth {
   }
 
   requestGithubAuthorization() {
-    const state = Math.random().toString().substr(2);
+    const state = crypto.randomUUID();
 
     const url = withParams(`${AUTH_ROOT}/authorize`, {
       client_id: this.clientId,

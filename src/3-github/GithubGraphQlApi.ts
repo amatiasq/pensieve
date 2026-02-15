@@ -1,3 +1,4 @@
+import { githubCircuitBreaker } from '../1-core/circuitBreaker.ts';
 import { POST } from '../1-core/http.ts';
 import { ghAuthHeaders, ghUrl } from './gh-utils.ts';
 import { GithubToken } from './GithubAuth.ts';
@@ -10,11 +11,13 @@ export class GithubGraphQlApi {
     const body = { query: fullQuery, variables };
     const headers = ghAuthHeaders(this.token);
 
-    return POST<T>(ghUrl('/graphql'), body, { headers }).then(x => {
-      const { errors } = x as any;
-      if (errors) console.error('GraphQL errors:', errors);
-      return x;
-    });
+    return githubCircuitBreaker.execute(() =>
+      POST<T>(ghUrl('/graphql'), body, { headers }).then(x => {
+        const { errors } = x as any;
+        if (errors) console.error('GraphQL errors:', errors);
+        return x;
+      }),
+    );
   }
 
   private buildQuery(query: string, params: Record<string, string>) {

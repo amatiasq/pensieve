@@ -1,8 +1,6 @@
 import { emitter } from '@amatiasq/emitter';
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { debounceTime, map, mergeWith } from 'rxjs/operators';
+import { useEffect, useRef, useState } from 'react';
 import { onPageActive } from '../../0-dom/page-lifecycle.ts';
 import { useNavigator } from '../../6-hooks/useNavigator.ts';
 import { usePageTitle } from '../../6-hooks/usePageTitle.ts';
@@ -10,7 +8,6 @@ import { useScheduler } from '../../6-hooks/useScheduler.ts';
 import { useSetting } from '../../6-hooks/useSetting.ts';
 import { useShortcut } from '../../6-hooks/useShortcut.ts';
 import { useStack } from '../../6-hooks/useStack.ts';
-import { fromEmitter } from '../../util/rxjs-extensions.ts';
 import { BusinessIndicator } from '../atoms/BusinessIndicator.tsx';
 import { Loader } from '../atoms/Loader.tsx';
 import { MonacoEditor } from './MonacoEditor.tsx';
@@ -41,9 +38,9 @@ export function Editor(props: EditorProps) {
   const readonly = isReadonly(props) || false;
   const requestSave = emitter<void>();
   const requestUrgentSave = emitter<void>();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const updateTitle = usePageTitle();
-  const history = useHistory();
   const autosave = useSetting('autosave')[0] || 0;
   const [saved, addSaved] = useStack<string>(5, content);
   const [hasUnsavedChanges, setHasUnsavedChanged] = useState(false);
@@ -77,7 +74,7 @@ export function Editor(props: EditorProps) {
 
   useEffect(() => {
     if (isEditable(props) && props.saveOnNavigation) {
-      return history.listen(() => requestSave());
+      return navigator.onNavigate(() => requestSave());
     }
   });
 
@@ -95,18 +92,23 @@ export function Editor(props: EditorProps) {
       if (!active) requestUrgentSave();
     });
 
-    return () => sus.unsubscribe();
+    return () => {
+      sus.unsubscribe();
+    };
   });
 
   if (value == null) return <Loader />;
 
-  const urgent = fromEmitter(requestUrgentSave).pipe(
-    map(() => ({ urgent: true })),
-  );
+  requestUrgentSave.subscribe(() => {
+    if (hasUnsavedChanges) forceSave({ urgent: true });
+  });
 
-  fromEmitter(requestSave)
-    .pipe(debounceTime(100), mergeWith(urgent))
-    .subscribe(options => hasUnsavedChanges && forceSave(options || {}));
+  requestSave.subscribe(() => {
+    clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      if (hasUnsavedChanges) forceSave();
+    }, 100);
+  });
 
   return (
     <EditorContainer>

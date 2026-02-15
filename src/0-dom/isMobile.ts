@@ -6,4 +6,4 @@ const SECOND_MATCH =
 const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
 
 export const isMobile =
-  FIRST_MATCH.test(ua) || SECOND_MATCH.test(ua.substr(0, 4));
+  FIRST_MATCH.test(ua) || SECOND_MATCH.test(ua.slice(0, 4));

@@ -1,4 +1,3 @@
-import { v4 as uuid } from 'uuid';
 import { messageBus } from '../1-core/messageBus.ts';
 import {
   getMetadataFromContent,
@@ -51,6 +50,8 @@ export class NotesStorage {
       console.log(`Notes found in ${key}`, Object.keys(result).length);
       return result;
     };
+
+    this.store.startPeriodicSync(pattern, data => this.synchronize(data));
 
     const values = await fetchAndUpdate(
       this.store.readAllLocal(pattern).then(log('local')),
@@ -143,7 +144,7 @@ function createNote(content: NoteContent): Note {
   const { group, title } = getMetadataFromContent(content);
 
   return {
-    id: uuid() as NoteId,
+    id: crypto.randomUUID() as NoteId,
     title,
     group,
     favorite: true,

@@ -68,10 +68,10 @@ export function MonacoEditor({
       'semanticHighlighting.enabled': true,
       minimap: { enabled: lines > 100 },
       readOnly: readonly,
-      renderIndentGuides,
+      guides: { indentation: renderIndentGuides },
       rulers,
       tabSize,
-      wordBasedSuggestions: isMarkdown ? false : true,
+      wordBasedSuggestions: isMarkdown ? 'off' : 'currentDocument',
       wordWrap: wordWrap ? 'on' : 'off',
     } as editor.IStandaloneEditorConstructionOptions;
   }

@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { createRef, useCallback, useState } from 'react';
+import React, { createRef, useCallback, useState } from 'react';
 import { useScheduler } from '../../6-hooks/useScheduler.ts';
 import { useShortcut } from '../../6-hooks/useShortcut.ts';
 import StringComparer from '../../util/StringComparer.ts';
@@ -55,7 +55,8 @@ export function FilterBox({ onChange }: FilterBoxProps) {
   );
 
   const handleInputChange = useCallback(
-    e => process(e.target.value),
+    (e: React.FormEvent<HTMLInputElement>) =>
+      process((e.target as HTMLInputElement).value),
     [process],
   );
   const handleClearButton = useCallback(() => process(''), [process]);

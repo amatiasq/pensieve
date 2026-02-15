@@ -40,7 +40,7 @@ export function isNoteIdentical(a: Note | null, b: Note | null) {
 export function getMetadataFromContent(content: NoteContent) {
   const trimmed = content.trim();
   const lineBreak = trimmed.indexOf('\n');
-  const firstLine = lineBreak === -1 ? trimmed : trimmed.substr(0, lineBreak);
+  const firstLine = lineBreak === -1 ? trimmed : trimmed.slice(0, lineBreak);
   const extension = getExtensionFor(firstLine);
   const cleanLine = removeCommentFrom(firstLine, extension);
 

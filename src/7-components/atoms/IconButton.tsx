@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { forwardRef } from 'react';
+import { forwardRef, type ReactElement } from 'react';
 import { iconContainerStyles } from '../icons/IconContainer.tsx';
 import { Button, ButtonProps } from './Button.tsx';
 
@@ -13,7 +13,7 @@ const StyledButton = styled(Button)`
 `;
 
 export interface IconButtonProps extends ButtonProps {
-  icon: JSX.Element;
+  icon: ReactElement;
 }
 
 export const IconButton = forwardRef(function IconButton(

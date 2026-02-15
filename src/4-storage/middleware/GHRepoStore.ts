@@ -1,9 +1,14 @@
 import { Scheduler } from '@amatiasq/scheduler';
-import { GHRepository, StagedFiles } from '../../3-github/GHRepository.ts';
+import {
+  GHRepository,
+  ShaConflictError,
+  StagedFiles,
+} from '../../3-github/GHRepository.ts';
 import { debugMethods } from '../../util/debugMethods.ts';
 import { AsyncStore } from '../AsyncStore.ts';
 import { setDefaultReason } from '../helpers/setDefaultReason.ts';
 import { WriteOptions } from '../helpers/WriteOptions.ts';
+import { setSyncStatus } from '../syncStatus.ts';
 
 const uniq = <T>(list: T[]) => Array.from(new Set(list));
 
@@ -84,9 +89,25 @@ export class GHRepoStore implements AsyncStore {
         ? `Multiple:\n- ${messages.join('\n- ')}`
         : messages[0];
 
+    setSyncStatus('saving');
+
     this.repo.commit(message, staged, isUrgent).then(
-      () => copy.forEach(x => x.resolve()),
-      reason => copy.forEach(x => x.reject(reason)),
+      () => {
+        setSyncStatus('synced');
+        copy.forEach(x => x.resolve());
+      },
+      reason => {
+        if (reason instanceof ShaConflictError) {
+          console.warn('SHA conflict detected, retrying commit...', reason.commitMessage);
+          setSyncStatus('conflict');
+          // Re-queue the individual commits for retry on next sync cycle
+          copy.forEach(x => this.pending.push(x));
+          this.scheduler.restart();
+        } else {
+          setSyncStatus('error');
+          copy.forEach(x => x.reject(reason));
+        }
+      },
     );
   }
 }

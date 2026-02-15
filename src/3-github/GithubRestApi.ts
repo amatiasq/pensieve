@@ -1,3 +1,4 @@
+import { githubCircuitBreaker } from '../1-core/circuitBreaker.ts';
 import { DELETE, GET, PATCH, POST, PUT, RequestBody } from '../1-core/http.ts';
 import { ghAuthHeaders, ghUrl } from './gh-utils.ts';
 import { GithubToken } from './GithubAuth.ts';
@@ -16,27 +17,38 @@ export class GithubRestApi {
   constructor(public token: GithubToken) {}
 
   GET<T>(path: string, options?: GHRequestOptions) {
-    return GET<T>(ghUrl(path), this.withAuth(options));
+    return githubCircuitBreaker.execute(() =>
+      GET<T>(ghUrl(path), this.withAuth(options)),
+    );
   }
 
   DELETE<T>(path: string) {
-    return DELETE<T>(ghUrl(path), this.withAuth());
+    return githubCircuitBreaker.execute(() =>
+      DELETE<T>(ghUrl(path), this.withAuth()),
+    );
   }
 
   PUT<T>(path: string, body: RequestBody) {
-    return PUT<T>(ghUrl(path), body, this.withAuth());
+    return githubCircuitBreaker.execute(() =>
+      PUT<T>(ghUrl(path), body, this.withAuth()),
+    );
   }
 
   POST<T>(path: string, body: RequestBody) {
-    return POST<T>(ghUrl(path), body, this.withAuth());
+    return githubCircuitBreaker.execute(() =>
+      POST<T>(ghUrl(path), body, this.withAuth()),
+    );
   }
 
   PATCH<T>(path: string, body: RequestBody) {
-    return PATCH<T>(ghUrl(path), body, this.withAuth());
+    return githubCircuitBreaker.execute(() =>
+      PATCH<T>(ghUrl(path), body, this.withAuth()),
+    );
   }
 
   private withAuth({ mediaType = MediaType.Json }: GHRequestOptions = {}) {
     return {
+      cache: 'no-cache' as RequestCache,
       headers: {
         ...ghAuthHeaders(this.token),
         Accept: mediaType,

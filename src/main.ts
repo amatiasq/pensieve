@@ -9,15 +9,17 @@ if (!container) {
   throw new Error('Missing container element');
 }
 
-if (isMobile) {
-  // This tool prints a lot of debug information
-  // that's too much for mobile devices
+if (isMobile && !location.search.includes('debug')) {
   console.debug = () => {
-    // noop
+    // Suppress verbose debug output on mobile unless ?debug is in URL
   };
 }
 
 renderApp(container);
+
+navigator.storage?.persist?.().then(granted => {
+  console.log('Persistent storage:', granted ? 'granted' : 'denied');
+});
 
 onVirtualKeyboardDisplayChange(isVisible => {
   if (isVisible) {
