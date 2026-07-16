@@ -1,0 +1,32 @@
+#!/bin/bash -e
+
+# amq pensieve check — full local CI check for pensieve.
+#
+# Mirrors .github/workflows/ci-pensieve.yml so a green CI run and a local
+# `amq pensieve check` cannot diverge:
+#   install deps (bun) + typecheck (tsc --noEmit).
+#
+# Runtime: Bun. Install is skipped when node_modules is already present so
+# repeated local runs stay fast; CI has no node_modules and installs fresh.
+
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+  self="$(basename "$0")"
+  echo "Usage: $self"
+  echo
+  echo "Runs the full CI check for pensieve (Bun):"
+  echo "  1. bun install (skipped when node_modules already exists)"
+  echo "  2. bunx tsc --noEmit -p tsconfig.json"
+  echo
+  echo "Mirrors .github/workflows/ci-pensieve.yml. Does nothing else."
+  exit 0
+fi
+
+if [ ! -d node_modules ]; then
+  echo "==> bun install"
+  bun install
+else
+  echo "==> deps present, skipping bun install"
+fi
+
+echo "==> typecheck (tsc --noEmit)"
+bunx tsc --noEmit -p tsconfig.json
