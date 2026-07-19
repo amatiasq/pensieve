@@ -1,0 +1,15 @@
+#!/bin/bash -e
+
+# Ship pensieve infra (compose + nginx.conf) to the VPS and restart.
+# pensieve is a static nginx site — no image to build; deploy just syncs the
+# reverse-proxy config and recreates the container.
+#
+# Run via `amq pensieve deploy`.
+
+SERVICE="pensieve"
+
+echo "==> ship infra (compose + nginx) to VPS"
+amq deploy-infra "$SERVICE"
+
+echo "==> pull-and-restart on VPS"
+amq vps pull-and-restart "$SERVICE"

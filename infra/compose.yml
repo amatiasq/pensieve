@@ -1,0 +1,22 @@
+version: '3.5'
+
+services:
+  nginx:
+    container_name: amq-pensieve
+    image: nginx
+    restart: unless-stopped
+    expose:
+      - 80
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./logs:/var/log/nginx
+    environment:
+      - VIRTUAL_HOST=pensieve.amatiasq.com,pensieve.amq.im
+      - LETSENCRYPT_HOST=pensieve.amatiasq.com,pensieve.amq.im
+      - LETSENCRYPT_EMAIL=amatiasq@gmail.com
+    networks:
+      - exposed
+
+networks:
+  exposed:
+    external: true
