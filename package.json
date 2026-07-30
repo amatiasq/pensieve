@@ -19,9 +19,9 @@
     "> 1% and last 2 versions"
   ],
   "dependencies": {
-    "@amatiasq/client-storage": "^3.0.3",
-    "@amatiasq/emitter": "^4.1.2",
-    "@amatiasq/scheduler": "^3.0.0",
+    "@amatiasq/client-storage": "^4.0.0",
+    "@amatiasq/emitter": "^5.0.0",
+    "@amatiasq/scheduler": "^4.0.0",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@monaco-editor/react": "^4.7.0",
