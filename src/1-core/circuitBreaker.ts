@@ -1,65 +1,60 @@
-type State = 'closed' | 'open' | 'half-open';
-
 const FAILURE_THRESHOLD = 3;
 const COOLDOWN_MS = 30_000;
-
-export class CircuitBreaker {
-  private state: State = 'closed';
-  private failures = 0;
-  private openedAt = 0;
-
-  execute<T>(fn: () => Promise<T>): Promise<T> {
-    if (this.state === 'open') {
-      if (Date.now() - this.openedAt >= COOLDOWN_MS) {
-        this.state = 'half-open';
-      } else {
-        return Promise.reject(new CircuitOpenError());
-      }
-    }
-
-    return fn().then(
-      result => {
-        this.onSuccess();
-        return result;
-      },
-      error => {
-        this.onFailure(error);
-        throw error;
-      },
-    );
-  }
-
-  private onSuccess() {
-    this.failures = 0;
-    this.state = 'closed';
-  }
-
-  private onFailure(error: unknown) {
-    // Don't count client errors (4xx except 429) as circuit failures
-    if (isHttpError(error) && error.status < 500 && error.status !== 429) {
-      return;
-    }
-
-    this.failures++;
-
-    if (this.failures >= FAILURE_THRESHOLD) {
-      this.state = 'open';
-      this.openedAt = Date.now();
-
-      // Respect rate limit reset header if available
-      if (isHttpError(error) && error.status === 429) {
-        const resetAt = parseRateLimitReset(error.body);
-        if (resetAt > 0) {
-          this.openedAt = Date.now() - COOLDOWN_MS + resetAt;
-        }
-      }
-    }
-  }
-}
 
 export class CircuitOpenError extends Error {
   constructor() {
     super('Circuit breaker is open — GitHub API temporarily unavailable');
+  }
+}
+
+// After 3 server-side failures every call fails fast for 30s, so an unreachable
+// or rate-limited GitHub degrades the app to local-only instead of hanging it.
+export function createCircuitBreaker() {
+  let state: 'closed' | 'open' | 'half-open' = 'closed';
+  let failures = 0;
+  let openedAt = 0;
+
+  return function execute<T>(fn: () => Promise<T>): Promise<T> {
+    if (state === 'open') {
+      if (Date.now() - openedAt < COOLDOWN_MS) {
+        return Promise.reject(new CircuitOpenError());
+      }
+      state = 'half-open';
+    }
+
+    return fn().then(
+      result => {
+        failures = 0;
+        state = 'closed';
+        return result;
+      },
+      error => {
+        onFailure(error);
+        throw error;
+      },
+    );
+  };
+
+  function onFailure(error: unknown) {
+    // A 4xx is our request being wrong, not GitHub being down — except 429
+    if (isHttpError(error) && error.status < 500 && error.status !== 429) {
+      return;
+    }
+
+    if (++failures < FAILURE_THRESHOLD) {
+      return;
+    }
+
+    state = 'open';
+    openedAt = Date.now();
+
+    const resetAt = isHttpError(error) && error.status === 429
+      ? parseRateLimitReset(error.body)
+      : 0;
+
+    if (resetAt > 0) {
+      openedAt = Date.now() - COOLDOWN_MS + resetAt;
+    }
   }
 }
 
@@ -74,14 +69,11 @@ function isHttpError(error: unknown): error is { status: number; body: string } 
 
 function parseRateLimitReset(body: string): number {
   try {
-    const data = JSON.parse(body);
-    if (data?.['X-RateLimit-Reset']) {
-      return (data['X-RateLimit-Reset'] * 1000 - Date.now());
-    }
+    const reset = JSON.parse(body)?.['X-RateLimit-Reset'];
+    return reset ? reset * 1000 - Date.now() : 0;
   } catch {
-    // ignore
+    return 0;
   }
-  return 0;
 }
 
-export const githubCircuitBreaker = new CircuitBreaker();
+export const githubCircuitBreaker = createCircuitBreaker();

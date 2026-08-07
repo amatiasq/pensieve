@@ -1,9 +1,6 @@
 import { GH_API } from '../config.json' with { type: 'json' };
 
-/**
- * @param {Request} request
- * @returns {Promise<Response>}
- */
+/** @param {Request} request @returns {Promise<Response>} */
 export default async request => {
   const body = await request.json();
   const userAgent = request.headers.get('User-Agent');
@@ -56,8 +53,7 @@ async function githubCommit({
   const ref = await request('GET', `/git/refs/heads/${branch}`);
   console.log(`${key} - Creating tree...`);
 
-  // Create tree
-  // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-tree
+  // https://docs.github.com/en/rest/git/trees#create-a-tree
   const tree = await request('POST', `/git/trees`, {
     tree: items,
     base_tree: ref.object.sha,
@@ -65,8 +61,7 @@ async function githubCommit({
 
   console.log(`${key} - Creating commit...`);
 
-  // Create commit
-  // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#create-a-commit
+  // https://docs.github.com/en/rest/git/commits#create-a-commit
   const commit = await request('POST', `/git/commits`, {
     message,
     tree: tree.sha,
@@ -75,8 +70,7 @@ async function githubCommit({
 
   console.log(`${key} - Updating branch...`);
 
-  // Update a reference
-  // https://docs.github.com/en/free-pro-team@latest/rest/reference/git#update-a-reference
+  // https://docs.github.com/en/rest/git/refs#update-a-reference
   return request('POST', `/git/refs/heads/${branch}`, {
     sha: commit.sha,
     force: true,

@@ -10,10 +10,7 @@ export default {
   },
 };
 
-/**
- * @param {Request} request
- * @returns {Promise<Response>}
- */
+/** @param {Request} request @returns {Promise<Response>} */
 async function handleCorsRequest(request) {
   const method = request.method;
   const { origin } = new URL(request.url);
@@ -36,10 +33,7 @@ async function handleCorsRequest(request) {
   return response;
 }
 
-/**
- * @param {Request} request
- * @returns {Promise<Response>}
- */
+/** @param {Request} request @returns {Promise<Response>} */
 async function handleRequest(request) {
   const { pathname } = new URL(request.url);
   const [, firstPart] = pathname.split('/');

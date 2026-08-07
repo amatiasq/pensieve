@@ -1,9 +1,7 @@
 import { CLIENT_ID_DEV, CLIENT_ID_PROD } from '../config.json' with { type: 'json' };
 
-/**
- * @param {Request} request
- * @returns {Promise<Response>}
- */
+// CLIENT_SECRET_DEV/PROD are wrangler secrets, injected as globals — never bundled.
+/** @param {Request} request @returns {Promise<Response>} */
 export default request => {
   const { searchParams } = new URL(request.url);
   const redirect_uri = searchParams.get('redirect_uri');

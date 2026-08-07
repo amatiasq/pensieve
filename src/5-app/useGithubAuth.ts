@@ -7,8 +7,8 @@ import {
   ghClientId,
   ghScope,
 } from '../3-github/gh-utils.ts';
+import { fetchCurrentUsername } from '../3-github/fetchCurrentUsername.ts';
 import { GithubAuth, GithubToken } from '../3-github/GithubAuth.ts';
-import { GithubUsers } from '../3-github/GithubUsers.ts';
 import { GithubUsername } from '../3-github/models/GHApiUser.ts';
 
 const auth = new GithubAuth({
@@ -56,8 +56,7 @@ export function useGithubAuth(): Record<string, never> | GithubAuthData {
 
 async function requestTokenAndUsername(code: string, state: string) {
   const token = await auth.processGithubAuthCode(code, state);
-  const requester = new GithubUsers(token);
-  const username = await requester.fetchCurrentUsername();
+  const username = await fetchCurrentUsername(token);
   user.set(username);
   return { token, username };
 }

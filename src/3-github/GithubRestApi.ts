@@ -17,31 +17,31 @@ export class GithubRestApi {
   constructor(public token: GithubToken) {}
 
   GET<T>(path: string, options?: GHRequestOptions) {
-    return githubCircuitBreaker.execute(() =>
+    return githubCircuitBreaker(() =>
       GET<T>(ghUrl(path), this.withAuth(options)),
     );
   }
 
   DELETE<T>(path: string) {
-    return githubCircuitBreaker.execute(() =>
+    return githubCircuitBreaker(() =>
       DELETE<T>(ghUrl(path), this.withAuth()),
     );
   }
 
   PUT<T>(path: string, body: RequestBody) {
-    return githubCircuitBreaker.execute(() =>
+    return githubCircuitBreaker(() =>
       PUT<T>(ghUrl(path), body, this.withAuth()),
     );
   }
 
   POST<T>(path: string, body: RequestBody) {
-    return githubCircuitBreaker.execute(() =>
+    return githubCircuitBreaker(() =>
       POST<T>(ghUrl(path), body, this.withAuth()),
     );
   }
 
   PATCH<T>(path: string, body: RequestBody) {
-    return githubCircuitBreaker.execute(() =>
+    return githubCircuitBreaker(() =>
       PATCH<T>(ghUrl(path), body, this.withAuth()),
     );
   }

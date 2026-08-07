@@ -11,7 +11,7 @@ export class GithubGraphQlApi {
     const body = { query: fullQuery, variables };
     const headers = ghAuthHeaders(this.token);
 
-    return githubCircuitBreaker.execute(() =>
+    return githubCircuitBreaker(() =>
       POST<T>(ghUrl('/graphql'), body, { headers }).then(x => {
         const { errors } = x as any;
         if (errors) console.error('GraphQL errors:', errors);
