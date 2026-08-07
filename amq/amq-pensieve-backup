@@ -1,0 +1,42 @@
+#!/bin/bash -e
+
+# Clona (o actualiza) pensieve-data en backups/, y lo copia al NAS.
+#
+# Los datos de pensieve son un repo, así que respaldarlos es clonarlos: cada
+# clon completo ya es una copia con todo el historial. Lo que faltaba era que
+# fuese un comando, porque lo que no es un comando no entra en el cron.
+#
+# Se clona en espejo: un `--mirror` trae también las ramas y tags que un clon
+# normal deja fuera, y es lo que se puede volver a empujar tal cual.
+
+DATA_REPO="${PENSIEVE_DATA_REPO:-git@github.com:amatiasq/pensieve-data.git}"
+MIRROR="backups/pensieve-data.git"
+
+case "$1" in
+  -h|--help|help)
+    echo "Usage: amq pensieve backup"
+    echo ''
+    echo "Mirrors $DATA_REPO into $MIRROR, then copies a dated bundle to the NAS."
+    echo ''
+    echo "Config (env): PENSIEVE_DATA_REPO"
+    exit 0
+    ;;
+esac
+
+mkdir -p backups
+
+if [[ -d "$MIRROR" ]]; then
+  echo "==> updating $MIRROR"
+  git -C "$MIRROR" remote update --prune
+else
+  echo "==> cloning $DATA_REPO"
+  git clone --mirror "$DATA_REPO" "$MIRROR"
+fi
+
+# Un bundle es un fichero único con todo el repo dentro: se copia como cualquier
+# otro backup y se restaura con `git clone <fichero>`.
+bundle="backups/pensieve-data-$(date +%Y-%m-%d).bundle"
+echo "==> writing $bundle"
+git -C "$MIRROR" bundle create "../../$bundle" --all
+
+amq nas backup pensieve "$bundle"
