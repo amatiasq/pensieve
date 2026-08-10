@@ -2,6 +2,7 @@ import { Monaco } from '@monaco-editor/react';
 import { languages } from 'monaco-editor';
 
 type IMonarchLanguage = languages.IMonarchLanguage;
+type ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
 
 export async function extendMonacoLanguage(
   monaco: Monaco,
@@ -9,7 +10,9 @@ export async function extendMonacoLanguage(
   definition: IMonarchLanguage,
 ) {
   const allLangs = monaco.languages.getLanguages();
-  const lang = allLangs.find(({ id }) => id === baseLanguage);
+  const lang = allLangs.find(
+    ({ id }: ILanguageExtensionPoint) => id === baseLanguage,
+  );
 
   if (!lang) {
     throw new Error(`Could not find language ${baseLanguage}`);

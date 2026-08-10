@@ -9,6 +9,7 @@ import { extendMonacoTheme } from './extendMonacoTheme.ts';
 // type IMonarchLanguage = languages.IMonarchLanguage;
 type IMonarchLanguageRule = languages.IMonarchLanguageRule;
 type ITokenThemeRule = editor.ITokenThemeRule;
+type ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
 
 export function extendMonaco(
   monaco: Monaco,
@@ -34,7 +35,9 @@ export function extendMonaco(
   errorFor(() => {
     initEditor(monaco as any);
     const allLangs = monaco.languages.getLanguages();
-    const lang = allLangs.find(({ id }) => id === 'mermaid');
+    const lang = allLangs.find(
+      ({ id }: ILanguageExtensionPoint) => id === 'mermaid',
+    );
     if (!lang) throw new Error(`Could not find language mermaid`);
     lang.extensions = ['.mmd', '.mermaid'];
   }, 'Error adding mermaid support to monaco');

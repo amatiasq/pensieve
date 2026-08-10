@@ -29,7 +29,9 @@ export function provideCustomLinks(monaco: Monaco, definition: LinkCreator) {
     .filter(isNotNull);
 
   monaco.languages.registerLinkProvider('markdown', {
-    provideLinks: model => ({ links: processors.flatMap(x => x(model)) }),
+    provideLinks: (model: ITextModel) => ({
+      links: processors.flatMap(x => x(model)),
+    }),
   });
 }
 
