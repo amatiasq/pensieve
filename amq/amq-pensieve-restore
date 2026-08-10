@@ -1,0 +1,64 @@
+#!/bin/bash -e
+
+# amq pensieve restore [bundle] [destino] — reconstruye pensieve-data desde un
+# bundle de backups/.
+#
+# Los datos de pensieve son un repo, así que restaurarlos es clonarlos: un
+# bundle es un fichero único con el repo entero dentro, y `git clone` lo abre
+# como si fuera un remoto.
+#
+# **Clona, y ahí se para.** Devolverlo a GitHub es `git push --mirror`, que
+# reescribe el repo remoto entero y no se puede deshacer; el comando lo imprime
+# para copiarlo, y no lo ejecuta. Un restore que publica solo no se puede
+# ensayar, y un backup que no se ensaya no es un backup.
+
+print-help() {
+  echo "Usage: amq pensieve restore [bundle] [destino]"
+  echo ''
+  echo "Clona un bundle de backups/ en <destino> y verifica lo que trae."
+  echo "Sin argumentos usa el bundle más reciente y un destino con la fecha."
+  echo ''
+  echo "Examples:"
+  echo "  amq pensieve restore"
+  echo "  amq pensieve restore backups/pensieve-data-2026-08-10.bundle /tmp/prueba"
+}
+
+case "$1" in
+  -h|--help|help) print-help; exit 0;;
+esac
+
+bundle="${1:-$(ls -t backups/pensieve-data-*.bundle 2>/dev/null | head -1)}"
+
+if [[ -z "$bundle" ]]; then
+  echo "No hay ningún bundle en backups/. Hazlo con: amq pensieve backup" >&2
+  exit 1
+fi
+
+if [[ ! -f "$bundle" ]]; then
+  echo "No existe el bundle: $bundle" >&2
+  exit 1
+fi
+
+dest="${2:-backups/restored-$(date +%Y-%m-%d_%H-%M-%S)}"
+
+if [[ -e "$dest" ]]; then
+  echo "El destino ya existe: $dest" >&2
+  exit 1
+fi
+
+# `git bundle verify` comprueba que el fichero está entero y que no le faltan
+# padres antes de clonar nada: un bundle truncado falla aquí, no a media copia.
+echo "==> verificando $bundle"
+git bundle verify "$bundle"
+
+echo "==> clonando en $dest"
+git clone "$bundle" "$dest"
+
+echo ''
+echo "==> restaurado: $dest"
+echo "    commits:  $(git -C "$dest" rev-list --count HEAD)"
+echo "    HEAD:     $(git -C "$dest" log -1 --format='%h %ad %s' --date=short)"
+echo "    ficheros: $(git -C "$dest" ls-files | wc -l | tr -d ' ')"
+echo ''
+echo "Para devolverlo a GitHub — REESCRIBE EL REPO REMOTO ENTERO:"
+echo "  git -C $dest push --mirror git@github.com:amatiasq/pensieve-data.git"

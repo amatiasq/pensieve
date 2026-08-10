@@ -12,17 +12,6 @@
 DATA_REPO="${PENSIEVE_DATA_REPO:-git@github.com:amatiasq/pensieve-data.git}"
 MIRROR="backups/pensieve-data.git"
 
-case "$1" in
-  -h|--help|help)
-    echo "Usage: amq pensieve backup"
-    echo ''
-    echo "Mirrors $DATA_REPO into $MIRROR, then copies a dated bundle to the NAS."
-    echo ''
-    echo "Config (env): PENSIEVE_DATA_REPO"
-    exit 0
-    ;;
-esac
-
 mkdir -p backups
 
 if [[ -d "$MIRROR" ]]; then

@@ -53,4 +53,10 @@ Notas en un repo privado de GitHub. Reglas del mono:
   service worker se prueba con la cuenta real y con una pestaña que ya tenga
   pensieve abierto — un service worker viejo esconde el despliegue nuevo.
 
+- **Respaldar un repo es clonarlo, y por eso `restore` se para en el clon.**
+  `amq pensieve backup` deja un espejo y un bundle; `amq pensieve restore` lo
+  abre y cuenta commits y ficheros. Devolverlo a GitHub es `git push --mirror`,
+  que reescribe el repo remoto entero: el comando lo imprime y no lo ejecuta,
+  porque un restore que publica solo no se puede ensayar.
+
 Planes en [`.agents/plans/`](.agents/plans/).
