@@ -4,6 +4,9 @@
 vivo; el resto (React 19, router 6, Monaco 0.52, ESLint 9, wrangler 4,
 idb-keyval, Playwright, outbox, circuit breaker, leader tab, indicador de sync,
 runtime caching del SW) ya está hecho.
+**Blocker:** el CORS depende de `pensieve-al-vps.md` — su fase 2 borra el CORS
+entero, así que antes de arreglar `isValidOrigin` hay que decidir ese plan. El
+resto (lint en 10 errores, los 10 specs e2e fuera de CI) no tiene blocker.
 
 ## 1. El Worker valida un origen que no es el del cliente
 
@@ -25,9 +28,9 @@ commit — deja escrito a qué repos commitea el usuario.
 ## 2. El CI mira una décima parte de la red
 
 `ci-pensieve.yml` corre sólo `typecheck` vía `amq pensieve check`. Existen
-`lint` (**10 errores** acumulados, todos triviales: variables sin usar,
-expresiones sin efecto), `build`, y **11 specs de Playwright** — nada de eso se
-ejecuta. La red existe y es buena; sin correrla se degrada en silencio, que es
+`lint` (**10 errores** acumulados, reverificados el 2026-08-17, todos triviales:
+variables sin usar, expresiones sin efecto), `build`, y **10 specs de Playwright**
+— nada de eso se ejecuta. La red existe y es buena; sin correrla se degrada en silencio, que es
 justo lo que le pasó al lint.
 
 Los e2e **ya no están bloqueados por el OAuth**: `e2e/fixtures.ts` intercepta el

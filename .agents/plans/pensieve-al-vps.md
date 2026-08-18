@@ -1,8 +1,8 @@
 # Plan — Pensieve entero en el VPS
 
-**Status:** ⬜ propuesta, sin empezar (2026-08-06). **Blocker:** se gana
-superficie y se pierde disponibilidad; decidir si compensa. Pensieve funciona y
-se usa a diario: esto no arregla una avería.
+**Status:** ⬜ propuesta, sin empezar (2026-08-06).
+**Blocker:** se gana superficie y se pierde disponibilidad; decidir si compensa.
+Pensieve funciona y se usa a diario: esto no arregla una avería.
 
 Objetivo: **pensieve depende de un solo sistema, y ese sistema es el VPS.** Hoy
 depende de cuatro en cadena, y cada uno es un sitio donde puede caerse sin que
@@ -127,7 +127,7 @@ que atención. Decidirlo a la vista de esto, no en abstracto.
   apuntando al viejo. Probar en un navegador que ya tenga pensieve abierto, no
   sólo en uno limpio.
 - **`e2e/fixtures.ts` intercepta `pensieve-api.amatiasq.workers.dev/auth` y
-  `/commit` a pelo.** Al cambiar `API_ORIGIN`, los mocks dejan de casar y los 11
+  `/commit` a pelo.** Al cambiar `API_ORIGIN`, los mocks dejan de casar y los 10
   specs se quedan sin auth sin decir por qué.
 - **`isValidOrigin` mira el origen equivocado**: `new URL(request.url).origin` es
   el del propio servidor, no la cabecera `Origin` del cliente. Al portarla,

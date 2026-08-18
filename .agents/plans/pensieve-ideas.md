@@ -1,6 +1,10 @@
 # Ideas y bugs abiertos de pensieve
 
-Lo que quedaba vivo de `docs/notes.md`. Sin fechas ni compromiso.
+**Status:** ⬜ backlog, sin compromiso. Lo único con diseño es la cola de
+precarga.
+**Blocker:** ninguno; nada de aquí está comprometido.
+
+Lo que quedaba vivo de `docs/notes.md`. Sin fechas.
 
 ## Bugs
 
