@@ -57,7 +57,14 @@ export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ['.cache/**', 'dist/**', '**/node_modules/**', 'playwright-report/**'],
+    // `api/` es Deno y lo comprueban `deno check` y `deno lint`, no éste.
+    ignores: [
+      '.cache/**',
+      'api/**',
+      'dist/**',
+      '**/node_modules/**',
+      'playwright-report/**',
+    ],
   },
   {
     plugins: { layers },
@@ -65,23 +72,6 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       'layers/no-upward-import': 'error',
-    },
-  },
-  {
-    // Los secretos de la OAuth App llegan al Worker como globals inyectados por
-    // wrangler; no existen en ningún fichero.
-    files: ['src/api/**/*.js'],
-    languageOptions: {
-      globals: {
-        CLIENT_SECRET_DEV: 'readonly',
-        CLIENT_SECRET_PROD: 'readonly',
-        Request: 'readonly',
-        Response: 'readonly',
-        URL: 'readonly',
-        URLSearchParams: 'readonly',
-        console: 'readonly',
-        fetch: 'readonly',
-      },
     },
   },
   {

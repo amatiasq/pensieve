@@ -1,0 +1,33 @@
+#!/bin/bash -e
+
+# amq pensieve local — la app en :1234 y la API en :8080, como en producción.
+#
+# La API es del mismo origen que la app: en el VPS lo hace el nginx, aquí el
+# proxy de `vite.config.ts`. Sin la API levantada no hay login.
+#
+# Los secretos salen de `pensieve/.env` (gitignorado). Son los mismos que van al
+# `.env` del servidor con `amq pensieve secrets`.
+
+if [ ! -f .env ]; then
+  echo "Falta pensieve/.env con CLIENT_SECRET_DEV y CLIENT_SECRET_PROD." >&2
+  echo "Son los de las OAuth Apps de GitHub: /auth no puede canjear el code sin ellos." >&2
+  exit 1
+fi
+
+if [ ! -d node_modules ]; then
+  echo "==> bun install"
+  bun install
+fi
+
+# Ctrl-C se lleva a los dos: la API queda en background y vite en primer plano.
+trap 'kill 0' EXIT
+
+set -a
+. ./.env
+set +a
+
+echo "==> API en http://localhost:8080"
+deno run --allow-net --allow-env --config api/deno.json api/index.ts &
+
+echo "==> app en http://localhost:1234"
+bun run start

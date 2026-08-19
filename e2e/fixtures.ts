@@ -272,15 +272,15 @@ async function setupMocks(page: Page, repo: MockRepo) {
     await route.fulfill({ status: 201, contentType: 'application/json', body: '{}' });
   });
 
-  // Cloudflare Worker — commit endpoint
-  await page.route('https://pensieve-api.amatiasq.workers.dev/commit**', async (route) => {
+  // The API, same origin as the app (nginx proxies it in production)
+  await page.route('http://localhost:1234/commit**', async (route) => {
     const body = JSON.parse(route.request().postData() || '{}');
     repo.applyCommit(body.message || '', body.files || {});
     await route.fulfill({ status: 200, contentType: 'text/plain', body: 'ok' });
   });
 
-  // Cloudflare Worker — auth endpoint
-  await page.route('https://pensieve-api.amatiasq.workers.dev/auth**', async (route) => {
+  // The API, same origin as the app (nginx proxies it in production)
+  await page.route('http://localhost:1234/auth**', async (route) => {
     await route.fulfill({ status: 200, contentType: 'text/plain', body: 'access_token=fake' });
   });
 }

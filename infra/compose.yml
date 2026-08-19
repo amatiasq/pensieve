@@ -1,4 +1,8 @@
-version: '3.5'
+# pensieve: la SPA la sirve nginx desde ./www, y la API vive a su lado en la red
+# `internal`, sin VIRTUAL_HOST — sólo la alcanza el nginx de este stack.
+#
+# La carpeta del stack se llama `pensieve` y no puede cambiar, o el servidor se
+# queda con el stack anterior huérfano.
 
 services:
   nginx:
@@ -10,13 +14,34 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./logs:/var/log/nginx
+      # El build, que `amq pensieve deploy` rsyncea aquí. Todo es generado: ese
+      # rsync sí lleva --delete.
+      - ./www:/www:ro
     environment:
       - VIRTUAL_HOST=pensieve.amatiasq.com,pensieve.amq.im
       - LETSENCRYPT_HOST=pensieve.amatiasq.com,pensieve.amq.im
       - LETSENCRYPT_EMAIL=amatiasq@gmail.com
     networks:
       - exposed
+      - internal
+
+  # El nombre del servicio es el host al que proxea el nginx de arriba.
+  pensieve-api:
+    image: docker.amatiasq.com/pensieve-api:latest
+    container_name: amq-pensieve-api
+    restart: unless-stopped
+    environment:
+      PORT: 8080
+      # Los secretos de la OAuth App. Sin ellos el contenedor no arranca, a
+      # propósito: `amq pensieve secrets` escribe el .env, que nunca sube por
+      # rsync ni está en el repo.
+      CLIENT_SECRET_DEV: ${CLIENT_SECRET_DEV}
+      CLIENT_SECRET_PROD: ${CLIENT_SECRET_PROD}
+    networks:
+      - internal
 
 networks:
+  internal:
+    driver: bridge
   exposed:
     external: true

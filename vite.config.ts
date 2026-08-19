@@ -50,5 +50,11 @@ export default defineConfig({
   ],
   server: {
     port: 1234,
+    // Mismo origen que en producción: en el servidor lo hace el nginx, aquí
+    // este proxy. La API la levanta `amq pensieve local` en el 8080.
+    proxy: {
+      '/auth': 'http://localhost:8080',
+      '/commit': 'http://localhost:8080',
+    },
   },
 });

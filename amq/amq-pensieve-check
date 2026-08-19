@@ -4,12 +4,15 @@
 #
 # Mirrors .github/workflows/ci-pensieve.yml so a green CI run and a local
 # `amq pensieve check` cannot diverge:
-#   install deps (bun) + lint (eslint) + typecheck (tsc --noEmit) + build (vite).
+#   install deps (bun) + lint (eslint) + typecheck (tsc) + build (vite), and
+#   typecheck the API (deno check).
+#
+# Two runtimes because the project is two things: the app is Bun + Vite and the
+# API is Deno, which is what the VPS can run (its CPU has no AVX2).
 #
 # The e2e suite is NOT here: it needs browsers and takes minutes, so it lives in
-# `amq pensieve test`. Runtime: Bun. Install is skipped when node_modules is
-# already present so repeated local runs stay fast; CI has no node_modules and
-# installs fresh.
+# `amq pensieve test`. Install is skipped when node_modules is already present so
+# repeated local runs stay fast; CI has no node_modules and installs fresh.
 
 if [ ! -d node_modules ]; then
   echo "==> bun install"
@@ -21,8 +24,11 @@ fi
 echo "==> lint (eslint)"
 bunx eslint .
 
-echo "==> typecheck (tsc --noEmit)"
+echo "==> typecheck app (tsc --noEmit)"
 bunx tsc --noEmit -p tsconfig.json
+
+echo "==> typecheck api (deno check)"
+deno check --config api/deno.json api/index.ts
 
 echo "==> build (vite)"
 bunx vite build

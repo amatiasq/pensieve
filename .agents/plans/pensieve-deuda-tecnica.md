@@ -1,31 +1,17 @@
 # Plan — deuda técnica de pensieve
 
-**Status:** 🟡 a medias (2026-08-19). Hechos el lint, el CI, la regla de capas y
-casi todo lo suelto; quedan vivos dos puntos, cada uno esperando a algo distinto.
-**Blocker:** el CORS espera a que se decida [`pensieve-al-vps.md`](pensieve-al-vps.md),
-que lo borraría entero en vez de arreglarlo. Los e2e esperan al punto 5, que es
-nuevo y no lo cubría este plan.
+**Status:** 🟡 a medias (2026-08-19). Hechos el lint, el CI, las capas, el
+CORS y casi todo lo suelto; queda vivo el punto de los e2e.
+**Blocker:** los e2e esperan al punto 5, que es nuevo y no lo cubría este plan.
 
 ## 1. El Worker valida un origen que no es el del cliente
 
-⬜ **Pendiente, y a propósito: depende de
-[`pensieve-al-vps.md`](pensieve-al-vps.md).** Su fase 2 pone la API en el mismo
-origen que la app y el CORS desaparece entero, así que arreglarlo antes de
-decidir ese plan es trabajo que se tira. Reverificado el 2026-08-19: sigue tal
-cual.
-
-`src/api/index.js` saca el origen de `new URL(request.url).origin` — el del
-**propio worker**, que está en la whitelist. `isValidOrigin` siempre pasa, y la
-respuesta lleva `Access-Control-Allow-Origin: '*'`, así que `VALID_ORIGINS` no
-filtra nada. El impacto es acotado (`/commit` exige el token del usuario en el
-body, inalcanzable cross-origin), pero una barrera que no filtra es peor que
-ninguna: da falsa confianza.
-
-Arreglo: leer `request.headers.get('Origin')`, validarlo, reflejar **ese** origen
-y añadir `Vary: Origin`.
-
-También: el worker loguea el origen en cada request y `owner/repo/branch` en cada
-commit — deja escrito a qué repos commitea el usuario.
+✅ **Hecho, borrándolo**, en la fase 2 de
+[`pensieve-al-vps.md`](pensieve-al-vps.md). No se arregló `isValidOrigin`: la
+API pasó a ser del mismo origen que la app, así que el CORS entero —la
+whitelist, el `Access-Control-Allow-Origin: '*'` y la barrera que no filtraba—
+dejó de existir en vez de tener que estar bien. Los logs que dejaban escrito a
+qué repos commitea el usuario se fueron con él.
 
 ## 2. El CI mira una décima parte de la red
 
@@ -73,9 +59,9 @@ hay capa a la que pudiera saltar.
   filtraba en JS y pedía cada valor por separado: N+1 transacciones.
 - ~~`MemoryCache` sólo caduca al tocarla.~~ ✅ ya estaba: tiene un
   `setInterval` de 60 s que barre las entradas vencidas.
-- ~~`src/api/.eslintrc` no lo linta nadie.~~ ✅ hecho: `.eslintrc` borrado,
-  `src/api/**` fuera de los `ignores` y con los globals del Worker declarados —
-  los dos secretos que inyecta wrangler incluidos, que es donde se ve que existen.
+- ~~`src/api/.eslintrc` no lo linta nadie.~~ ✅ hecho: `.eslintrc` borrado. Ese
+  código ya no es del Worker ni es JS — es `api/`, Deno, y lo comprueban
+  `deno check` y `deno lint`, así que vuelve a los `ignores` de eslint.
 - Actualizaciones menores: ✅ ESLint 9→10 y react-router 6→7 (los future flags
   eran el trabajo y en 7 ya son el defecto; el uso es `Routes`/`Route`/`Link`/
   `useParams`/`useNavigate`, intacto). ⬜ **Monaco 0.52 se queda**: ver punto 6.

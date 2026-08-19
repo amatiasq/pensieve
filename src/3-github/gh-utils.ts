@@ -1,7 +1,6 @@
 import { getQueryParameter } from '../0-dom/getQueryParameter.ts';
 import { Note } from '../2-entities/Note.ts';
 import {
-  API_ORIGIN,
   AUTH_ENDPOINT,
   CLIENT_ID_DEV,
   CLIENT_ID_PROD,
@@ -34,11 +33,10 @@ export const appOrigin = getOrigin();
 export const ghScope = GH_SCOPE;
 export const ghClientId = isLocalHost ? CLIENT_ID_DEV : CLIENT_ID_PROD;
 
-// TODO: we can't proxy the API calls since we moved to Cloudflare Workers
-// const endpointOrigin = isLocalHost ? VALID_ORIGINS[0] : appOrigin;
-
-export const ghAuthEndpoint = `${API_ORIGIN}${AUTH_ENDPOINT}`;
-export const ghCommitEndpoint = `${API_ORIGIN}${COMMIT_ENDPOINT}`;
+// Rutas relativas: la API la sirve el mismo origen que la app, así que no hay
+// petición cross-origin y no hay CORS. En local lo resuelve el proxy de vite.
+export const ghAuthEndpoint = AUTH_ENDPOINT;
+export const ghCommitEndpoint = COMMIT_ENDPOINT;
 
 function getOrigin() {
   const { origin } = location;

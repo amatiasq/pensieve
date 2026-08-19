@@ -1,8 +1,10 @@
 # Plan — Pensieve entero en el VPS
 
-**Status:** ⬜ propuesta, sin empezar (2026-08-06).
-**Blocker:** se gana superficie y se pierde disponibilidad; decidir si compensa.
-Pensieve funciona y se usa a diario: esto no arregla una avería.
+**Status:** 🟡 fases 1 y 2 escritas y probadas enteras en local con Docker,
+**sin desplegar**; la fase 3, hecha en el repo y pendiente fuera (2026-08-19).
+**Blocker:** el `client_secret` de la OAuth App. Es un secreto de Cloudflare y
+de ahí no se lee de vuelta: hay que regenerarlo en GitHub y meterlo en
+1Password antes de que `amq pensieve deploy` pueda correr.
 
 Objetivo: **pensieve depende de un solo sistema, y ese sistema es el VPS.** Hoy
 depende de cuatro en cadena, y cada uno es un sitio donde puede caerse sin que
@@ -14,143 +16,151 @@ navegador  ─────────────────────→  C
                                           └──────────→  GitHub API
 ```
 
-El `AAAA` apunta al VPS, cuyo nginx hace `proxy_pass` a
-`amatiasq.github.io/pensieve/`. **La API la llama el navegador directamente**,
-no el nginx: `API_ORIGIN` de `src/config.json` es
-`pensieve-api.amatiasq.workers.dev`. Y existe un cuarto despliegue,
-`pensieve.amatiasq.workers.dev` (`wrangler.jsonc`), que sirve el mismo build sin
-que nadie lo use.
+## Lo que se encontró al hacerlo (2026-08-19)
 
-## Lo que está muerto pero no roto
+Tres cosas que el plan no sabía, todas comprobadas contra los servidores de
+verdad:
 
-**Los `location /auth` y `/commit` del `nginx.conf` no los usa nadie** — son de
-cuando la API era del mismo origen — y además dan **502** (comprobado el
-2026-08-06 y otra vez el 2026-08-19). La causa: el `upstream` es un host público
-y el `proxy_pass` va a través de una variable, así que nginx resuelve en runtime
-y necesita un
-`resolver` que ahí no existe; sin variable resolvería al cargar y se quedaría con
-una IP de Cloudflare que rota. El `# TODO: remove set instruction` del fichero es
-de cuando alguien peleó con esto. **No las arregles: bórralas.**
+- **Producción lleva nueve meses congelada.** `pensieve.amatiasq.com` sirve la
+  rama `gh-pages` de `amatiasq/pensieve`, y su último commit es del
+  **2025-11-19**. El mirror empuja a `main`; Pages publica desde `gh-pages`, y
+  nadie las une. Esto deja de ser una reforma cosmética: el despliegue al VPS es
+  lo que descongela la app.
+- **Un `proxy_pass` con el nombre del contenedor escrito literal tira la app
+  entera si la API no está.** nginx lo resuelve al cargar y **se niega a
+  arrancar** si el nombre no resuelve; y si arranca, se queda con la IP que
+  tenía la API, que cambia al recrearla. La cura es el `resolver` de Docker más
+  el nombre en una variable — que es exactamente lo que le faltaba al
+  `proxy_pass` a Cloudflare de antes: la variable estaba, el `resolver` no.
+- **Devolver la respuesta de GitHub tal cual da 502.** `/auth` proxeaba el
+  `Response` entero, cabeceras incluidas, y son tantas que nginx contesta
+  «upstream sent too big header». Ahora se devuelve sólo el cuerpo y el
+  content-type, que además deja de pasar al navegador las cookies y el CSP de
+  GitHub.
 
-Lo que este plan sí gana: **la API es cross-origin hoy y dejará de serlo.** Por
-eso el Worker tiene `Access-Control-Allow-Origin: '*'` y una `isValidOrigin` que
-no valida nada — con la API en el mismo origen, el CORS entero desaparece en vez
-de tener que estar bien.
+## Fase 1 — servir la app desde el VPS ✅ (en el repo)
 
-## Fase 1 — servir la app desde el VPS
+- `compose.yml` monta `./www:/www:ro` y el `nginx.conf` sirve `root /www` con
+  `try_files $uri $uri/ /index.html`.
+- `index.html` y `sw.js` van con `no-cache` y `/assets/` con `immutable`, que es
+  lo que impide que un service worker viejo esconda el despliegue nuevo.
+  `manifest.webmanifest` lleva su `default_type`: nginx no conoce la extensión y
+  sin eso el navegador no instala la PWA.
+- `amq pensieve deploy` hace el trabajo entero: build en Lorelei (el VPS no
+  puede con Bun), estampar `dist/version.txt` con el commit y el sufijo
+  `-dirty`, imprimir cuánto pesa `dist/` (7,9 MB hoy), imagen de la API,
+  `rsync --delete` del build, `amq vps deploy` de la infra y recrear el stack.
+- Los `location /gist` y `/note` han desaparecido; `/halt` se queda.
 
-Copiar lo que `amatiasq.com` ya hace en producción:
+**Se recrea el stack en vez de `nginx -s reload`**: el despliegue trae imagen
+nueva de la API y un reload no la recogería.
 
-- `compose.yml` gana `./www:/www:ro`, y el `nginx.conf` cambia el `proxy_pass`
-  por `root /www; try_files $uri $uri/ /index.html;` — el fallback es
-  obligatorio, es una SPA con `react-router-dom`.
-- `amq pensieve deploy` pasa a: build → estampar `dist/version.txt` con el commit
-  → `rsync -az --delete dist/ → vps/docker/pensieve/www/` → `amq vps deploy
-  pensieve` → `nginx -s reload`. **Con `--delete`**: todo es generado, y una ruta
-  que dejó de construirse debe dejar de servirse.
-- Los `location /gist` y `/note` desaparecen: con la SPA local son rutas del
-  router y las resuelve el `try_files`. `/halt` se queda, lo sirve nginx.
-- **El build se hace en Lorelei**, no en el VPS: es Bun + Vite y el VPS no puede
-  ejecutar Bun (CPU sin AVX2). Al servidor sólo llega `dist/`.
+## Fase 2 — la API en el VPS ✅ (en el repo)
 
-## Fase 2 — la API en el VPS
+`pensieve/api/`: Deno + Hono, tres ficheros, sin estado. Segundo servicio del
+mismo compose, en la red `internal` y sin `VIRTUAL_HOST`.
 
-Los dos endpoints son diminutos y **sin estado**: `auth.js` cambia un `code` por
-un token, `commit.js` construye un commit. Ni KV, ni D1, ni Durable Objects.
+- Los `CLIENT_ID` salen del mismo `src/config.json` que lee el cliente, para
+  que no puedan divergir; por eso el contexto de build es `pensieve/`, no
+  `api/`.
+- **Sin los `CLIENT_SECRET_*` el contenedor no arranca**, a propósito: si el
+  login falla la app no carga, y eso es mejor verlo al desplegar.
+  `amq pensieve secrets` escribe el `.env` del servidor desde 1Password.
+- `API_ORIGIN` ya no existe: el cliente pide `/auth` y `/commit` en rutas
+  relativas. **El CORS entero se ha borrado**, `isValidOrigin` incluida — con la
+  API en el mismo origen no hay nada que validar. Eso cierra también el punto 1
+  de [`pensieve-deuda-tecnica.md`](pensieve-deuda-tecnica.md).
+- En local lo cose el proxy de `vite.config.ts`, y `amq pensieve local` levanta
+  las dos mitades.
+- **Un `/commit` que falla ahora falla.** El worker se comía los errores de
+  GitHub y contestaba 200, así que un guardado que no se guardaba parecía
+  guardado; ahora devuelve 500 y el outbox lo reintenta.
 
-- **Runtime: Deno**, como `meme` y `conta` (Node con `--strip-types` es la
-  alternativa; Bun no, por el AVX2). Vive en `pensieve/api/` con su Dockerfile y
-  un segundo servicio en el mismo compose, **en la red `internal` y sin
-  `VIRTUAL_HOST`**: sólo lo alcanza el nginx de al lado.
-- El `proxy_pass` va a `http://pensieve-api:8080` — **nombre de servicio de
-  Docker**, que es lo que mata el 502 de hoy.
-- **Los secretos son lo único delicado.** `CLIENT_SECRET_DEV`/`_PROD` son hoy
-  secretos de Cloudflare; pasan a un `.env` gitignorado en el servidor. **Es el
-  secreto de una OAuth App: no puede tocar el bundle del cliente jamás**, y por
-  eso `/auth` necesita servidor.
-- `API_ORIGIN` pasa a ser el propio origen (rutas relativas) y `VALID_ORIGINS`
-  pierde las entradas de `workers.dev`.
-- **No hay que tocar la OAuth App.** El `redirect_uri` lo manda el cliente y
-  sigue siendo `pensieve.amatiasq.com`; sólo se mueve dónde se intercambia el
-  token.
+No se ha tocado la OAuth App: el `redirect_uri` lo sigue mandando el cliente.
 
-## Fase 3 — apagar lo que sobra
+## Fase 3 — apagar lo que sobra 🟡
 
-En este orden, comprobando entre pasos:
+Hecho en el repo: no queda `wrangler.jsonc`, ni `wrangler.toml`, ni `wrangler`
+en `devDependencies`, ni el `package-lock.json` que lo arrastraba. El
+`account_id` de la cuenta, que sólo vivía en ese `wrangler.toml`, está ahora en
+[`cloudflare.md`](../../../infra/machines/cloudflare.md).
 
-1. `wrangler delete` del Worker y del despliegue de assets — **antes**, confirmar
-   que login y guardado funcionan en el dominio.
-2. Quitar `wrangler.jsonc`, `src/api/wrangler.toml` y `wrangler` de
-   `devDependencies`.
-3. Dejar de publicar en GitHub Pages. **Confirmado**: lo alimenta el mirror.
-   `.github/workflows/push-to-pensieve.yml` replica `pensieve/**` al repo
-   `amatiasq/pensieve` en cada push a main, y Pages publica desde allí, así que
-   se retira en ese repo y no en mono.
-4. `infra/machines/cloudflare.md` y el `AGENTS.md` raíz pierden la fila de
-   pensieve.
+**Lo que ya no hay es vuelta atrás por comando**: los dos Workers siguen en pie
+pero no se pueden redesplegar desde aquí. Un arreglo urgente antes del corte es
+`git revert`, no `wrangler deploy`.
+
+Queda fuera del repo, en este orden y comprobando entre pasos:
+
+1. `wrangler delete` de `pensieve-api` (la API) y de `pensieve` (los assets que
+   no usa nadie) — **antes**, confirmar que login y guardado funcionan en el
+   dominio.
+2. Retirar Pages en `amatiasq/pensieve`: es la rama `gh-pages`, que el mirror no
+   toca. Basta con desactivar Pages y borrar la rama; el workflow de mono se
+   queda como está.
 
 ## El único sistema que queda fuera
 
 **Los datos son un repo de GitHub** (`amatiasq/pensieve-data`), así que «un solo
 sistema» vale para *servir la app*, no para *guardar el contenido*. Forgejo ya
 corre en el VPS y podría alojarlo, pero expone API de Gitea, no de GitHub —
-`commit.js` habría que reescribirlo — y sobre todo **perdería lo que hace útil
+`commit.ts` habría que reescribirlo — y sobre todo **perdería lo que hace útil
 ese repo: que está fuera de casa**. Es la copia off-site de las notas, y las
 notas son lo que hace falta para arreglar el VPS cuando el VPS se rompe (ver
 [`backups-3-2-1.md`](../../../.agents/plans/backups-3-2-1.md)).
 
-**Recomendación: dejar los datos en GitHub.** Un servicio con un solo punto de
+**Decidido: los datos se quedan en GitHub.** Un servicio con un solo punto de
 fallo operativo y los datos replicados fuera es mejor que la pureza de tenerlo
 todo en una caja.
 
 ## Lo que se pierde al salir de Cloudflare
 
-Pensieve está en Cloudflare **porque guarda las notas que hacen falta para
-mantener todo lo demás**: para sobrevivir a la caída del VPS. Y el cambio es
-real, no teórico: hoy, si el VPS se apaga, el dominio deja de responder pero el
-contenido sigue en pie en `amatiasq.github.io/pensieve/` y el Worker sigue
-atendiendo la API. Después no hay ese sitio al que ir.
+Hoy, si el VPS se apaga, el dominio deja de responder pero el Worker sigue
+atendiendo la API. Después no hay ese sitio al que ir. El mitigante ya está
+montado: **es una PWA con escrituras offline** — visitada una vez, las notas se
+leen y se editan sin red, y el contenido se lee en GitHub sin pasar por aquí.
 
-El mitigante ya está montado: **es una PWA con escrituras offline**. Visitada una
-vez, las notas se leen y se editan sin red; lo que no funciona sin servidor es el
-`/commit`. Y el contenido se lee en GitHub sin pasar por pensieve.
+Lo que **no** se pierde es el segundo sitio donde vivía la app: no existía. Ese
+`amatiasq.github.io/pensieve/` llevaba nueve meses sirviendo un build viejo.
 
-**La ganancia no es disponibilidad, es superficie**: cuatro sistemas con cuatro
-despliegues para una SPA y dos endpoints — con dos rutas de nginx muertas y en
-502 sin que nadie se entere, que es exactamente el síntoma de tener más piezas
-que atención. Decidirlo a la vista de esto, no en abstracto.
+## Lo que falta para cerrar
 
-## Trampas
-
-- **Service worker + nginx.** VitePWA precachea con hashes: `index.html` sin
-  caché larga y `assets/*` inmutable, o un deploy queda invisible detrás del
-  propio worker. Es el fallo clásico de mudar de host un PWA.
-- **La primera carga tras el cambio** llega con un service worker registrado
-  apuntando al viejo. Probar en un navegador que ya tenga pensieve abierto, no
-  sólo en uno limpio.
-- **`e2e/fixtures.ts` intercepta `pensieve-api.amatiasq.workers.dev/auth` y
-  `/commit` a pelo.** Al cambiar `API_ORIGIN`, los mocks dejan de casar y los 10
-  specs se quedan sin auth sin decir por qué.
-- **`isValidOrigin` mira el origen equivocado**: `new URL(request.url).origin` es
-  el del propio servidor, no la cabecera `Origin` del cliente. Al portarla,
-  arreglarla — o borrarla, si la API pasa a ser del mismo origen.
-- **`/commit` recibe el token del usuario en el body.** Ya es así hoy; que no
-  acabe en los logs de nginx.
-- **`dist/` está gitignorado**: sin `version.txt` no se sabe qué corre en
-  producción. Copiar el estampado de `amatiasq.com`, sufijo `-dirty` incluido.
-- **La carpeta compose se llama `pensieve`** y no puede cambiar, o el VPS se
-  queda con el stack anterior huérfano.
-- **El disco del VPS es muy pequeño** y `dist/` trae `monaco-editor`. Medir antes
-  de subirlo y no dejar builds viejos.
+1. Regenerar los dos `client_secret` en la OAuth App de GitHub y meterlos en un
+   ítem `pensieve` de 1Password
+   ([`secretos-en-1password.md`](../../../infra/.agents/plans/secretos-en-1password.md)).
+2. `PENSIEVE_OP_ITEM=<id> amq pensieve secrets` y `amq pensieve deploy`.
+3. **Un login y un guardado de verdad, con la cuenta real**, que aparezca como
+   commit en `pensieve-data`, y **desde una pestaña que ya tuviera pensieve
+   abierta**: la primera carga tras el cambio llega con un service worker
+   registrado apuntando al viejo.
+4. Los dos pasos de la fase 3 que están fuera del repo.
 
 ## Criterios de aceptación
 
-- `pensieve.amatiasq.com` sirve la app desde el VPS, sin `github.io` en el camino.
-- `/auth` y `/commit` responden desde el propio dominio y `src/config.json` ya no
-  nombra `workers.dev`.
-- **Un login y un guardado de verdad, con la cuenta real**, que aparezca como
-  commit en `pensieve-data`. Este plan toca el camino crítico de una herramienta
-  en uso: no se despliega sin eso.
-- `amq pensieve deploy` hace el trabajo entero: build, ship, reload.
-- `wrangler` ya no es dependencia y no queda ningún Worker en pie.
-- Con la red apagada la app abre y se puede escribir; al volver, sincroniza.
+- ✅ `src/config.json` ya no nombra `workers.dev`, y la app pide `/auth` y
+  `/commit` en su propio origen. Los 58 specs e2e de escritorio pasan contra el
+  build de producción con esas rutas.
+- ✅ `amq pensieve deploy` hace el trabajo entero: build, ship, recrear.
+- ✅ `wrangler` ya no es dependencia ni queda config suya en el repo.
+- ✅ El stack entero levanta en local: la SPA se sirve, `/note/…` resuelve por
+  `try_files`, `/auth` y `/commit` llegan a la API por el nombre del servicio, y
+  con la API parada la app **sigue sirviéndose**.
+- ⬜ `pensieve.amatiasq.com` sirve la app desde el VPS, sin `github.io`.
+- ⬜ Un login y un guardado de verdad con la cuenta real.
+- ⬜ No queda ningún Worker en pie.
+- ⬜ Con la red apagada la app abre y se puede escribir; al volver, sincroniza.
+
+## Trampas
+
+- **Los e2e contra el servidor de dev de vite fallan enteros**, y ya fallaban
+  antes de esto: el plugin de babel de Emotion no se aplica y revienta al
+  pintar. Se corren contra `vite preview`, que sí pasa. Es de
+  [`pensieve-deuda-tecnica.md`](pensieve-deuda-tecnica.md), no de aquí.
+- **Tres specs de `mobile.spec.ts` fallan** en el viewport de Pixel 7, también
+  desde antes.
+- **La carpeta compose se llama `pensieve`** y no puede cambiar, o el VPS se
+  queda con el stack anterior huérfano.
+- **`dist/stats.html`** —el informe de tamaños del bundle— se despliega con todo
+  lo demás. Es inofensivo y no se ha tocado.
+- **`VALID_ORIGINS` no incluye `pensieve.amq.im`** aunque el compose sirva ese
+  dominio, así que entrar por ahí lanza «Invalid origin». Es de antes y no se ha
+  tocado.

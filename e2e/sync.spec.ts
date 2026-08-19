@@ -64,7 +64,7 @@ test.describe('Sync indicator', () => {
 
   test('shows "Saving..." during active commit', async ({ app }) => {
     // Intercept commit endpoint with a delay to observe saving state
-    await app.route('https://pensieve-api.amatiasq.workers.dev/commit**', async (route) => {
+    await app.route('http://localhost:1234/commit**', async (route) => {
       // Delay response to give us time to observe the indicator
       await new Promise(resolve => setTimeout(resolve, 2000));
       await route.fulfill({ status: 200, contentType: 'text/plain', body: 'ok' });

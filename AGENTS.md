@@ -39,16 +39,22 @@ Notas en un repo privado de GitHub. Reglas del mono:
 - **El `client_secret` de la OAuth App no puede tocar el bundle del cliente.**
   Por eso `/auth` existe como endpoint de servidor: es el único
   sitio donde el intercambio del `code` por token puede ocurrir. Los secretos
-  llegan a `src/api/auth.js` como globals inyectados por wrangler, no desde
-  `config.json`.
+  llegan a `api/auth.ts` como variables de entorno, desde un `.env` gitignorado
+  —el del servidor lo escribe `amq pensieve secrets`, el de local lo lee `amq
+  pensieve local`—, nunca desde `config.json`.
+- **La API es del mismo origen que la app, y por eso no hay CORS.** `api/` es un
+  servicio Deno en la red `internal` del stack, al que sólo llega el nginx de al
+  lado; el cliente pide `/auth` y `/commit` en rutas relativas. Volver a
+  separarlos trae de vuelta un CORS que hay que acertar.
 - **Las capas `src/0-dom` … `src/7-components` sólo importan de capas de número
   igual o inferior.** Es lo que mantiene el storage y GitHub fuera de la UI, y
   lo comprueba `layers/no-upward-import`, en `eslint.config.js`.
 - **Las notas son la copia off-site de todo lo demás.** Son lo que hace falta
   para arreglar el VPS cuando el VPS se rompe, así que pensieve no puede acabar
-  dependiendo de aquello que sus notas sirven para reparar. Es la razón de vivir
-  en Cloudflare hoy y el eje de
-  [`.agents/plans/pensieve-al-vps.md`](.agents/plans/pensieve-al-vps.md).
+  dependiendo de aquello que sus notas sirven para reparar. Lo que lo sostiene
+  ya no es Cloudflare: **los datos siguen en un repo de GitHub**
+  (`amatiasq/pensieve-data`) y la app es una PWA con escrituras offline, así que
+  con el VPS caído las notas se leen, se editan y se leen también en GitHub.
 - **El camino crítico se usa a diario.** Cualquier cambio en auth, guardado o
   service worker se prueba con la cuenta real y con una pestaña que ya tenga
   pensieve abierto — un service worker viejo esconde el despliegue nuevo.

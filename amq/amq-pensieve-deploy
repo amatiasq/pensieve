@@ -1,15 +1,92 @@
 #!/bin/bash -e
 
-# Ship pensieve infra (compose + nginx.conf) to the VPS and restart.
-# pensieve is a static nginx site — no image to build; deploy just syncs the
-# reverse-proxy config and recreates the container.
+# amq pensieve deploy — construye aquí, y pone en producción la app y la API.
 #
-# Run via `amq pensieve deploy`.
+# El stack del VPS son dos contenedores: el nginx que sirve el build desde
+# ./www, y la API (Deno) en la red interna, a la que sólo llega ese nginx. Este
+# comando hace las dos mitades: la imagen de la API y el `dist/` de la app.
+#
+# El build se hace aquí y no en el VPS: es Bun + Vite y la CPU del VPS no tiene
+# AVX2. Al servidor sólo llega `dist/`.
+#
+# Config (env): VPS_REMOTE_DIR (default vps)
 
+case "$1" in
+  -h|--help)
+    echo "Usage: amq pensieve deploy [--skip-build]"
+    echo
+    echo "  --skip-build   sube el dist/ que ya está construido"
+    echo
+    echo "Config (env): VPS_REMOTE_DIR (default vps)"
+    exit 0;;
+esac
+
+IMAGE="docker.amatiasq.com/pensieve-api"
 SERVICE="pensieve"
+STAMP="$(date +%Y-%m-%dT%H-%M-%S)"
+VPS_REMOTE_DIR="${VPS_REMOTE_DIR:-vps}"
+SITE_DIR="$VPS_REMOTE_DIR/docker/$SERVICE/www"
 
-echo "==> ship infra (compose + nginx) to VPS"
+cd "$(dirname "$0")/.."
+
+# Fail-closed y antes de construir nada: sin los secretos de la OAuth App el
+# contenedor de la API no arranca, y si el login falla la app no carga.
+for secret in CLIENT_SECRET_DEV CLIENT_SECRET_PROD; do
+  if ! amq vps ssh "grep -q '^$secret=' ~/$VPS_REMOTE_DIR/docker/$SERVICE/.env" 2>/dev/null; then
+    echo "Falta $secret en ~/$VPS_REMOTE_DIR/docker/$SERVICE/.env; la API no arrancaría." >&2
+    echo "Ponlos con: amq pensieve secrets" >&2
+    exit 1
+  fi
+done
+
+if [[ "$1" != "--skip-build" ]]; then
+  if [ ! -d node_modules ]; then
+    echo "==> bun install"
+    bun install
+  fi
+
+  echo "==> build"
+  bun run build
+fi
+
+[ -f dist/index.html ] || { echo "no dist/index.html — nada que desplegar" >&2; exit 1; }
+
+# `dist/` está gitignorado, así que sin esto no se sabe qué corre en producción.
+# El sufijo -dirty lo decide `git status`: un build de un árbol sucio no es el
+# commit que dice ser.
+echo "==> estampar versión"
+commit="$(git rev-parse HEAD)"
+[ -z "$(git status --porcelain -- . ':!dist')" ] || commit="$commit-dirty"
+printf '%s\n%s\n' "$commit" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > dist/version.txt
+echo "    $commit"
+
+# El disco del VPS es muy pequeño y `dist/` trae monaco-editor: el tamaño se
+# imprime siempre, para que crecer de golpe se vea antes de subirlo.
+echo "==> dist/ pesa $(du -sh dist | cut -f1)"
+
+# La imagen se construye para linux/amd64 (esta máquina es arm64) y se etiqueta
+# también con la fecha, para poder volver atrás.
+echo "==> construir la imagen de la API (linux/amd64)"
+docker buildx build --platform linux/amd64 --pull \
+  -f api/Dockerfile -t "$IMAGE:latest" -t "$IMAGE:$STAMP" .
+
+echo "==> subir la imagen"
+docker push "$IMAGE:latest"
+docker push "$IMAGE:$STAMP"
+
+# Con --delete, al revés que `amq vps deploy`: aquí todo es generado, y una ruta
+# que dejó de construirse debe dejar de servirse.
+echo "==> rsync dist/ -> $SITE_DIR/ en el VPS"
+amq vps ssh "mkdir -p '$SITE_DIR'"
+amq vps rsync --delete dist/ ":$SITE_DIR/"
+
+echo "==> subir infra (compose + nginx.conf)"
 amq vps deploy "$SERVICE"
 
-echo "==> pull-and-restart on VPS"
+# Recrear y no `nginx -s reload`: el despliegue trae imagen nueva de la API, y
+# un reload de nginx no la recogería. Es una PWA con escrituras offline, así que
+# el corte de un recreate no se nota.
+echo "==> pull-and-restart en el VPS"
 amq vps pull-and-restart "$SERVICE"
+
+echo "==> desplegado: https://pensieve.amatiasq.com/ ($commit)"
