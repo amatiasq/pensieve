@@ -9,7 +9,7 @@
 SERVICE="pensieve"
 
 echo "==> ship infra (compose + nginx) to VPS"
-amq deploy-infra "$SERVICE"
+amq vps deploy "$SERVICE"
 
 echo "==> pull-and-restart on VPS"
 amq vps pull-and-restart "$SERVICE"

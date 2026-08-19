@@ -44,7 +44,7 @@ Copiar lo que `amatiasq.com` ya hace en producción:
   por `root /www; try_files $uri $uri/ /index.html;` — el fallback es
   obligatorio, es una SPA con `react-router-dom`.
 - `amq pensieve deploy` pasa a: build → estampar `dist/version.txt` con el commit
-  → `rsync -az --delete dist/ → vps/docker/pensieve/www/` → `amq deploy-infra
+  → `rsync -az --delete dist/ → vps/docker/pensieve/www/` → `amq vps deploy
   pensieve` → `nginx -s reload`. **Con `--delete`**: todo es generado, y una ruta
   que dejó de construirse debe dejar de servirse.
 - Los `location /gist` y `/note` desaparecen: con la SPA local son rutas del
