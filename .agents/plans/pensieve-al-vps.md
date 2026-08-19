@@ -24,9 +24,10 @@ que nadie lo use.
 ## Lo que está muerto pero no roto
 
 **Los `location /auth` y `/commit` del `nginx.conf` no los usa nadie** — son de
-cuando la API era del mismo origen — y además dan **502** (comprobado
-2026-08-06). La causa: el `upstream` es un host público y el `proxy_pass` va a
-través de una variable, así que nginx resuelve en runtime y necesita un
+cuando la API era del mismo origen — y además dan **502** (comprobado el
+2026-08-06 y otra vez el 2026-08-19). La causa: el `upstream` es un host público
+y el `proxy_pass` va a través de una variable, así que nginx resuelve en runtime
+y necesita un
 `resolver` que ahí no existe; sin variable resolvería al cargar y se quedaría con
 una IP de Cloudflare que rota. El `# TODO: remove set instruction` del fichero es
 de cuando alguien peleó con esto. **No las arregles: bórralas.**
@@ -81,9 +82,10 @@ En este orden, comprobando entre pasos:
    que login y guardado funcionan en el dominio.
 2. Quitar `wrangler.jsonc`, `src/api/wrangler.toml` y `wrangler` de
    `devDependencies`.
-3. Dejar de publicar en GitHub Pages. **Ojo:** hay que averiguar qué publica hoy
-   `amatiasq.github.io/pensieve/`, porque no está en este repo — hay un mirror,
-   no un workflow de Pages. Si el mirror alimenta Pages, se retira allí.
+3. Dejar de publicar en GitHub Pages. **Confirmado**: lo alimenta el mirror.
+   `.github/workflows/push-to-pensieve.yml` replica `pensieve/**` al repo
+   `amatiasq/pensieve` en cada push a main, y Pages publica desde allí, así que
+   se retira en ese repo y no en mono.
 4. `infra/machines/cloudflare.md` y el `AGENTS.md` raíz pierden la fila de
    pensieve.
 

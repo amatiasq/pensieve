@@ -1,31 +1,13 @@
-# Ideas y bugs abiertos de pensieve
+# Ideas de pensieve, sin compromiso
 
-**Status:** ⬜ backlog, sin compromiso. Lo único con diseño es la cola de
-precarga.
-**Blocker:** ninguno; nada de aquí está comprometido.
+**Status:** ⬜ backlog. Nada de aquí está diseñado ni prometido.
+**Blocker:** ninguno.
 
-Lo que quedaba vivo de `docs/notes.md`. Sin fechas.
-
-## Bugs
-
-- **Commits vacíos**: el historial del repo de datos está lleno de ellos. Mirar
-  si la API de GitHub puede rechazarlos o si hay que comparar antes de commitear.
-- **El filtro devuelve resultados en orden errático**: buscando "Pensieve"
-  salen primero los buenos, luego casi todas las notas, luego otra vez los
-  buenos. Es `match-sorter` puntuando algo que no queremos.
-
-## Precarga: que *todas* las notas estén offline
-
-Hoy sólo funcionan offline las notas abiertas alguna vez. La idea es una cola de
-precarga: al listar notas se encolan las que tienen `modified` nuevo, ordenadas
-por fecha, y se van descargando despacio (~1/s) para no gastar el rate limit de
-GitHub; abrir una nota la saca de la cola porque ya se descargó. El ritmo debería
-seguir una curva `__/‾‾`: mucho por lo reciente, poco por lo viejo.
-
-El enganche natural es `MixedStore`, que ya ve las claves nuevas al reconciliar
-`readAllRemote` — o emitir desde ahí un evento que capture el precargador.
-
-## Nice to have
+Lo que quedaba vivo de un `docs/notes.md` que ya se borró. Sin fechas. Lo que
+tenía diseño o causa localizada salió a su propio plan:
+[`precarga-offline.md`](precarga-offline.md),
+[`commits-vacios.md`](commits-vacios.md),
+[`filtro-orden-erratico.md`](filtro-orden-erratico.md).
 
 - Crear nota desde la selección (menú contextual); en una nota nueva, el texto
   por defecto debería venir ya seleccionado.
