@@ -1,4 +1,4 @@
-import { getMousePosition } from '../1-core/mouse.ts';
+import { getMousePosition } from './mouse.ts';
 import { escapeHtml } from './escapeHtml.ts';
 import './tooltip.css';
 

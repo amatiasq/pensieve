@@ -42,8 +42,8 @@ Notas en un repo privado de GitHub. Reglas del mono:
   llegan a `src/api/auth.js` como globals inyectados por wrangler, no desde
   `config.json`.
 - **Las capas `src/0-dom` … `src/7-components` sólo importan de capas de número
-  igual o inferior.** Nada lo comprueba hoy — es la convención que mantiene el
-  storage y GitHub fuera de la UI, y se rompe sin que salte nada.
+  igual o inferior.** Es lo que mantiene el storage y GitHub fuera de la UI, y
+  lo comprueba `layers/no-upward-import`, en `eslint.config.js`.
 - **Las notas son la copia off-site de todo lo demás.** Son lo que hace falta
   para arreglar el VPS cuando el VPS se rompe, así que pensieve no puede acabar
   dependiendo de aquello que sus notas sirven para reparar. Es la razón de vivir

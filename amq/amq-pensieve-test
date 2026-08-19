@@ -1,0 +1,23 @@
+#!/bin/bash -e
+
+# amq pensieve test — the Playwright e2e suite (10 specs, desktop + mobile).
+#
+# No OAuth needed: `e2e/fixtures.ts` intercepts `/auth` and serves a repo mock
+# from memory, so the suite runs offline against a plain `vite` dev server that
+# Playwright starts itself.
+#
+# NOT in CI yet: `@vitejs/plugin-react` 6 dropped Babel, so
+# `@emotion/babel-plugin` no longer runs and the six emotion component selectors
+# throw on boot — every spec fails before it asserts anything. See
+# `.agents/plans/pensieve-deuda-tecnica.md`.
+
+if [ ! -d node_modules ]; then
+  echo "==> bun install"
+  bun install
+fi
+
+echo "==> playwright install (chromium)"
+bunx playwright install --with-deps chromium
+
+echo "==> e2e (playwright)"
+exec bunx playwright test "$@"

@@ -27,7 +27,7 @@ export class GHRepoStore implements AsyncStore {
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
-  has(key: string): Promise<boolean> {
+  has(): Promise<boolean> {
     throw new Error('Do not use me');
   }
 

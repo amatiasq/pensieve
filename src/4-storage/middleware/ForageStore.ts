@@ -28,19 +28,26 @@ export class ForageStore implements AsyncStore {
     return allKeys.includes(key);
   }
 
-  async readAll(pattern: string) {
+  readAll(pattern: string) {
     const regex = patternToRegex(pattern);
-    const allKeys = (await keys(this.store)) as string[];
-    const match = allKeys.filter(x => regex.test(x));
+    const range = prefixRangeFor(pattern);
 
-    const promises = match.map(async key => {
-      const content = await this.read(key);
-      return [key, content] as const;
+    return this.store('readonly', store => {
+      const result: Record<string, string> = {};
+      const request = store.openCursor(range);
+
+      return new Promise<Record<string, string>>((resolve, reject) => {
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const cursor = request.result;
+          if (!cursor) return resolve(result);
+
+          const key = String(cursor.key);
+          if (regex.test(key) && cursor.value) result[key] = cursor.value;
+          cursor.continue();
+        };
+      });
     });
-
-    const entries = await Promise.all(promises);
-    const result = entries.filter(x => x[1]) as Array<[string, string]>;
-    return Object.fromEntries(result);
   }
 
   read(key: string) {
@@ -58,4 +65,12 @@ export class ForageStore implements AsyncStore {
 
 export function createForageStore(name: string) {
   return new ForageStore(createIdbStore(name, 'keyval'));
+}
+
+// Un patrón `prefijo*` es un rango de claves: el cursor se salta las que no
+// empiezan por ahí en vez de leerlas todas para descartarlas en JS después.
+function prefixRangeFor(pattern: string) {
+  const [prefix] = pattern.split('*');
+  if (!prefix || pattern.startsWith('*')) return undefined;
+  return IDBKeyRange.bound(prefix, `${prefix}\uffff`);
 }

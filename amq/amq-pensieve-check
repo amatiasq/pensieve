@@ -4,10 +4,12 @@
 #
 # Mirrors .github/workflows/ci-pensieve.yml so a green CI run and a local
 # `amq pensieve check` cannot diverge:
-#   install deps (bun) + typecheck (tsc --noEmit).
+#   install deps (bun) + lint (eslint) + typecheck (tsc --noEmit) + build (vite).
 #
-# Runtime: Bun. Install is skipped when node_modules is already present so
-# repeated local runs stay fast; CI has no node_modules and installs fresh.
+# The e2e suite is NOT here: it needs browsers and takes minutes, so it lives in
+# `amq pensieve test`. Runtime: Bun. Install is skipped when node_modules is
+# already present so repeated local runs stay fast; CI has no node_modules and
+# installs fresh.
 
 if [ ! -d node_modules ]; then
   echo "==> bun install"
@@ -16,5 +18,11 @@ else
   echo "==> deps present, skipping bun install"
 fi
 
+echo "==> lint (eslint)"
+bunx eslint .
+
 echo "==> typecheck (tsc --noEmit)"
 bunx tsc --noEmit -p tsconfig.json
+
+echo "==> build (vite)"
+bunx vite build

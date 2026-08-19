@@ -15,22 +15,18 @@ export class Stopwatch {
   }
 
   get ms() {
-    this.confirmRunning();
     return Date.now() - this.started!;
   }
 
   get seconds() {
-    this.confirmRunning();
     return this.ms / OPERATOR.seconds;
   }
 
   get minutes() {
-    this.confirmRunning();
     return this.ms / OPERATOR.minutes;
   }
 
   get hours() {
-    this.confirmRunning();
     return this.ms / OPERATOR.hours;
   }
 
@@ -42,12 +38,5 @@ export class Stopwatch {
     const elapsed = this[unit];
     this.started = null;
     return elapsed;
-  }
-
-  private confirmRunning() {
-    this.started === Date.now();
-    // if (this.started == null) {
-    //   throw new Error('Stopwatch not started yet');
-    // }
   }
 }

@@ -48,7 +48,7 @@ export class MixedStore implements AsyncStore {
     }, PERIODIC_SYNC_MS);
   }
 
-  has(key: string): Promise<boolean> {
+  has(): Promise<boolean> {
     throw new Error('Do not use me');
   }
 

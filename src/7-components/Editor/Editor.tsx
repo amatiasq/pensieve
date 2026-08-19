@@ -124,7 +124,7 @@ export function Editor(props: EditorProps) {
     if (!isEditable(props)) wtf();
     setHasUnsavedChanged(value !== content);
     setValue(value);
-    props.onChange && props.onChange(value);
+    props.onChange?.(value);
     scheduler.restart();
   }
 

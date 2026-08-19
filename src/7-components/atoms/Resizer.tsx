@@ -29,7 +29,7 @@ export function Resizer({ size, onChange, ...divProps }: ResizerProps) {
 
   const dragMove = useCallback(
     (event: React.DragEvent<HTMLDivElement>) => {
-      isDragging && setDelta([delta[1], event.clientX - initialPosition]);
+      if (isDragging) setDelta([delta[1], event.clientX - initialPosition]);
     },
     [isDragging, initialPosition, delta],
   );

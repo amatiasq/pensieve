@@ -27,7 +27,7 @@ export function isDeserializable(x: string) {
   try {
     deserialize(x);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
