@@ -6,8 +6,8 @@
 Lo que quedaba vivo de un `docs/notes.md` que ya se borró. Sin fechas. Lo que
 tenía diseño o causa localizada salió a su propio plan:
 [`precarga-offline.md`](precarga-offline.md),
-[`commits-vacios.md`](commits-vacios.md),
-[`filtro-orden-erratico.md`](filtro-orden-erratico.md).
+[`commits-vacios.md`](commits-vacios.md). El del orden errático del filtro se
+descartó: [`../discarded/filtro-orden-erratico.md`](../discarded/filtro-orden-erratico.md).
 
 - Crear nota desde la selección (menú contextual); en una nota nueva, el texto
   por defecto debería venir ya seleccionado.

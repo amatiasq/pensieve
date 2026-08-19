@@ -1,7 +1,8 @@
-# Plan — El filtro devuelve las notas en orden errático
+# Descartado (2026-08-20) — El filtro devuelve las notas en orden errático
 
-**Status:** ⬜ causa localizada, sin arreglar.
-**Blocker:** ninguno. Es un umbral en una línea.
+**Ya no molesta.** Dejó de ser un problema en el uso real, así que no se arregla.
+El diagnóstico se guarda por si vuelve: la causa está localizada y el arreglo es
+una línea.
 
 Buscando "Pensieve" salen primero las notas buenas, después casi todas las
 demás, y luego otra vez buenas. Parece que ordena al azar.

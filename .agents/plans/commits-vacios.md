@@ -3,6 +3,9 @@
 **Status:** ⬜ diagnosticado, sin arreglar.
 **Blocker:** ninguno. Es una guarda en `src/api/commit.js`, nada más.
 
+**No es crítico** (2026-08-20): si al abrirlo resulta más complicado que la guarda
+que promete, se descarta en vez de pelearlo.
+
 El historial de `pensieve-data` está lleno de commits que no cambian nada.
 Guardar una nota sin haberla tocado deja un commit igual.
 
