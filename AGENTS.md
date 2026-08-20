@@ -64,5 +64,8 @@ Notas en un repo privado de GitHub. Reglas del mono:
   abre y cuenta commits y ficheros. Devolverlo a GitHub es `git push --mirror`,
   que reescribe el repo remoto entero: el comando lo imprime y no lo ejecuta,
   porque un restore que publica solo no se puede ensayar.
+- **La copia de fuera no la hace este comando: la baja Cereza**, con una llave de
+  despliegue de sólo lectura, y su ensayo diario clona ese espejo. Aquí sólo queda
+  la copia de Lorelei — dos caminos copiando los mismos 97 M ocupan el doble.
 
 Planes en [`.agents/plans/`](.agents/plans/).

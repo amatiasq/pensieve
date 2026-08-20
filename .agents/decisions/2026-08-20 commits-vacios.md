@@ -2,10 +2,6 @@
 
 Cierra `pensieve/.agents/plans/commits-vacios.md`.
 
-**Review:** ⚠️ pendiente — mirar el historial de `amatiasq/pensieve-data` tras el
-primer despliegue con esto: si en una semana de uso no aparece ningún commit sin
-cambios, borrar esta línea.
-
 `api/commit.ts` creaba el commit sin comparar nada, así que guardar una nota sin
 haberla tocado dejaba un commit igual al padre —GitHub los acepta— y el
 historial se llenaba de ellos.

@@ -1,26 +1,29 @@
 # Plan — El corte: pensieve sale de Cloudflare
 
-**Status:** 👨‍💻 el código está listo y probado en local, **sin desplegar**. Sale de
-partir [`2026-08-20 pensieve-desacoplado-de-cloudflare.md`](../decisions/2026-08-20%20pensieve-desacoplado-de-cloudflare.md).
-**Blocker:** el `client_secret` de la OAuth App. Es un secreto de Cloudflare y de
-ahí no se lee de vuelta: hay que regenerarlo en GitHub y meterlo en 1Password
-antes de que `amq pensieve deploy` pueda correr.
+**Status:** 🟡 el código está listo y probado en local, **sin desplegar**; el
+paso 1 hecho. Sale de partir
+[`2026-08-20 pensieve-desacoplado-de-cloudflare.md`](../decisions/2026-08-20%20pensieve-desacoplado-de-cloudflare.md).
+**Blocker:** ninguno. Los dos `client_secret` ya están en 1Password y
+`amq-pensieve-secrets` los lee; lo que queda empieza por `amq pensieve deploy`.
 
 **Producción lleva sin desplegar desde el 2025-11-19**: lo que sirve hoy es de hace
 nueve meses. Este plan es lo que la descongela.
 
-Los pasos con los clics, en [`.agents/finish.md`](../../../.agents/finish.md) —
-el de la raíz del mono, no el de aquí.
+Los pasos 3, 4 y 5 son clics —una sesión de verdad en el navegador, el panel de
+Cloudflare y el de GitHub—, y por eso este plan estuvo marcado 👨‍💻. Pero el que
+lo desatasca, el 2, es un comando: se ejecuta y luego se piden los clics.
 
 ## El orden, que importa
 
-1. **Regenerar los dos `client_secret`** en las OAuth Apps de GitHub y crear el
-   ítem `Pensieve / .env` en 1Password (vault `Projects`) con los campos
-   `CLIENT_SECRET_DEV` y `CLIENT_SECRET_PROD`. **No se pueden copiar de donde
-   están**: son secretos de Cloudflare y de ahí no se leen de vuelta.
-2. `PENSIEVE_OP_ITEM=<id> amq pensieve secrets` y `amq pensieve deploy`. Cuando el
-   ítem exista, **meter su id dentro de `amq-pensieve-secrets`** como hacen los
-   demás `secrets`: la variable de entorno sólo existe porque el ítem no existía.
+1. **Regenerar los dos `client_secret`** ✅ (2026-08-20). El ítem
+   `Pensieve / .env` existe en el vault `Projects` con los dos campos con valor, y
+   su id está dentro de `amq-pensieve-secrets`, así que ya no hace falta
+   `PENSIEVE_OP_ITEM`.
+
+   El id que llevaba el script era el del ítem **`Pensieve`** —el login de la web,
+   que no tiene estos campos—, no el de `Pensieve / .env`. Se veía porque falla
+   cerrado y lo dice, pero se veía al desplegar; corregido.
+2. `amq pensieve deploy`, que llama a `secrets` él solo.
 3. **Un login y un guardado de verdad, con la cuenta real**, que aparezca como
    commit en `pensieve-data`, y **desde una pestaña que ya tuviera pensieve
    abierta**: la primera carga tras el cambio llega con el service worker viejo
@@ -47,4 +50,4 @@ el login falla la app no carga, y es mejor verlo al desplegar.
 - **Desde una pestaña que ya tuviera pensieve abierta**, no sólo en una nueva.
 - No queda ningún Worker en pie, ni Pages sirviendo `gh-pages`.
 - Con la red apagada la app abre y se puede escribir; al volver, sincroniza.
-- `amq-pensieve-secrets` nombra su ítem por id y ya no pide `PENSIEVE_OP_ITEM`.
+- `amq-pensieve-secrets` nombra su ítem por id y ya no pide `PENSIEVE_OP_ITEM`. ✅

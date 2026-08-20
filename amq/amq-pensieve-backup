@@ -1,6 +1,10 @@
 #!/bin/bash -e
 
-# Clona (o actualiza) pensieve-data en backups/, y lo copia al NAS.
+# Clona (o actualiza) pensieve-data en backups/. **La copia de Lorelei, y sólo
+# ésa**: desde el 2026-08-20 Cereza baja su propio espejo con una llave de sólo
+# lectura, así que aquí no se archiva nada con fecha en el NAS. Dos caminos
+# copiando los mismos 97 M es la trampa que ya mordió con el registry —9,1 G
+# donde caben 4,6—. Ver `.agents/decisions/2026-08-20 pensieve-en-el-tiron-de-cereza.md`.
 #
 # Los datos de pensieve son un repo, así que respaldarlos es clonarlos: cada
 # clon completo ya es una copia con todo el historial. Lo que faltaba era que
@@ -22,10 +26,8 @@ else
   git clone --mirror "$DATA_REPO" "$MIRROR"
 fi
 
-# Un bundle es un fichero único con todo el repo dentro: se copia como cualquier
-# otro backup y se restaura con `git clone <fichero>`.
+# Un bundle es un fichero único con todo el repo dentro, y es lo que abren `amq
+# pensieve restore` y su `restore-check`: se queda aquí, que es donde se ensaya.
 bundle="backups/pensieve-data-$(date +%Y-%m-%d).bundle"
 echo "==> writing $bundle"
 git -C "$MIRROR" bundle create "../../$bundle" --all
-
-amq nas backup pensieve "$bundle"

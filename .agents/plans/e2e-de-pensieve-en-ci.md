@@ -2,9 +2,7 @@
 
 **Status:** ⬜ sin empezar (2026-08-20). Sale de partir
 [`2026-08-20 selectores-de-componente-de-emotion.md`](../decisions/2026-08-20%20selectores-de-componente-de-emotion.md).
-**Blocker:** ninguno. El plan del que sale este declaraba «el refactor de
-pensieve»; era un comentario de pasada que nunca fue compromiso escrito, y no
-bloquea a nadie. La suite pasa entera, 63 tests.
+**Blocker:** ninguno. La suite pasa entera, 63 tests.
 
 `ci-pensieve.yml` corre `amq pensieve check` —lint, typecheck, build, y el `deno
 check`/`deno test` de la API— y nada más. **Los 10 specs de `amq pensieve test`

@@ -1,9 +1,5 @@
 # 2026-08-20 — Fuera los seis selectores de componente de emotion
 
-**Review:** ⚠️ pendiente — el CSS que volvió sólo se ha visto contra el mock de
-los e2e; míralo en la app real (loader, caret de grupo, acciones y estrella de
-una nota) en el primer deploy y borra esta línea.
-
 Cierra la mitad de `selectores-de-componente-de-emotion.md`. La otra mitad —los
 e2e en CI— sigue con el blocker que declaraba aquel plan y sale como
 [`e2e-de-pensieve-en-ci.md`](../plans/e2e-de-pensieve-en-ci.md).
