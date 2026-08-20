@@ -6,10 +6,7 @@
 # from memory, so the suite runs offline against a plain `vite` dev server that
 # Playwright starts itself.
 #
-# NOT in CI yet: `@vitejs/plugin-react` 6 dropped Babel, so
-# `@emotion/babel-plugin` no longer runs and the six emotion component selectors
-# throw on boot — every spec fails before it asserts anything. See
-# `.agents/plans/pensieve-deuda-tecnica.md`.
+# NOT in CI yet, though it is green: `.agents/plans/e2e-de-pensieve-en-ci.md`.
 
 if [ ! -d node_modules ]; then
   echo "==> bun install"

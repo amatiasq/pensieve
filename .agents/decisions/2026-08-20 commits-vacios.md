@@ -31,7 +31,5 @@ llamadas que salen: con el árbol idéntico no se llega a `POST /git/commits`.
 entra en CI sin tocar el workflow.
 
 **Sin probar contra GitHub de verdad**: la app no está desplegada todavía
-([`pensieve-el-corte.md`](../plans/pensieve-el-corte.md)), y los e2e siguen
-fallando enteros al arrancar por los selectores de emotion
-([`selectores-de-componente-de-emotion.md`](../plans/selectores-de-componente-de-emotion.md)),
-que es de antes de esto.
+([`pensieve-el-corte.md`](../plans/pensieve-el-corte.md)) y los e2e corren contra
+un mock del repo en memoria, no contra GitHub.

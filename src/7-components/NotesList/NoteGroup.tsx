@@ -51,7 +51,7 @@ const styles = css`
       border-color: var(--group-border-color);
     }
 
-    ${Content} {
+    .group-content {
       animation: details-show var(--animation-speed) ease-in-out;
     }
 
@@ -104,7 +104,7 @@ export function NoteGroup({ group, notes }: { group: string; notes: Note[] }) {
         <GroupCounter items={notes.length} favorites={favorites.length} />
       </>
 
-      <Content>
+      <Content className="group-content">
         {notes.map(x => (
           <NoteGroupItem key={x.id} id={x.id} />
         ))}

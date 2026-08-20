@@ -42,7 +42,7 @@ const StyledAppContainer = styled.div`
   ${mobileOnly} {
     grid-template-columns: 100vw;
 
-    ${GridResizer} {
+    .resizer {
       display: none;
     }
 
@@ -113,7 +113,7 @@ export function App() {
     <StyledAppContainer className={`page-${pageName}`}>
       <SidebarHeader onFilterChange={setFilter} />
       <NotesList filter={filter} />
-      <GridResizer size={size} onChange={setSize} />
+      <GridResizer className="resizer" size={size} onChange={setSize} />
       <Router />
     </StyledAppContainer>
   );

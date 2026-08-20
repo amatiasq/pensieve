@@ -40,8 +40,7 @@ const Ripple = styled.div`
   animation: loader 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
 `;
 
-const Ripple2 = styled.div`
-  ${Ripple};
+const Ripple2 = styled(Ripple)`
   animation-delay: -0.5s;
 `;
 

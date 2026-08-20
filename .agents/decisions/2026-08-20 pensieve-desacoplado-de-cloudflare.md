@@ -101,7 +101,7 @@ se lee en GitHub sin pasar por aquí.
 - **`VALID_ORIGINS` no incluye `pensieve.amq.im`** aunque el compose sirva ese
   dominio, así que entrar por ahí lanza «Invalid origin». Es de antes y no se ha
   tocado.
-- Los e2e contra el servidor de dev de vite fallan enteros, y tres specs de
-  `mobile.spec.ts` fallan en el viewport de Pixel 7. Las dos cosas son de
-  [`selectores-de-componente-de-emotion.md`](../plans/selectores-de-componente-de-emotion.md),
-  no de aquí.
+- Los e2e contra el servidor de dev de vite fallaban enteros, y con ellos tres
+  specs de `mobile.spec.ts` en el viewport de Pixel 7. Las dos cosas eran de los
+  selectores de emotion, no de aquí, y ya están arregladas:
+  [`2026-08-20 selectores-de-componente-de-emotion.md`](2026-08-20%20selectores-de-componente-de-emotion.md).

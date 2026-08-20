@@ -8,10 +8,6 @@ import { ellipsis, hStack } from '../styles.ts';
 import { FavoriteButton } from './FavoriteButton.tsx';
 import { NoteActions } from './NoteActions.tsx';
 
-const StyledFavouriteButton = styled(FavoriteButton)``;
-
-const StyledActions = styled(NoteActions)``;
-
 const NoteItemContainer = styled.h5`
   ${hStack};
   --gap: var(--sidebar-gap);
@@ -26,11 +22,11 @@ const NoteItemContainer = styled.h5`
   }
 
   &:not(:hover) {
-    ${StyledActions} {
+    .note-actions {
       display: none;
     }
 
-    &:not(.favorite) ${StyledFavouriteButton} {
+    &:not(.favorite) .favorite-button {
       visibility: hidden;
     }
   }
@@ -81,9 +77,9 @@ export function NoteItem({ id, className = '' }: NoteItemProps) {
 
   return (
     <NoteItemContainer className={cn}>
-      <StyledFavouriteButton id={note.id} />
+      <FavoriteButton className="favorite-button" id={note.id} />
       <Title to={navigator.toNote(note)}>{note.title || '(untitled)'}</Title>
-      <StyledActions id={note.id} />
+      <NoteActions className="note-actions" id={note.id} />
     </NoteItemContainer>
   );
 }

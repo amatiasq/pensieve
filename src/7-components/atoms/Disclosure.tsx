@@ -16,7 +16,7 @@ const AnimatedIcon = styled(IconContainer)`
 `;
 
 const Details = styled.details`
-  &[open] ${AnimatedIcon} {
+  &[open] .disclosure-caret {
     transform: rotate(90deg);
   }
 `;
@@ -69,7 +69,7 @@ export function Disclosure({
   return (
     <Details {...props} open={isOpen}>
       <Summary onClick={handleClick}>
-        <AnimatedIcon>
+        <AnimatedIcon className="disclosure-caret">
           <CaretIcon title="Open / close group" />
         </AnimatedIcon>
         {summary}
