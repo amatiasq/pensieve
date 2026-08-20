@@ -5,7 +5,7 @@
 # Mirrors .github/workflows/ci-pensieve.yml so a green CI run and a local
 # `amq pensieve check` cannot diverge:
 #   install deps (bun) + lint (eslint) + typecheck (tsc) + build (vite), and
-#   typecheck the API (deno check).
+#   typecheck and test the API (deno check, deno test).
 #
 # Two runtimes because the project is two things: the app is Bun + Vite and the
 # API is Deno, which is what the VPS can run (its CPU has no AVX2).
@@ -29,6 +29,9 @@ bunx tsc --noEmit -p tsconfig.json
 
 echo "==> typecheck api (deno check)"
 deno check --config api/deno.json api/index.ts
+
+echo "==> test api (deno test)"
+deno test --config api/deno.json api/
 
 echo "==> build (vite)"
 bunx vite build

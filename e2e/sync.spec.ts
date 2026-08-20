@@ -67,7 +67,11 @@ test.describe('Sync indicator', () => {
     await app.route('http://localhost:1234/commit**', async (route) => {
       // Delay response to give us time to observe the indicator
       await new Promise(resolve => setTimeout(resolve, 2000));
-      await route.fulfill({ status: 200, contentType: 'text/plain', body: 'ok' });
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ sha: 'mock-commit-slow', committed: true }),
+      });
     });
 
     await clickNote(app, 'hello-world.js');

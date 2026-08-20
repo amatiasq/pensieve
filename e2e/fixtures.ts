@@ -157,15 +157,25 @@ export class MockRepo {
     return this.files.get(path) ?? null;
   }
 
+  /** Like the API: a commit whose tree matches the parent's is not created. */
   applyCommit(message: string, files: Record<string, string | null>) {
+    const changes = Object.entries(files).filter(
+      ([path, content]) => (this.files.get(path) ?? null) !== content,
+    );
+
+    if (!changes.length) return false;
+
     this.commits.push({ message, files });
-    for (const [path, content] of Object.entries(files)) {
+
+    for (const [path, content] of changes) {
       if (content === null) {
         this.files.delete(path);
       } else {
         this.files.set(path, content);
       }
     }
+
+    return true;
   }
 }
 
@@ -275,8 +285,12 @@ async function setupMocks(page: Page, repo: MockRepo) {
   // The API, same origin as the app (nginx proxies it in production)
   await page.route('http://localhost:1234/commit**', async (route) => {
     const body = JSON.parse(route.request().postData() || '{}');
-    repo.applyCommit(body.message || '', body.files || {});
-    await route.fulfill({ status: 200, contentType: 'text/plain', body: 'ok' });
+    const committed = repo.applyCommit(body.message || '', body.files || {});
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ sha: `mock-commit-${repo.commits.length}`, committed }),
+    });
   });
 
   // The API, same origin as the app (nginx proxies it in production)

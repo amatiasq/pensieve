@@ -46,6 +46,13 @@ export interface GHRepoFile extends GHRepoNode {
   content: string;
 }
 
+// Lo que contesta `/commit`. `committed: false` es «no había nada que guardar»:
+// el árbol coincidía con el del padre y no se creó commit.
+export interface CommitResult {
+  sha: string;
+  committed: boolean;
+}
+
 export class ShaConflictError extends Error {
   constructor(
     readonly commitMessage: string,
@@ -306,7 +313,9 @@ export class GHRepository {
     this.commiting = true;
 
     try {
-      return await POST<void>(ghCommitEndpoint, body, { keepalive: isUrgent });
+      return await POST<CommitResult>(ghCommitEndpoint, body, {
+        keepalive: isUrgent,
+      });
     } catch (error) {
       if (error instanceof HttpError && (error.status === 409 || error.status === 422)) {
         throw new ShaConflictError(message, files, error);
