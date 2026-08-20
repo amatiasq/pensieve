@@ -9,7 +9,8 @@ antes de que `amq pensieve deploy` pueda correr.
 **Producción lleva sin desplegar desde el 2025-11-19**: lo que sirve hoy es de hace
 nueve meses. Este plan es lo que la descongela.
 
-Los pasos con los clics, en `.agents/finish.md`.
+Los pasos con los clics, en [`.agents/finish.md`](../../../.agents/finish.md) —
+el de la raíz del mono, no el de aquí.
 
 ## El orden, que importa
 
