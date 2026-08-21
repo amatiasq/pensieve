@@ -1,10 +1,6 @@
 import { Scheduler } from '@amatiasq/scheduler';
-import {
-  createStore as createIdbStore,
-  del,
-  get,
-  set,
-} from 'idb-keyval';
+import { del, get, set } from 'idb-keyval';
+import { createStore as createIdbStore } from '../../1-core/idb.ts';
 import { isLeader } from '../../1-core/tabLeader.ts';
 import { debugMethods } from '../../util/debugMethods.ts';
 import { AsyncStore } from '../AsyncStore.ts';

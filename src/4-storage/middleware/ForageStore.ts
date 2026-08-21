@@ -1,11 +1,5 @@
-import {
-  createStore as createIdbStore,
-  del,
-  get,
-  keys,
-  set,
-  type UseStore,
-} from 'idb-keyval';
+import { del, get, keys, set, type UseStore } from 'idb-keyval';
+import { createStore as createIdbStore } from '../../1-core/idb.ts';
 import { debugMethods } from '../../util/debugMethods.ts';
 import { AsyncStore } from '../AsyncStore.ts';
 import { patternToRegex } from '../helpers/patternToRegex.ts';

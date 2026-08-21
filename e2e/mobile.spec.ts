@@ -23,6 +23,27 @@ test.describe('Mobile layout', () => {
     ).toBeVisible({ timeout: 10_000 });
   });
 
+  // El layout de móvil vive entero en la clase `page-*` del contenedor: cada
+  // página tiene su propio `grid-template-areas`. Si la clase no sigue a la URL
+  // se ve el header de la sidebar encima de la nota, y al volver atrás una
+  // pantalla en blanco.
+  test('layout follows navigation without a reload', async ({ app }) => {
+    await expect(app.locator('div.page-home')).toBeAttached();
+
+    await clickNote(app, 'hello-world.js');
+
+    await expect(app).toHaveURL(/\/note\//);
+    await expect(app.locator('div.page-note')).toBeAttached();
+    await expect(app.locator('div.page-home')).toHaveCount(0);
+
+    await app.goBack();
+
+    await expect(app).toHaveURL(/\/$/);
+    await expect(app.locator('div.page-home')).toBeAttached();
+    await expect(app.locator('div.page-note')).toHaveCount(0);
+    await expect(app.locator('h5').first()).toBeVisible();
+  });
+
   test('can create a note from mobile sidebar', async ({ app }) => {
     const noteCountBefore = await app.locator('h5').count();
 

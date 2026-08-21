@@ -52,6 +52,7 @@ export default defineConfig({
     proxy: {
       '/auth': 'http://localhost:8080',
       '/commit': 'http://localhost:8080',
+      '/tarball': 'http://localhost:8080',
     },
   },
 });

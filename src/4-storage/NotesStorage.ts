@@ -69,7 +69,11 @@ export class NotesStorage {
 
   private synchronize(notes: Record<NoteId, string>) {
     const toBeAdded = [];
-    const existing = new Set<NoteId>(...(this.notes.keys() as any));
+    // Sin el spread: `new Set(...keys)` le pasa cada clave como un argumento
+    // distinto, y `Set` sólo mira el primero, así que salía un conjunto con las
+    // *letras* de la primera nota. Nada coincidía, y cada sincronización
+    // anunciaba el repo entero como notas nuevas.
+    const existing = new Set<NoteId>(this.notes.keys());
 
     for (const [, json] of Object.entries(notes)) {
       const note = deserialize<Note>(cleanJson(json));

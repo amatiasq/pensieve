@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NoteContent, NoteId } from '../2-entities/Note.ts';
 import { WriteOptions } from '../4-storage/helpers/WriteOptions.ts';
 import { useStore } from './useStore.ts';
@@ -6,74 +6,51 @@ import { useStore } from './useStore.ts';
 export function useNoteContent(id: NoteId) {
   const store = useStore();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
   const [value, setValue] = useState<NoteContent>('');
 
-  useEffect(() => {
-    setValue('');
+  // La nota que se está pidiendo ahora. El efecto no se vuelve a crear cuando
+  // cambia `loading` o `value`, así que lo que capturó sigue siendo lo de la
+  // nota anterior: sin esto, lo que llega tarde de una nota se pinta en otra.
+  const requested = useRef(id);
 
-    if (!loading) {
-      setLoading(true);
-    }
+  useEffect(() => {
+    requested.current = id;
+    setValue('');
+    setLoading(true);
+    setError(null);
 
     const remote = store.note(id);
-    remote.read().then(initialize);
-    return remote.onContentChange(initialize);
+
+    remote.read().then(
+      content => receive(id, content),
+      reason => fail(id, reason),
+    );
+
+    return remote.onContentChange(content => receive(id, content));
   }, [id]);
 
-  return [value, set, loading] as const;
+  return [value, set, loading, error] as const;
 
-  function initialize(newValue: NoteContent | null) {
-    if (newValue !== value) {
-      setValue(newValue || '');
-    }
+  function receive(forId: NoteId, newValue: NoteContent | null) {
+    if (requested.current !== forId) return;
 
-    if (loading) {
-      setLoading(false);
-    }
+    setValue(newValue || '');
+    setLoading(false);
+    setError(null);
   }
 
+  function fail(forId: NoteId, reason: unknown) {
+    if (requested.current !== forId) return;
+
+    console.error(`Failed to read note ${forId}`, reason);
+    setLoading(false);
+    setError(reason instanceof Error ? reason : new Error(String(reason)));
+  }
+
+  // Guardar no es cargar: marcarlo como «cargando» desmontaba el editor a media
+  // escritura y se perdía el cursor.
   function set(content: NoteContent, options?: WriteOptions) {
-    setLoading(true);
     store.note(id).write(content, options);
   }
 }
-
-// export function useNoteContent(id: NoteId) {
-//   const store = useContext(AppStorageContext);
-//   const [value, setValue] = useState('');
-//   const [reloadAfterSeconds] = useSetting('reloadIfAwayForSeconds');
-
-//   useEffect(() => {
-//     store.getNoteContent(id).then(setValue);
-//     return store.onNoteContentChanged(id, setValue) as () => void;
-//   }, [id]);
-
-//   useEffect(() =>
-//     whenBackAfterSeconds(reloadAfterSeconds, async () => {
-//       const content = await store.getNoteContent(id);
-
-//       if (content !== value) {
-//         setValue(content);
-//       }
-//     }),
-//   );
-
-//   return value;
-// }
-
-// const away = new Stopwatch();
-
-// function whenBackAfterSeconds(seconds: number, listener: () => void) {
-//   return onPageVisibilityChange(isVisible => {
-//     if (!isVisible) {
-//       away.start();
-//       return;
-//     }
-
-//     if (seconds && away.seconds > seconds) {
-//       listener();
-//     }
-
-//     away.stop();
-//   });
-// }

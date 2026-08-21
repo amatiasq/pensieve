@@ -1,9 +1,10 @@
-# Plan — Monaco: del CDN o del bundle, pero una de las dos
+# Monaco: del CDN o del bundle, pero una de las dos
 
-**Status:** ⬜ decidido, sin hacer (2026-08-20). Sale de partir
+**Status:** ⚪ decidido, sin hacer (2026-08-20)
+
+Sale de partir
 [`2026-08-20 deuda-tecnica-de-pensieve.md`](../decisions/2026-08-20%20deuda-tecnica-de-pensieve.md),
 punto 6.
-**Blocker:** ninguno.
 
 **Decidido: del CDN** (2026-08-20). Es lo que ya pasa en runtime, así que el
 trabajo es que el bundle deje de mentir.

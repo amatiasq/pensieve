@@ -22,13 +22,17 @@ export class RemoteValue {
   }
 
   readAsap(callback: (updated: string) => void) {
-    const def = (x: string | null) => x || this.defaultValue;
+    const def = (x: string | null) => x ?? this.defaultValue;
 
-    return fetchAndUpdate(
-      this.store.readLocal(this.key).then(def),
-      this.store.readRemote(this.key).then(def),
-      callback,
-    );
+    // Que no esté en local no es «está vacía», es que no está. Con el valor por
+    // defecto puesto antes de la carrera lo local ganaba siempre, el editor
+    // pintaba '' y el fallo del remoto no se veía en ninguna parte.
+    return fetchAndUpdate<string | null>(
+      this.store.readLocal(this.key),
+      this.store.readRemote(this.key),
+      updated => callback(def(updated)),
+      x => x != null,
+    ).then(def);
   }
 
   readCache() {

@@ -13,7 +13,12 @@ export function useNoteList() {
       setLoading(true);
     }
 
-    store.all().then(initialize);
+    // Si no hay ni caché ni remoto, esto falla. Sin recogerlo la lista se queda
+    // girando para siempre y no dice nada.
+    store.all().then(initialize, reason => {
+      console.error('Failed to load the note list', reason);
+      setLoading(false);
+    });
   }, []);
 
   useEffect(() => {

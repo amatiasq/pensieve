@@ -76,14 +76,8 @@ export class RemoteNote {
   get(): Note | null {
     const cached = this.getCache();
 
-    // We can't do this at the same time for all notes
-    // this.meta.get().then(x => {
-    //   if (!isNoteIdentical(cached, x)) {
-    //     cache.set(this.id, x);
-    //     this.emitChange(x);
-    //   }
-    // });
-
+    // Sin refresco en segundo plano aquí: dispararlo por nota a la vez es lo
+    // que no aguanta el rate limit.
     return cached;
   }
 

@@ -1,7 +1,6 @@
-# Plan — Precarga: que *todas* las notas estén offline
+# Precarga: que *todas* las notas estén offline
 
-**Status:** ⬜ propuesta con diseño, sin empezar.
-**Blocker:** ninguno.
+**Status:** ⚪ diseñado, sin empezar (2026-08-19)
 
 Hoy sólo funcionan offline las notas que se abrieron alguna vez. La PWA guarda lo
 visitado, así que un portátil recién abierto sin red no tiene las notas viejas.

@@ -23,12 +23,6 @@ export function busyWhile<T>(promise: Promise<T>) {
   return promise.finally(finish);
 }
 
-// export function busyCall<Args extends any[], Result>(
-//   fn: (...args: Args) => Promise<Result>,
-// ) {
-//   return (...args: Args) => busyWhile(fn(...args));
-// }
-
 function notifyChange() {
   const newState = Boolean(operations.size);
 

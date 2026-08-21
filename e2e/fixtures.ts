@@ -232,13 +232,13 @@ async function setupMocks(page: Page, repo: MockRepo) {
     },
   );
 
-  // GitHub REST API — tarball (cold-start optimization, not needed in E2E)
-  await page.route(
-    `https://api.github.com/repos/${FAKE_USER}/${FAKE_REPO}/tarball/**`,
-    async (route) => {
-      await route.fulfill({ status: 404, contentType: 'application/json', body: '{"message":"Not Found"}' });
-    },
-  );
+  // The tarball goes through the app's own API, not api.github.com: GitHub
+  // redirects it to codeload.github.com, which doesn't allow the app's origin.
+  // Cold-start optimization, not needed in E2E: these repos are a handful of
+  // files, so the tree listing reads them all without hitting any limit.
+  await page.route('/tarball**', async (route) => {
+    await route.fulfill({ status: 502, contentType: 'application/json', body: '{"error":"no tarball in E2E"}' });
+  });
 
   // GitHub REST API — Git Trees API (used by readDir for file listing)
   await page.route(
@@ -283,7 +283,7 @@ async function setupMocks(page: Page, repo: MockRepo) {
   });
 
   // The API, same origin as the app (nginx proxies it in production)
-  await page.route('http://localhost:1234/commit**', async (route) => {
+  await page.route('/commit**', async (route) => {
     const body = JSON.parse(route.request().postData() || '{}');
     const committed = repo.applyCommit(body.message || '', body.files || {});
     await route.fulfill({
@@ -294,7 +294,7 @@ async function setupMocks(page: Page, repo: MockRepo) {
   });
 
   // The API, same origin as the app (nginx proxies it in production)
-  await page.route('http://localhost:1234/auth**', async (route) => {
+  await page.route('/auth**', async (route) => {
     await route.fulfill({ status: 200, contentType: 'text/plain', body: 'access_token=fake' });
   });
 }

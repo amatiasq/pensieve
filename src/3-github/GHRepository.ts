@@ -1,10 +1,7 @@
-import {
-  createStore as createIdbStore,
-  get,
-  set,
-} from 'idb-keyval';
+import { get, set } from 'idb-keyval';
 import { HttpError, POST } from '../1-core/http.ts';
-import { ghAuthHeaders, ghCommitEndpoint, ghUrl } from './gh-utils.ts';
+import { createStore as createIdbStore } from '../1-core/idb.ts';
+import { ghCommitEndpoint, ghTarballEndpoint } from './gh-utils.ts';
 import { parseTarball } from './parseTarball.ts';
 import { GithubToken } from './GithubAuth.ts';
 import { GithubGraphQlApi } from './GithubGraphQlApi.ts';
@@ -29,6 +26,16 @@ const CREATE_REPO_CONFIG = {
 };
 
 const FETCH_BATCH_SIZE = 20;
+
+// Una petición por fichero sólo vale para el puñado que cambió desde la última
+// sincronización. Pasado esto, quien tiene que traer los datos es el tarball, y
+// seguir pidiendo de uno en uno agota el rate limit de la cuenta entera —no sólo
+// de esta carga— para la hora siguiente.
+const MAX_INDIVIDUAL_FETCHES = 200;
+
+// «Esto no se arregla pidiendo ficheros»: lo lanza la sincronización por árbol
+// para que quien la llamó se lo pida al tarball, que es una sola petición.
+class TooManyIndividualReads extends Error {}
 
 // any is necessary here because of https://github.com/microsoft/TypeScript/issues/14174#issuecomment-856812565
 export type StagedFiles = Record<string, any>;
@@ -148,30 +155,59 @@ export class GHRepository {
     const cache =
       (await get<Record<string, CachedEntry>>(dirPath, dirCacheStore)) ?? {};
     const hasCachedData = Object.keys(cache).length > 0;
+    let tarballFailed = false;
 
     // Cold start: download tarball (1 API call for everything)
     if (!hasCachedData) {
       try {
         return await this.readDirViaTarball(dirPath, prefix);
       } catch (error) {
+        tarballFailed = true;
         console.warn('Tarball download failed, falling back to tree listing:', error);
       }
     }
 
     // Warm cache: incremental sync via Git Trees API
-    return this.readDirViaTree(dirPath, prefix, cache);
+    try {
+      return await this.readDirViaTree(dirPath, prefix, cache);
+    } catch (error) {
+      // Una caché a medias no es una caché caliente: es lo que deja una carga
+      // que se quedó sin rate limit a mitad, y pide tantos ficheros como una
+      // vacía. Si esto se rindiera, esa caché no se llenaría nunca —nunca está
+      // vacía, así que nunca volvería a pasar por el tarball— y la app se
+      // quedaría para siempre leyendo sólo lo local.
+      //
+      // Si el tarball ya ha fallado en esta misma llamada no se le pide otra
+      // vez: rendirse aquí deja la app leyendo lo local, que es lo que toca
+      // cuando la única forma de traer tantos ficheros no está disponible.
+      if (!(error instanceof TooManyIndividualReads) || tarballFailed) {
+        throw error;
+      }
+
+      console.warn(`${error.message}; downloading tarball instead`);
+      return this.readDirViaTarball(dirPath, prefix);
+    }
   }
 
+  // A `/tarball` de la app, no a api.github.com: GitHub redirige a codeload,
+  // que no permite este origen (CORS), y el fallback por árbol pedía una nota
+  // por petición hasta comerse el rate limit.
   private async readDirViaTarball(
     dirPath: string,
     prefix: string,
   ): Promise<Array<readonly [string, string]>> {
     console.debug(`readDir(${dirPath}): cold start, downloading tarball`);
 
-    const response = await fetch(
-      ghUrl(`${this.url}/tarball/${this.branch}`),
-      { headers: ghAuthHeaders(this.token) },
-    );
+    const response = await fetch(ghTarballEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: this.token,
+        owner: this.owner,
+        repo: this.name,
+        branch: this.branch,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(`Tarball download failed: ${response.status}`);
@@ -182,14 +218,13 @@ export class GHRepository {
     // Populate IDB caches for ALL directories at once
     const byDir = new Map<string, Record<string, CachedEntry>>();
 
-    for (const [filePath, content] of allFiles) {
+    for (const [filePath, { content, sha }] of allFiles) {
       const slashIdx = filePath.indexOf('/');
       if (slashIdx === -1) continue; // root files like settings.json
       const dir = filePath.slice(0, slashIdx);
 
       if (!byDir.has(dir)) byDir.set(dir, {});
-      // Use content hash as SHA placeholder for cache invalidation
-      byDir.get(dir)![filePath] = { sha: simpleHash(content), content };
+      byDir.get(dir)![filePath] = { sha, content };
     }
 
     // Persist all directory caches
@@ -205,7 +240,7 @@ export class GHRepository {
 
     // Return only entries matching the requested directory
     const results: Array<readonly [string, string]> = [];
-    for (const [filePath, content] of allFiles) {
+    for (const [filePath, { content }] of allFiles) {
       if (filePath.startsWith(prefix) && !filePath.slice(prefix.length).includes('/')) {
         results.push([filePath, content]);
       }
@@ -250,12 +285,22 @@ export class GHRepository {
       `readDir(${dirPath}): ${listing.length} files, ${results.length} cached, ${toFetch.length} to fetch`,
     );
 
+    if (toFetch.length > MAX_INDIVIDUAL_FETCHES) {
+      throw new TooManyIndividualReads(
+        `readDir(${dirPath}) needs ${toFetch.length} individual reads ` +
+          `(max ${MAX_INDIVIDUAL_FETCHES})`,
+      );
+    }
+
     // Fetch changed files in parallel batches
     for (let i = 0; i < toFetch.length; i += FETCH_BATCH_SIZE) {
       const batch = toFetch.slice(i, i + FETCH_BATCH_SIZE);
       const batchResults = await Promise.all(
+        // `requestFile`, no `readFile`: lo que se guarda aquí queda apuntado con
+        // el SHA nuevo, y si viniera de la caché el contenido viejo se quedaría
+        // marcado como al día y no se volvería a pedir nunca.
         batch.map(async ({ path, sha }) => {
-          const content = await this.readFile(path);
+          const content = await this.requestFile(path);
           cache[path] = { sha, content };
           return [path, content] as const;
         }),
@@ -282,7 +327,26 @@ export class GHRepository {
     });
   }
 
+  // El tarball baja el contenido de **todas** las notas y lo deja en la caché de
+  // directorios, así que cuando GitHub no contesta —rate limit agotado, sin red,
+  // token caducado— el contenido ya está en disco. Sin esto la app tiene la nota
+  // guardada y aun así abre el editor vacío, que es lo mismo que perderla.
   async readFile(path: string): Promise<string> {
+    try {
+      return await this.requestFile(path);
+    } catch (error) {
+      const cached = await this.readFileFromDirCache(path);
+
+      if (cached == null) {
+        throw error;
+      }
+
+      console.warn(`readFile(${path}) failed, serving cached copy:`, error);
+      return cached;
+    }
+  }
+
+  private async requestFile(path: string): Promise<string> {
     const file = await this.rest.GET<string | GHApiRepositoryNode[]>(
       `${this.url}/contents/${path}`,
       { mediaType: MediaType.Raw },
@@ -293,6 +357,21 @@ export class GHRepository {
     }
 
     return file;
+  }
+
+  private async readFileFromDirCache(path: string) {
+    const slashIdx = path.indexOf('/');
+
+    if (slashIdx === -1) {
+      return null;
+    }
+
+    const cache = await get<Record<string, CachedEntry>>(
+      path.slice(0, slashIdx),
+      dirCacheStore,
+    ).catch(() => null);
+
+    return cache?.[path]?.content ?? null;
   }
 
   async writeFile(path: string, content: string, message: string) {
@@ -342,16 +421,6 @@ export class GHRepository {
       path: `${this.branch}:${path}`,
     };
   }
-}
-
-/** Simple hash for tarball cache entries (no real git SHA available) */
-function simpleHash(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash).toString(16).padStart(8, '0');
 }
 
 const requestLimit = localStorage.getItem('gh-req-limit') || 5000;

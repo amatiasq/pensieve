@@ -5,6 +5,7 @@ import {
   CLIENT_ID_DEV,
   CLIENT_ID_PROD,
   COMMIT_ENDPOINT,
+  TARBALL_ENDPOINT,
   GH_SCOPE,
   VALID_ORIGINS,
 } from '../config.json' with { type: 'json' };
@@ -37,6 +38,7 @@ export const ghClientId = isLocalHost ? CLIENT_ID_DEV : CLIENT_ID_PROD;
 // petición cross-origin y no hay CORS. En local lo resuelve el proxy de vite.
 export const ghAuthEndpoint = AUTH_ENDPOINT;
 export const ghCommitEndpoint = COMMIT_ENDPOINT;
+export const ghTarballEndpoint = TARBALL_ENDPOINT;
 
 function getOrigin() {
   const { origin } = location;

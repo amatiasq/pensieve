@@ -1,9 +1,10 @@
 import { Hono } from 'hono';
 import { createAuthHandler } from './auth.ts';
 import { commit } from './commit.ts';
+import { tarball } from './tarball.ts';
 
-// El nginx de al lado sirve la app y proxea /auth y /commit aquí, así que para
-// el navegador esto es el mismo origen: no hay CORS que acertar.
+// El nginx de al lado sirve la app y proxea /auth, /commit y /tarball aquí, así
+// que para el navegador esto es el mismo origen: no hay CORS que acertar.
 const app = new Hono();
 
 app.post(
@@ -15,6 +16,7 @@ app.post(
 );
 
 app.post('/commit', commit);
+app.post('/tarball', tarball);
 
 Deno.serve({ port: Number(Deno.env.get('PORT') ?? 8080) }, app.fetch);
 

@@ -1,5 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
+// El 1234 es el puerto de siempre, pero es un puerto popular —LM Studio escucha
+// ahí— y `reuseExistingServer` no comprueba qué hay al otro lado: si algo lo
+// ocupa, la suite entera se ejecuta contra ese algo y falla por todas partes.
+const port = Number(process.env.PENSIEVE_E2E_PORT ?? 1234);
+
 export default defineConfig({
   testDir: './e2e',
   timeout: 30_000,
@@ -7,7 +12,7 @@ export default defineConfig({
   fullyParallel: true,
   retries: 1,
   use: {
-    baseURL: 'http://localhost:1234',
+    baseURL: `http://localhost:${port}`,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
@@ -23,8 +28,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm start',
-    port: 1234,
+    command: `npm start -- --port ${port} --strictPort`,
+    port,
     reuseExistingServer: true,
   },
 });

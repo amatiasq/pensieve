@@ -65,13 +65,10 @@ else
   DIM=''; OFF=''
 fi
 
-# Una sola pasada de awk por lote de ficheros en vez de un `head` por nota: con
-# miles de notas la diferencia son minutos.
-#
-# El título se limpia al imprimir porque la primera línea puede venir comentada
-# (`// grupo/título.ts`, `# …`) y media lista saldría con `//` delante. No es
-# `getMetadataFromContent` entero — para buscar basta la línea cruda —, sólo su
-# parte visible; los marcadores son los de COMMENTS_BY_LANG en Note.ts.
+# Una pasada de awk por lote en vez de un `head` por nota: con miles, minutos.
+# El título se limpia al imprimir (la primera línea puede venir comentada);
+# sólo la parte visible de `getMetadataFromContent`, con los marcadores de
+# COMMENTS_BY_LANG en Note.ts.
 find "$CACHE/note" -type f -print0 \
   | xargs -0 awk -v term="$term" -v dim="$DIM" -v off="$OFF" '
       FNR != 1 { nextfile }

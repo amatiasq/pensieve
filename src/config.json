@@ -3,6 +3,7 @@
   "GH_API": "https://api.github.com",
   "AUTH_ENDPOINT": "/auth",
   "COMMIT_ENDPOINT": "/commit",
+  "TARBALL_ENDPOINT": "/tarball",
   "CLIENT_ID_DEV": "c55d2c46c215f9a4c3cb",
   "CLIENT_ID_PROD": "09580e62d66243b6b09d",
   "VALID_ORIGINS": ["https://pensieve.amatiasq.com", "http://localhost:1234/"]

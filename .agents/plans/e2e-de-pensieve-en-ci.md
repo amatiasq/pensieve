@@ -1,8 +1,10 @@
-# Plan — Los e2e de pensieve entran en CI
+# Los e2e de pensieve entran en CI
 
-**Status:** ⬜ sin empezar (2026-08-20). Sale de partir
+**Status:** ⚪ sin empezar (2026-08-20)
+
+Sale de partir
 [`2026-08-20 selectores-de-componente-de-emotion.md`](../decisions/2026-08-20%20selectores-de-componente-de-emotion.md).
-**Blocker:** ninguno. La suite pasa entera, 63 tests.
+La suite pasa entera, 63 tests.
 
 `ci-pensieve.yml` corre `amq pensieve check` —lint, typecheck, build, y el `deno
 check`/`deno test` de la API— y nada más. **Los 10 specs de `amq pensieve test`

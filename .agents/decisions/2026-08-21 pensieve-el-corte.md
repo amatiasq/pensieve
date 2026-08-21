@@ -38,6 +38,3 @@ El login real, con la cuenta real, **desde una pestaña que ya tuviera pensieve
 abierta**. Abrirlo desde aquí registraría el service worker nuevo y destruiría la
 condición que hay que probar, que es un service worker viejo escondiendo el
 despliegue nuevo. Es el primer paso del plan que queda.
-
-**Review:** ⚠️ pendiente — nadie ha mirado esta app en un navegador de verdad;
-borra esta línea cuando haya pasado el login real del plan que queda.

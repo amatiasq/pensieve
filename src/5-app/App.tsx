@@ -88,13 +88,13 @@ const StyledAppContainer = styled.div`
 
 export function App() {
   const navigator = useNavigator();
-  const [pageName, setPageName] = useState(navigator.getPageName());
   const [filter, setFilter] = useState<StringComparer | null>(null);
   const [size, setSize] = useSetting('sidebarWidth');
 
-  useEffect(() =>
-    navigator.onNavigate(next => setPageName(next.getPageName())),
-  );
+  // Del render, no de `onNavigate`: los efectos de los hijos corren antes que
+  // los del padre, así que `Router` emite la navegación cuando `App` todavía no
+  // se ha vuelto a suscribir y el evento se pierde.
+  const pageName = navigator.getPageName();
 
   useEffect(() => {
     const abort = new AbortController();

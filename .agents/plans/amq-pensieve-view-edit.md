@@ -1,9 +1,10 @@
-# Plan — `amq pensieve view <id>` y `amq pensieve edit <id>`
+# `amq pensieve view <id>` y `amq pensieve edit <id>`
 
-**Status:** ⬜ sin empezar. Continúa lo que
+**Status:** ⚪ sin empezar (2026-08-20)
+
+Continúa lo que
 [`amq pensieve search`](../decisions/2026-08-20%20amq-pensieve-search.md) dejó
 listo: el clon en caché y los ids que imprime.
-**Blocker:** ninguno.
 
 `search` da ids y no hay forma de leer la nota sin abrir la web. Dos comandos:
 `view` la escribe por stdout, `edit` la abre en `$EDITOR` y la guarda de vuelta.

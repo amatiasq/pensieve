@@ -1,7 +1,8 @@
 # Ideas de pensieve, sin compromiso
 
-**Status:** ⬜ backlog. Nada de aquí está diseñado ni prometido.
-**Blocker:** ninguno.
+**Status:** ⚪ backlog (2026-08-20)
+
+Nada de aquí está diseñado ni prometido.
 
 Lo que quedaba vivo de un `docs/notes.md` que ya se borró. Sin fechas. Lo que
 tenía diseño o causa localizada salió a su propio plan:

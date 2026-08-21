@@ -1,15 +1,18 @@
-# Plan — Retirar Cloudflare y Pages de pensieve
+# Retirar Cloudflare y Pages de pensieve
 
-**Status:** 👨‍💻 tres pasos de clics, en este orden (2026-08-21). Sale de partir
+**Status:** ⚪ sin empezar (2026-08-21)
+**Manual:** tres tandas de clics, en este orden — [pasos](#manual)
+
+Sale de partir
 [`2026-08-21 pensieve-el-corte.md`](../decisions/2026-08-21%20pensieve-el-corte.md).
-**Blocker:** ninguno. Hacen falta una sesión de verdad en el navegador, el panel
-de Cloudflare y el de GitHub.
+Hacen falta una sesión de verdad en el navegador, el panel de Cloudflare y el
+de GitHub.
 
 `pensieve.amatiasq.com` ya lo sirve el VPS. Siguen en pie los dos sitios de los
 que la app ya no depende, y mientras estén ahí nadie sabe si el corte fue de
 verdad.
 
-## El orden, que importa
+## Manual
 
 1. **Un login y un guardado de verdad, con la cuenta real**, que aparezca como
    commit en `pensieve-data`, y **desde una pestaña que ya tuviera pensieve
