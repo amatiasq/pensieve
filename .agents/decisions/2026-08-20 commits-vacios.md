@@ -26,6 +26,6 @@ llamadas que salen: con el árbol idéntico no se llega a `POST /git/commits`.
 `amq pensieve check` corre ahora `deno test` además de `deno check`, así que
 entra en CI sin tocar el workflow.
 
-**Sin probar contra GitHub de verdad**: la app no está desplegada todavía
-([`pensieve-el-corte.md`](../plans/pensieve-el-corte.md)) y los e2e corren contra
-un mock del repo en memoria, no contra GitHub.
+**Sin probar contra GitHub de verdad**: los e2e corren contra un mock del repo en
+memoria, y el guardado real con la cuenta real sigue pendiente
+([`retirar-cloudflare-y-pages.md`](../plans/retirar-cloudflare-y-pages.md)).

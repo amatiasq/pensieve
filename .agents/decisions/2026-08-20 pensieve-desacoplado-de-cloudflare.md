@@ -1,8 +1,8 @@
 # 2026-08-20 — Pensieve sale de Cloudflare, en el repo
 
-Cierra `pensieve/.agents/plans/pensieve-al-vps.md`. **Las tres fases están
-escritas y probadas enteras en local con Docker; nada de esto está desplegado**, y
-soltarlo es [`pensieve-el-corte.md`](../plans/pensieve-el-corte.md).
+Cierra `pensieve/.agents/plans/pensieve-al-vps.md`. Las tres fases se escribieron
+y se probaron enteras en local con Docker; **soltarlas fue el
+[`2026-08-21`](2026-08-21%20pensieve-el-corte.md)**.
 
 Objetivo: **pensieve depende de un solo sistema, y ese sistema es el VPS.** Antes
 dependía de cuatro en cadena, y cada uno era un sitio donde caerse sin que los
