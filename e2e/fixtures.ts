@@ -23,7 +23,7 @@ interface TestNote {
   content: string;
 }
 
-export const TEST_NOTES: TestNote[] = [
+const TEST_NOTES: TestNote[] = [
   {
     id: NOTE_IDS.helloWorld,
     title: 'hello-world.js',

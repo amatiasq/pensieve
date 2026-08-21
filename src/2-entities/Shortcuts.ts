@@ -40,6 +40,3 @@ export type ShortcutCommand =
 
 export type Shortcuts = Record<string, ShortcutCommand>;
 
-export function areShortcutsIdentical(a: Shortcuts, b: Shortcuts) {
-  return serialize(a) === serialize(b);
-}

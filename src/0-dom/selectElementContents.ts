@@ -9,7 +9,7 @@ export function selectElementContents(el: HTMLElement) {
   }
 }
 
-export function clearSelection() {
+function clearSelection() {
   const selection = window.getSelection();
 
   if (selection) {

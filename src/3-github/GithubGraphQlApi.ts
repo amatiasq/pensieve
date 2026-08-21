@@ -3,31 +3,30 @@ import { POST } from '../1-core/http.ts';
 import { ghAuthHeaders, ghUrl } from './gh-utils.ts';
 import { GithubToken } from './GithubAuth.ts';
 
-export class GithubGraphQlApi {
-  constructor(public token: GithubToken) {}
+export function githubGraphql<T = any>(
+  token: GithubToken,
+  query: string,
+  variables: Record<string, string>,
+) {
+  const body = { query: buildQuery(query, variables), variables };
+  const headers = ghAuthHeaders(token);
 
-  send<T = any>(query: string, variables: Record<string, string>) {
-    const fullQuery = this.buildQuery(query, variables);
-    const body = { query: fullQuery, variables };
-    const headers = ghAuthHeaders(this.token);
+  return githubCircuitBreaker(() =>
+    POST<T>(ghUrl('/graphql'), body, { headers }).then(x => {
+      const { errors } = x as any;
+      if (errors) console.error('GraphQL errors:', errors);
+      return x;
+    }),
+  );
+}
 
-    return githubCircuitBreaker(() =>
-      POST<T>(ghUrl('/graphql'), body, { headers }).then(x => {
-        const { errors } = x as any;
-        if (errors) console.error('GraphQL errors:', errors);
-        return x;
-      }),
-    );
+function buildQuery(query: string, params: Record<string, string>) {
+  const keys = Object.keys(params);
+
+  if (!keys.length) {
+    return `query {${query}}`;
   }
 
-  private buildQuery(query: string, params: Record<string, string>) {
-    const keys = Object.keys(params);
-
-    if (!keys.length) {
-      return `query {${query}}`;
-    }
-
-    const args = keys.map(x => `$${x}: String!`).join(', ');
-    return `query(${args}) {${query}}`;
-  }
+  const args = keys.map(x => `$${x}: String!`).join(', ');
+  return `query(${args}) {${query}}`;
 }

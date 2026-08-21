@@ -1,7 +1,7 @@
 const FAILURE_THRESHOLD = 3;
 const COOLDOWN_MS = 30_000;
 
-export class CircuitOpenError extends Error {
+class CircuitOpenError extends Error {
   constructor() {
     super('Circuit breaker is open — GitHub API temporarily unavailable');
   }
@@ -9,7 +9,7 @@ export class CircuitOpenError extends Error {
 
 // After 3 server-side failures every call fails fast for 30s, so an unreachable
 // or rate-limited GitHub degrades the app to local-only instead of hanging it.
-export function createCircuitBreaker() {
+function createCircuitBreaker() {
   let state: 'closed' | 'open' | 'half-open' = 'closed';
   let failures = 0;
   let openedAt = 0;

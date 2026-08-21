@@ -18,9 +18,6 @@ const noop = () => {
 
 const cache = new Map<NoteId, Note>();
 
-export function isIdValid(id: NoteId) {
-  return cache.has(id);
-}
 
 export class RemoteNote {
   private readonly emitChange: (data: Note) => void;

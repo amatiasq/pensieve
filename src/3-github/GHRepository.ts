@@ -4,7 +4,7 @@ import { createStore as createIdbStore } from '../1-core/idb.ts';
 import { ghCommitEndpoint, ghTarballEndpoint } from './gh-utils.ts';
 import { parseTarball } from './parseTarball.ts';
 import { GithubToken } from './GithubAuth.ts';
-import { GithubGraphQlApi } from './GithubGraphQlApi.ts';
+import { githubGraphql } from './GithubGraphQlApi.ts';
 import { GithubRestApi, MediaType } from './GithubRestApi.ts';
 import {
   GHApiRepositoryNode,
@@ -94,7 +94,6 @@ const dirCacheStore = createIdbStore('pensieve-dir-cache', 'entries');
 
 export class GHRepository {
   private readonly rest: GithubRestApi;
-  private readonly gql: GithubGraphQlApi;
   private commiting = false;
   branch = 'main';
 
@@ -112,7 +111,6 @@ export class GHRepository {
     readonly name: string,
   ) {
     this.rest = new GithubRestApi(token);
-    this.gql = new GithubGraphQlApi(token);
   }
 
   exists() {
@@ -406,7 +404,7 @@ export class GHRepository {
   }
 
   async readFileCool(path: string, keys: string) {
-    const response = await this.gql.send(
+    const response = await githubGraphql(this.token,
       getFileProperty(keys),
       this.getFileVars(path),
     );

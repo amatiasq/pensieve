@@ -11,7 +11,6 @@ let lastHeartbeat = 0;
 let heartbeatTimer: ReturnType<typeof setInterval> | undefined;
 
 const emit = emitter<boolean>();
-export const onLeaderChange = emit.subscribe;
 
 export function isLeader() {
   return _isLeader;

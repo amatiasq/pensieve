@@ -17,7 +17,7 @@ interface Command<T extends keyof AsyncStore = keyof AsyncStore> {
   attempts: number;
 }
 
-export class StoreOfflineError extends Error {}
+class StoreOfflineError extends Error {}
 
 const outboxStore = createIdbStore('pensieve-outbox', 'commands');
 
