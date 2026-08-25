@@ -4,9 +4,6 @@ Cierra `.agents/plans/amq-pensieve-view-edit.md`. `search` daba ids y leer la
 nota seguía pidiendo abrir la web: ahora `view <id>` la escribe por stdout y
 `edit <id>` la abre en `$EDITOR` y la guarda de vuelta, con su commit.
 
-**Review:** ⚠️ pendiente — edita una nota de verdad con `amq pensieve edit` y
-mira que la web la ve cambiada; con eso comprobado, esta línea se borra.
-
 Las tres decisiones que el plan dejaba abiertas:
 
 - **Cada comando con su clon.** `view` lee del de `search` (`PENSIEVE_CACHE`,

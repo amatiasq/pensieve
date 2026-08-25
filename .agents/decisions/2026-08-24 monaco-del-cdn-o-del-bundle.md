@@ -44,3 +44,7 @@ teclas mientras se engancha: la suite escribe «new line added» y llega «new
 ldded», reproducible en tres pasadas y verde en cuanto se apaga. Un editor de
 notas no puede comerse letras, así que se queda en el textarea, que es el camino
 que ya usaba la 0.52. La suite pasa 71/71.
+
+**Probado a mano el 2026-08-25: tecleando un humano no se reproduce** — sólo lo
+vio Playwright, que teclea a ráfagas que ningún dedo alcanza. `editContext:
+false` se queda igual: no cuesta nada y el riesgo es comerse letras.

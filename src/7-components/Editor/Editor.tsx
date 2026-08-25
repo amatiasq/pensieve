@@ -1,12 +1,7 @@
-import { emitter } from '@amatiasq/emitter';
 import styled from '@emotion/styled';
-import { useEffect, useRef, useState } from 'react';
-import { onPageActive } from '../../0-dom/page-lifecycle.ts';
-import { useNavigator } from '../../6-hooks/useNavigator.ts';
+import { useEffect, useState } from 'react';
+import { useAutosave } from '../../6-hooks/useAutosave.ts';
 import { usePageTitle } from '../../6-hooks/usePageTitle.ts';
-import { useScheduler } from '../../6-hooks/useScheduler.ts';
-import { useSetting } from '../../6-hooks/useSetting.ts';
-import { useShortcut } from '../../6-hooks/useShortcut.ts';
 import { useStack } from '../../6-hooks/useStack.ts';
 import { BusinessIndicator } from '../atoms/BusinessIndicator.tsx';
 import { Loader } from '../atoms/Loader.tsx';
@@ -36,47 +31,21 @@ export type EditorProps = ReadonlyEditorProps | EditableEditorProps;
 export function Editor(props: EditorProps) {
   const { title, content, ext, gap } = props;
   const readonly = isReadonly(props) || false;
-  const requestSave = emitter<void>();
-  const requestUrgentSave = emitter<void>();
-  const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const updateTitle = usePageTitle();
-  const autosave = useSetting('autosave')[0] || 0;
   const [saved, addSaved] = useStack<string>(5, content);
   const [hasUnsavedChanges, setHasUnsavedChanged] = useState(false);
   const [value, setValue] = useState<string>(content);
 
-  const scheduler = useScheduler(autosave * 1000, () => {
-    if (autosave !== 0) {
-      requestSave();
-    }
+  const { onUserEdit } = useAutosave({
+    hasUnsavedChanges,
+    saveOnNavigation: isEditable(props) && props.saveOnNavigation,
+    save: forceSave,
   });
-
-  const navigator = useNavigator();
-
-  useEffect(() =>
-    navigator.onNavigate(() => {
-      // Stop the scheduler when unmounting
-      if (scheduler.isRunning) {
-        scheduler.stop();
-        if (hasUnsavedChanges) {
-          forceSave();
-        }
-      }
-    }),
-  );
-
-  useShortcut('save', forceSave);
 
   useEffect(() => {
     updateTitle(title);
   }, [title]);
-
-  useEffect(() => {
-    if (isEditable(props) && props.saveOnNavigation) {
-      return navigator.onNavigate(() => requestSave());
-    }
-  });
 
   useEffect(() => {
     if (!saved.includes(content)) {
@@ -85,30 +54,7 @@ export function Editor(props: EditorProps) {
     }
   }, [content]);
 
-  useEffect(() => {
-    if (!hasUnsavedChanges) return;
-
-    const sus = onPageActive.subscribe(active => {
-      if (!active) requestUrgentSave();
-    });
-
-    return () => {
-      sus.unsubscribe();
-    };
-  });
-
   if (value == null) return <Loader />;
-
-  requestUrgentSave.subscribe(() => {
-    if (hasUnsavedChanges) forceSave({ urgent: true });
-  });
-
-  requestSave.subscribe(() => {
-    clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
-      if (hasUnsavedChanges) forceSave();
-    }, 100);
-  });
 
   return (
     <EditorContainer>
@@ -125,7 +71,7 @@ export function Editor(props: EditorProps) {
     setHasUnsavedChanged(value !== content);
     setValue(value);
     props.onChange?.(value);
-    scheduler.restart();
+    onUserEdit();
   }
 
   function forceSave({ urgent = false } = {}) {
@@ -134,7 +80,6 @@ export function Editor(props: EditorProps) {
     }
 
     if (!isEditable(props)) wtf();
-    scheduler.stop();
     addSaved(value);
     const formatted = format(value);
     addSaved(formatted);
