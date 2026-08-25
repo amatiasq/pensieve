@@ -1,0 +1,75 @@
+#!/bin/bash -e
+# amq pensieve edit <id> — abre la nota en $EDITOR y, si la cambias, la guarda:
+# reescribe meta/<id>.json con el título y el grupo que dicta la primera línea,
+# comitea los dos ficheros juntos y empuja. Sin cambios no hay commit.
+#
+# Clona en PENSIEVE_EDIT_CLONE, distinto del clon de `search` y `view`: aquél
+# es una caché que nadie escribe, y un comando que escribe no comparte
+# directorio con uno que asume lo contrario.
+#
+# Si la web guardó esa misma nota mientras la editabas, el push rebota. Aquí no
+# se fusiona nada: se dice y se para, con el commit hecho en el clon.
+#
+# Config (env):
+#   PENSIEVE_DATA_REPO    repo de notas (el mismo que lee amq pensieve backup)
+#   PENSIEVE_EDIT_CLONE   dónde clonarlo (default /tmp/pensieve-data-edit)
+
+case "$1" in
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
+  '') awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0" >&2; exit 1;;
+esac
+
+LIB="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)/lib"
+source "$LIB/pensieve-data.sh"
+
+if [ -z "$EDITOR" ]; then
+  echo "amq pensieve edit: la variable de entorno \$EDITOR no está puesta." >&2
+  exit 1
+fi
+
+id="$1"
+CLONE="${PENSIEVE_EDIT_CLONE:-/tmp/pensieve-data-edit}"
+
+pensieve_data_clone "$CLONE"
+
+note="note/$id"
+meta="meta/$id.json"
+
+if [[ ! -f "$CLONE/$note" ]]; then
+  echo "amq pensieve edit: no hay ninguna nota con id $id en $CLONE" >&2
+  exit 1
+fi
+
+if [[ ! -f "$CLONE/$meta" ]]; then
+  echo "amq pensieve edit: la nota $id no tiene $meta; sin él no hay qué actualizar." >&2
+  exit 1
+fi
+
+$EDITOR "$CLONE/$note"
+
+if [ -z "$(git -C "$CLONE" status --porcelain -- "$note")" ]; then
+  echo "==> sin cambios, nada que guardar"
+  exit 0
+fi
+
+# El título y el grupo salen de la primera línea, con la misma función que usa
+# la app; el bash sólo comitea lo que ella deja escrito.
+titles="$(bun --no-install run "$LIB/write-note-meta.ts" "$CLONE/$meta" "$CLONE/$note")"
+before="${titles%%$'\t'*}"
+after="${titles#*$'\t'}"
+
+message="Update note \"$before\""
+if [ "$after" != "$before" ]; then
+  message="$message renamed \"$after\""
+fi
+
+echo "==> $message"
+git -C "$CLONE" add -- "$note" "$meta"
+git -C "$CLONE" commit --quiet -m "$message"
+
+if ! git -C "$CLONE" push --quiet; then
+  echo "amq pensieve edit: el push rebotó; lo más probable es que la web guardara" >&2
+  echo "                   esta misma nota mientras la editabas. Tu commit está en" >&2
+  echo "                   $CLONE: míralo antes de nada, que aquí no se fusiona." >&2
+  exit 1
+fi

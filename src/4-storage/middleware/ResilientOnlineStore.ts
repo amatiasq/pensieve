@@ -1,5 +1,5 @@
 import { Scheduler } from '@amatiasq/scheduler';
-import { del, get, set } from 'idb-keyval';
+import { get, set } from 'idb-keyval';
 import { createStore as createIdbStore } from '../../1-core/idb.ts';
 import { isLeader } from '../../1-core/tabLeader.ts';
 import { debugMethods } from '../../util/debugMethods.ts';
@@ -46,9 +46,11 @@ function registerBackgroundSync() {
 }
 
 async function retrievePending(): Promise<Command[]> {
-  const queue = (await get<Command[]>('queue', outboxStore)) ?? [];
-  await del('queue', outboxStore);
-  return queue;
+  return (await get<Command[]>('queue', outboxStore)) ?? [];
+}
+
+async function replacePending(queue: Command[]) {
+  await set('queue', queue, outboxStore);
 }
 
 export class ResilientOnlineStore implements AsyncStore {
@@ -98,7 +100,7 @@ export class ResilientOnlineStore implements AsyncStore {
     }
 
     if (this.isOffline) {
-      return Promise.reject(() => new StoreOfflineError());
+      return Promise.reject(new StoreOfflineError());
     }
 
     const promise = this.remote.read(key);
@@ -163,12 +165,34 @@ export class ResilientOnlineStore implements AsyncStore {
 
     this.retryDelay = BASE_RETRY_MS;
 
-    for (const { method, params, attempts } of await retrievePending()) {
-      if (attempts < MAX_ATTEMPTS) {
-        this.command(method, params, attempts);
-      } else {
-        console.warn(`Command ${method} failed ${attempts} times`, ...params);
+    // Each command leaves the stored queue only after it succeeds,
+    // so closing the tab mid-flush loses nothing.
+    while (true) {
+      const queue = await retrievePending();
+      if (!queue.length) return;
+
+      const [next, ...rest] = queue;
+
+      if (next.attempts >= MAX_ATTEMPTS) {
+        console.warn(
+          `Command ${next.method} failed ${next.attempts} times`,
+          ...next.params,
+        );
+        await replacePending(rest);
+        continue;
       }
+
+      try {
+        // TS doesn't recognize params as valid parameters for method
+        await (this.remote[next.method] as any)(...next.params);
+      } catch {
+        await replacePending([{ ...next, attempts: next.attempts + 1 }, ...rest]);
+        setSyncStatus('pending');
+        this.scheduleRetryWithBackoff();
+        return;
+      }
+
+      await replacePending(rest);
     }
   }
 }

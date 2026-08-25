@@ -1,6 +1,8 @@
 #!/bin/bash -e
-
-# amq pensieve deploy — construye aquí, y pone en producción la app y la API.
+# amq pensieve deploy [--skip-build] — construye aquí, y pone en producción la
+# app y la API.
+#
+#   --skip-build   sube el dist/ que ya está construido
 #
 # El stack del VPS son dos contenedores: el nginx que sirve el build desde
 # ./www, y la API (Deno) en la red interna, a la que sólo llega ese nginx. Este
@@ -12,13 +14,7 @@
 # Config (env): VPS_REMOTE_DIR (default vps)
 
 case "$1" in
-  -h|--help)
-    echo "Usage: amq pensieve deploy [--skip-build]"
-    echo
-    echo "  --skip-build   sube el dist/ que ya está construido"
-    echo
-    echo "Config (env): VPS_REMOTE_DIR (default vps)"
-    exit 0;;
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
 IMAGE="docker.amatiasq.com/pensieve-api"

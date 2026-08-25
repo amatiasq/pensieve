@@ -1,4 +1,4 @@
-import { editor, Range } from 'monaco-editor';
+import type { editor, IRange } from 'monaco-editor';
 
 export interface MatchDescription {
   text: string;
@@ -7,7 +7,7 @@ export interface MatchDescription {
   col: number;
   prevLine: number;
   prevChar: number;
-  range: Range;
+  range: IRange;
 }
 
 export function getMatchesForRegex(pattern: string | RegExp) {
@@ -29,12 +29,12 @@ export function getMatchesForRegex(pattern: string | RegExp) {
         const row = i;
         const col = match.index!;
 
-        const range = new Range(
-          row + 1,
-          col + 1,
-          row + 1,
-          col + 1 + text.length,
-        );
+        const range = {
+          startLineNumber: row + 1,
+          startColumn: col + 1,
+          endLineNumber: row + 1,
+          endColumn: col + 1 + text.length,
+        };
 
         result.push({
           text,

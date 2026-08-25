@@ -1,0 +1,30 @@
+#!/bin/bash -e
+# amq pensieve view <id> — escribe la nota por stdout, tal cual. No formatea,
+# no colorea, no pagina: quien quiera un pager la encañona.
+#
+# El id es el que imprime `amq pensieve search`, sin más ceremonia. Se lee del
+# mismo clon en caché, que se actualiza antes de leer; escribir es `amq
+# pensieve edit`, que tiene el suyo.
+#
+# Config (env):
+#   PENSIEVE_DATA_REPO   repo de notas (el mismo que lee amq pensieve backup)
+#   PENSIEVE_CACHE       dónde clonarlo (default /tmp/pensieve-data)
+
+case "$1" in
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
+  '') awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0" >&2; exit 1;;
+esac
+
+source "$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)/lib/pensieve-data.sh"
+
+id="$1"
+CACHE="${PENSIEVE_CACHE:-/tmp/pensieve-data}"
+
+pensieve_data_clone "$CACHE"
+
+if [[ ! -f "$CACHE/note/$id" ]]; then
+  echo "amq pensieve view: no hay ninguna nota con id $id en $CACHE" >&2
+  exit 1
+fi
+
+cat "$CACHE/note/$id"

@@ -76,5 +76,5 @@ el flujo entero. Queda escrito como decisión consciente, no como pendiente.
   [`2026-08-20 selectores-de-componente-de-emotion.md`](2026-08-20%20selectores-de-componente-de-emotion.md).
   Lo que sigue fuera de CI son los e2e:
   [`e2e-de-pensieve-en-ci.md`](../plans/e2e-de-pensieve-en-ci.md).
-- [`monaco-del-cdn-o-del-bundle.md`](../plans/monaco-del-cdn-o-del-bundle.md) — el
-  punto 6, que es una decisión antes que un trabajo.
+- El punto 6, que era una decisión antes que un trabajo, ya cayó:
+  [`2026-08-24 monaco-del-cdn-o-del-bundle.md`](2026-08-24%20monaco-del-cdn-o-del-bundle.md).

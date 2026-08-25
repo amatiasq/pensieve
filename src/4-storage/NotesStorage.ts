@@ -1,13 +1,10 @@
 import { messageBus } from '../1-core/messageBus.ts';
-import {
-  getMetadataFromContent,
-  Note,
-  NoteContent,
-  NoteId,
-} from '../2-entities/Note.ts';
+import { getMetadataFromContent } from '../2-entities/getMetadataFromContent.ts';
+import { Note, NoteContent, NoteId } from '../2-entities/Note.ts';
 import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings.ts';
 import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts.ts';
-import { datestr, deserialize, serialize } from '../util/serialization.ts';
+import { datestr } from '../util/datestr.ts';
+import { deserialize, serialize } from '../util/serialization.ts';
 import { fetchAndUpdate } from './helpers/fetchAndUpdate.ts';
 import { RemoteJson } from './helpers/RemoteJson.ts';
 import { RemoteValue } from './helpers/RemoteValue.ts';

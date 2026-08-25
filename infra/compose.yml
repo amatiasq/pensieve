@@ -7,7 +7,7 @@
 services:
   nginx:
     container_name: amq-pensieve
-    image: nginx
+    image: nginx:1.31
     restart: unless-stopped
     expose:
       - 80

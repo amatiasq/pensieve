@@ -1,12 +1,12 @@
 import { messageBus } from '../1-core/messageBus.ts';
+import { getMetadataFromContent } from '../2-entities/getMetadataFromContent.ts';
 import {
-  getMetadataFromContent,
   isNoteIdentical,
   Note,
   NoteContent,
   NoteId,
 } from '../2-entities/Note.ts';
-import { datestr } from '../util/serialization.ts';
+import { datestr } from '../util/datestr.ts';
 import { RemoteJson } from './helpers/RemoteJson.ts';
 import { RemoteValue } from './helpers/RemoteValue.ts';
 import { setDefaultReason } from './helpers/setDefaultReason.ts';

@@ -1,5 +1,4 @@
 import styled from '@emotion/styled';
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NoteId } from '../../2-entities/Note.ts';
 import { useNavigator } from '../../6-hooks/useNavigator.ts';
@@ -55,17 +54,7 @@ export function NoteItem({ id, className = '' }: NoteItemProps) {
   const navigator = useNavigator();
 
   const [note] = useNote(id);
-  const [active, setActive] = useState<boolean>(navigator.isNote(id));
-
-  useEffect(() =>
-    navigator.onNavigate(next => {
-      const isNextActive = next.isNote(id);
-
-      if (active || isNextActive) {
-        setActive(isNextActive);
-      }
-    }),
-  );
+  const active = navigator.isNote(id);
 
   if (!note) return null;
 

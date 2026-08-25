@@ -1,5 +1,4 @@
 #!/bin/bash -e
-
 # amq pensieve local — la app en :1234 y la API en :8080, como en producción.
 #
 # La API es del mismo origen que la app: en el VPS lo hace el nginx, aquí el
@@ -7,6 +6,10 @@
 #
 # Los secretos salen de `pensieve/.env` (gitignorado). Son los mismos que van al
 # `.env` del servidor con `amq pensieve secrets`.
+
+case "$1" in
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
+esac
 
 if [ ! -f .env ]; then
   echo "Falta pensieve/.env con CLIENT_SECRET_DEV y CLIENT_SECRET_PROD." >&2

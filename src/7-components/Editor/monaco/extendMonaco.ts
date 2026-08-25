@@ -1,5 +1,5 @@
-import { Monaco } from '@monaco-editor/react';
-import { editor, languages } from 'monaco-editor';
+import type { Monaco } from '@monaco-editor/react';
+import type { editor, languages } from 'monaco-editor';
 import initEditor from 'monaco-mermaid';
 import { errorFor } from '../../../util/errorFor.ts';
 import { extendMonacoLanguage } from './extendMonacoLanguage.ts';

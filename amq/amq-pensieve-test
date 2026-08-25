@@ -1,12 +1,16 @@
 #!/bin/bash -e
-
-# amq pensieve test — the Playwright e2e suite (10 specs, desktop + mobile).
+# amq pensieve test [args de playwright] — the Playwright e2e suite (10 specs,
+# desktop + mobile). Extra args go straight to `playwright test`.
 #
 # No OAuth needed: `e2e/fixtures.ts` intercepts `/auth` and serves a repo mock
 # from memory, so the suite runs offline against a plain `vite` dev server that
 # Playwright starts itself.
 #
 # NOT in CI yet, though it is green: `.agents/plans/e2e-de-pensieve-en-ci.md`.
+
+case "$1" in
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
+esac
 
 if [ ! -d node_modules ]; then
   echo "==> bun install"

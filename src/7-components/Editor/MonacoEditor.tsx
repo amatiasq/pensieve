@@ -1,12 +1,15 @@
 import { css } from '@emotion/react';
 import Editor, { useMonaco } from '@monaco-editor/react';
-import { editor } from 'monaco-editor';
+import type { editor } from 'monaco-editor';
 import { isMobile } from '../../0-dom/isMobile.ts';
-import { getMetadataFromContent } from '../../2-entities/Note.ts';
+import { getMetadataFromContent } from '../../2-entities/getMetadataFromContent.ts';
 import { useSetting } from '../../6-hooks/useSetting.ts';
 import { MobileFallback } from './MobileFallback.tsx';
 import { extendMonaco } from './monaco/extendMonaco.ts';
+import { loadMonacoFromCdn } from './monaco/loadMonacoFromCdn.ts';
 import * as hardcodedConfig from './monacoConfiguration.ts';
+
+loadMonacoFromCdn();
 
 const styles = css`
   .monaco-editor {

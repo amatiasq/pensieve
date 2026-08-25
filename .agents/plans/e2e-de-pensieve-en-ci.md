@@ -31,10 +31,10 @@ lo que se despliega y es donde el bug de emotion no se veía.
 - **`bunx playwright install --with-deps chromium` tarda minutos** en un runner
   limpio. Merece caché, y merece ser un job aparte del de `check` para que un
   fallo de lint no espere a un navegador.
-- **Monaco se trae su worker de `cdn.jsdelivr.net`**, así que la suite depende de
-  la red del runner. Lo tolera —los tests pasan igual—, pero es un fallo
-  intermitente esperando su día, y es justo lo que decide
-  [`monaco-del-cdn-o-del-bundle.md`](monaco-del-cdn-o-del-bundle.md).
+- **Monaco entero viene de `cdn.jsdelivr.net`**, así que la suite depende de la
+  red del runner. Lo tolera —los tests pasan igual—, pero es un fallo
+  intermitente esperando su día, y ya no hay copia local a la que caer:
+  [`2026-08-24 monaco-del-cdn-o-del-bundle.md`](../decisions/2026-08-24%20monaco-del-cdn-o-del-bundle.md).
 
 Y una advertencia: `keyboard.spec.ts` «Ctrl+B toggles sidebar visibility» falló
 una vez en local y pasó al reintento. `retries: 1` lo tapa; si vuelve a asomar en

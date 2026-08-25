@@ -8,17 +8,41 @@ const manifest = JSON.parse(
   readFileSync('./src/manifest.webmanifest').toString(),
 );
 
+// Monaco no entra en el bundle, se baja del CDN; su versión es la de la
+// dependencia de desarrollo, la misma de la que salen los tipos.
+const monacoVersion = JSON.parse(
+  readFileSync('./node_modules/monaco-editor/package.json').toString(),
+).version;
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    __MONACO_VERSION__: JSON.stringify(monacoVersion),
+  },
   plugins: [
     VitePWA({
       strategies: 'generateSW',
       manifest,
       workbox: {
         importScripts: ['/sw-background-sync.js'],
-        maximumFileSizeToCacheInBytes: 5 * 1024 ** 2, // 5MB
         navigateFallback: 'index.html',
         runtimeCaching: [
+          {
+            // Monaco no va en el bundle: se baja del CDN, y sin esto el editor
+            // no abriría sin red. La URL lleva la versión, así que subirla
+            // estrena entrada y la vieja caduca sola.
+            urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/npm\/monaco-editor@/,
+            handler: 'CacheFirst',
+            method: 'GET',
+            options: {
+              cacheName: 'monaco-cdn',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             // Cache GitHub API responses (GET only) for offline support
             urlPattern: /^https:\/\/api\.github\.com\//,

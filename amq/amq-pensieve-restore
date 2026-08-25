@@ -1,7 +1,7 @@
 #!/bin/bash -e
-
 # amq pensieve restore [bundle] [destino] — reconstruye pensieve-data desde un
-# bundle de backups/.
+# bundle de backups/, clonándolo en <destino> y verificando lo que trae. Sin
+# argumentos usa el bundle más reciente y un destino con la fecha.
 #
 # Los datos de pensieve son un repo, así que restaurarlos es clonarlos: un
 # bundle es un fichero único con el repo entero dentro, y `git clone` lo abre
@@ -11,20 +11,13 @@
 # reescribe el repo remoto entero y no se puede deshacer; el comando lo imprime
 # para copiarlo, y no lo ejecuta. Un restore que publica solo no se puede
 # ensayar, y un backup que no se ensaya no es un backup.
-
-print-help() {
-  echo "Usage: amq pensieve restore [bundle] [destino]"
-  echo ''
-  echo "Clona un bundle de backups/ en <destino> y verifica lo que trae."
-  echo "Sin argumentos usa el bundle más reciente y un destino con la fecha."
-  echo ''
-  echo "Examples:"
-  echo "  amq pensieve restore"
-  echo "  amq pensieve restore backups/pensieve-data-2026-08-10.bundle /tmp/prueba"
-}
+#
+# Examples:
+#   amq pensieve restore
+#   amq pensieve restore backups/pensieve-data-2026-08-10.bundle /tmp/prueba
 
 case "$1" in
-  -h|--help|help) print-help; exit 0;;
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
 bundle="${1:-$(ls -t backups/pensieve-data-*.bundle 2>/dev/null | head -1)}"

@@ -28,5 +28,5 @@ grupo exista como carpeta.
 - **Una sola pasada de `awk` por lote**, no un `head` por nota: con miles de
   ficheros la diferencia son minutos.
 
-Leer y editar una nota desde la terminal es el plan siguiente:
-[`amq-pensieve-view-edit.md`](../plans/amq-pensieve-view-edit.md).
+Leer y editar una nota desde la terminal vino después:
+[`2026-08-24 amq-pensieve-view-edit.md`](2026-08-24%20amq-pensieve-view-edit.md).

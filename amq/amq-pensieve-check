@@ -1,5 +1,4 @@
 #!/bin/bash -e
-
 # amq pensieve check — full local CI check for pensieve.
 #
 # Mirrors .github/workflows/ci-pensieve.yml so a green CI run and a local
@@ -8,11 +7,14 @@
 #   typecheck and test the API (deno check, deno test).
 #
 # Two runtimes because the project is two things: the app is Bun + Vite and the
-# API is Deno, which is what the VPS can run (its CPU has no AVX2).
-#
-# The e2e suite is NOT here: it needs browsers and takes minutes, so it lives in
-# `amq pensieve test`. Install is skipped when node_modules is already present so
-# repeated local runs stay fast; CI has no node_modules and installs fresh.
+# API is Deno, which is what the VPS can run (its CPU has no AVX2). The e2e
+# suite needs browsers and takes minutes, so it lives in `amq pensieve test`.
+# Install is skipped when node_modules is already present so repeated local
+# runs stay fast; CI has no node_modules and installs fresh.
+
+case "$1" in
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
+esac
 
 if [ ! -d node_modules ]; then
   echo "==> bun install"

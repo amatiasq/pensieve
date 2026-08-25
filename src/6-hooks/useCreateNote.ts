@@ -1,4 +1,4 @@
-import { datestr } from '../util/serialization.ts';
+import { datestr } from '../util/datestr.ts';
 import { useNavigator } from './useNavigator.ts';
 import { useStore } from './useStore.ts';
 

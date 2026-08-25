@@ -1,5 +1,5 @@
-import { Monaco } from '@monaco-editor/react';
-import { editor, Uri } from 'monaco-editor';
+import type { Monaco } from '@monaco-editor/react';
+import type { editor } from 'monaco-editor';
 import { errorFor } from '../../../util/errorFor.ts';
 import { getMatchesForRegex } from './getMatchesForRegex.ts';
 
@@ -23,7 +23,7 @@ export function provideCustomLinks(monaco: Monaco, definition: LinkCreator) {
       return (model: ITextModel) =>
         matcher(model).map(({ range, capture }) => ({
           range,
-          url: getUrlFrom(conversor, capture),
+          url: getUrlFrom(monaco, conversor, capture),
         }));
     })
     .filter(isNotNull);
@@ -35,7 +35,7 @@ export function provideCustomLinks(monaco: Monaco, definition: LinkCreator) {
   });
 }
 
-function getUrlFrom(conversor: string, captures: string[]) {
+function getUrlFrom(monaco: Monaco, conversor: string, captures: string[]) {
   if (typeof conversor !== 'string') {
     throw new Error(`URL pattern is not a string: ${typeof conversor}`);
   }
@@ -46,7 +46,7 @@ function getUrlFrom(conversor: string, captures: string[]) {
   );
 
   return errorFor(
-    () => Uri.parse(url),
+    () => monaco.Uri.parse(url),
     `Invalid URL generated from settings: ${url}`,
     conversor,
     captures,

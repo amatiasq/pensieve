@@ -1,17 +1,20 @@
 #!/bin/bash -e
+# amq pensieve backup — clona (o actualiza) pensieve-data en backups/ y escribe
+# el bundle fechado que abren `amq pensieve restore` y su `restore-check`.
+#
+# **La copia de Lorelei, y sólo ésa**: desde el 2026-08-20 Cereza baja su propio
+# espejo con una llave de sólo lectura, así que aquí no se archiva nada con
+# fecha en el NAS — dos caminos copiando los mismos 97 M es la trampa que ya
+# mordió con el registry. Ver `.agents/decisions/2026-08-20
+# pensieve-en-el-tiron-de-cereza.md`.
+#
+# Se clona en espejo: `--mirror` trae también las ramas y tags que un clon
+# normal deja fuera, y se puede volver a empujar tal cual. Config (env):
+# PENSIEVE_DATA_REPO.
 
-# Clona (o actualiza) pensieve-data en backups/. **La copia de Lorelei, y sólo
-# ésa**: desde el 2026-08-20 Cereza baja su propio espejo con una llave de sólo
-# lectura, así que aquí no se archiva nada con fecha en el NAS. Dos caminos
-# copiando los mismos 97 M es la trampa que ya mordió con el registry —9,1 G
-# donde caben 4,6—. Ver `.agents/decisions/2026-08-20 pensieve-en-el-tiron-de-cereza.md`.
-#
-# Los datos de pensieve son un repo, así que respaldarlos es clonarlos: cada
-# clon completo ya es una copia con todo el historial. Lo que faltaba era que
-# fuese un comando, porque lo que no es un comando no entra en el cron.
-#
-# Se clona en espejo: un `--mirror` trae también las ramas y tags que un clon
-# normal deja fuera, y es lo que se puede volver a empujar tal cual.
+case "$1" in
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
+esac
 
 DATA_REPO="${PENSIEVE_DATA_REPO:-git@github.com:amatiasq/pensieve-data.git}"
 MIRROR="backups/pensieve-data.git"
@@ -26,8 +29,8 @@ else
   git clone --mirror "$DATA_REPO" "$MIRROR"
 fi
 
-# Un bundle es un fichero único con todo el repo dentro, y es lo que abren `amq
-# pensieve restore` y su `restore-check`: se queda aquí, que es donde se ensaya.
+# Un bundle es un fichero único con todo el repo dentro: se queda aquí, que es
+# donde se ensaya.
 bundle="backups/pensieve-data-$(date +%Y-%m-%d).bundle"
 echo "==> writing $bundle"
 git -C "$MIRROR" bundle create "../../$bundle" --all

@@ -1,22 +1,15 @@
 #!/bin/bash -e
-
 # amq pensieve restore-check [bundle] — prueba que un bundle restaura, y borra
-# lo restaurado.
+# lo restaurado. Clona un bundle de backups/ (el más reciente si no se da) en
+# un temporal, comprueba que trae commits y ficheros, y lo borra.
 #
 # `amq pensieve restore` ya es inofensivo —clona, no publica—, así que esto es
 # el mismo trabajo contra un temporal más la afirmación que convierte el ensayo
 # en una prueba: **un repo con cero commits o cero ficheros no es una copia**, y
 # clonar un bundle vacío sale 0.
 
-print-help() {
-  echo "Usage: amq pensieve restore-check [bundle]"
-  echo ''
-  echo "Clona un bundle de backups/ en un temporal, comprueba que trae commits"
-  echo "y ficheros, y lo borra. Sin argumento usa el más reciente."
-}
-
 case "$1" in
-  -h|--help|help) print-help; exit 0;;
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
 tmp="$(mktemp -d)"

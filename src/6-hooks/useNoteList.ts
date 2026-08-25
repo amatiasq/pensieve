@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { isNoteIdentical, Note, NoteId } from '../2-entities/Note.ts';
-import { parseDate } from '../util/serialization.ts';
+import { parseDate } from '../util/datestr.ts';
 import { useStore } from './useStore.ts';
 
 export function useNoteList() {

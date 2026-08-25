@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import React, { useCallback, useMemo, useState } from 'react';
 import { Note } from '../../2-entities/Note.ts';
+import type { Settings } from '../../2-entities/Settings.ts';
 import { useFilteredNotes } from '../../6-hooks/useFilteredNotes.ts';
 import { useNoteList } from '../../6-hooks/useNoteList.ts';
 import { useSetting } from '../../6-hooks/useSetting.ts';
@@ -66,31 +67,9 @@ export function NotesList({ filter }: NotesListProps) {
   const [isVisible, setIsVisible] = useSetting('sidebarVisible');
   const [folders] = useSetting('folders');
 
-  const getUnifiedFolderName = useMemo(() => {
-    if (!folders) return (group: string) => group;
-
-    const folderKeys = Object.fromEntries(
-      Object.keys(folders).map(x => [x.toLocaleLowerCase(), x]),
-    );
-
-    return (group: string) => folderKeys[group.toLocaleLowerCase()] || group;
-  }, [folders]);
+  const unifyFolderName = useMemo(() => folderNameUnifier(folders), [folders]);
 
   useShortcut('hideSidebar', () => setIsVisible(!isVisible));
-
-  const handleScroll = useCallback((event: React.UIEvent<HTMLElement>) => {
-    const target = event.currentTarget;
-    const isScrolledNow = Boolean(target.scrollTop);
-    const wasScrolled = target.hasAttribute('data-scrolled');
-
-    if (isScrolledNow !== wasScrolled) {
-      if (isScrolledNow) {
-        target.setAttribute('data-scrolled', 'true');
-      } else {
-        target.removeAttribute('data-scrolled');
-      }
-    }
-  }, []);
 
   const renderMoreItems = useCallback(() => {
     const newCount = itemsCount + ITEMS_COUNT_INCREASE;
@@ -105,63 +84,95 @@ export function NotesList({ filter }: NotesListProps) {
   const listProps = filter ? { 'data-filter': true } : {};
 
   return (
-    <NotesListContainer {...listProps} onScroll={handleScroll}>
+    <NotesListContainer {...listProps} onScroll={markScrolled}>
       {loading ? <Loader /> : renderList()}
     </NotesListContainer>
   );
 
   function renderList() {
-    const groups = new Map<string, Note[]>();
-
-    const notes = [
-      ...filtered.filter(x => x.favorite),
-      ...filtered.filter(x => !x.favorite),
-    ];
-
-    const finalList = notes
-      .map(x => {
-        if (!x.group) return x;
-
-        const group = getUnifiedFolderName(x.group);
-
-        if (groups.has(group)) {
-          groups.get(group)?.push(x);
-          return null;
-        }
-
-        groups.set(group, [x]);
-        return group;
-      })
-      .filter((x): x is string | Note => Boolean(x));
-
-    const toRender = finalList.slice(0, itemsCount);
-    const finalElement = finalList.length > 50 ? 'No more notes' : null;
-    console.debug(`🚅 Rendering ${toRender.length} of ${finalList.length}`);
+    const rows = foldGroups(filtered, unifyFolderName);
+    const toRender = rows.slice(0, itemsCount);
+    console.debug(`🚅 Rendering ${toRender.length} of ${rows.length}`);
 
     return (
       <>
-        {toRender.map(note => {
-          if (typeof note !== 'string') {
-            return <NoteItem key={note.id} id={note.id} />;
-          }
-
-          const group = note;
-          const list = groups.get(group)!;
-          return (
-            <NoteGroup key={`group/${group}`} group={group} notes={list} />
-          );
-        })}
+        {toRender.map(row =>
+          'notes' in row ? (
+            <NoteGroup
+              key={`group/${row.group}`}
+              group={row.group}
+              notes={row.notes}
+            />
+          ) : (
+            <NoteItem key={row.id} id={row.id} />
+          ),
+        )}
         <PresenceDetector
           className="notes-list__end"
           onVisible={renderMoreItems}
         >
-          {itemsCount < finalList.length ? (
+          {itemsCount < rows.length ? (
             <Loader onClick={renderMoreItems} />
-          ) : (
-            finalElement
-          )}
+          ) : rows.length > 50 ? (
+            'No more notes'
+          ) : null}
         </PresenceDetector>
       </>
     );
   }
+}
+
+type ListRow = Note | { group: string; notes: Note[] };
+
+// Las favoritas primero, y cada carpeta ocupa una sola fila: la de su primera
+// nota. La fila se queda con el array que las siguientes siguen llenando, así
+// que basta una pasada para que la carpeta salga completa y en su sitio.
+function foldGroups(notes: Note[], unifyName: (group: string) => string) {
+  const ordered = [
+    ...notes.filter(x => x.favorite),
+    ...notes.filter(x => !x.favorite),
+  ];
+
+  const byGroup = new Map<string, Note[]>();
+  const rows: ListRow[] = [];
+
+  for (const note of ordered) {
+    if (!note.group) {
+      rows.push(note);
+      continue;
+    }
+
+    const group = unifyName(note.group);
+    const collected = byGroup.get(group);
+
+    if (collected) {
+      collected.push(note);
+      continue;
+    }
+
+    const first = [note];
+    byGroup.set(group, first);
+    rows.push({ group, notes: first });
+  }
+
+  return rows;
+}
+
+// Los settings mandan en cómo se escribe una carpeta: `todo` y `TODO` son la
+// misma, y se pinta con las mayúsculas que el usuario le puso.
+function folderNameUnifier(folders: Settings['folders']) {
+  if (!folders) return (group: string) => group;
+
+  const byLowercase = Object.fromEntries(
+    Object.keys(folders).map(x => [x.toLocaleLowerCase(), x]),
+  );
+
+  return (group: string) => byLowercase[group.toLocaleLowerCase()] || group;
+}
+
+// A mano y no por estado: la sombra del borde no vale un render de la lista
+// entera en cada scroll.
+function markScrolled(event: React.UIEvent<HTMLElement>) {
+  const target = event.currentTarget;
+  target.toggleAttribute('data-scrolled', Boolean(target.scrollTop));
 }

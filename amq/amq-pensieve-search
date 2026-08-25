@@ -1,63 +1,34 @@
 #!/bin/bash -e
-
-print-help() {
-  cat <<'EOF'
-Usage: amq pensieve search <término>
-
-Busca notas por su nombre y escribe una línea por cada una: el título tal cual,
-y detrás su id. Sin distinguir mayúsculas.
-
-Una nota es un fichero de pensieve-data cuya primera línea es su nombre, así que
-buscar es mirar primeras líneas — con el repo clonado no hace falta la web. Como
-el grupo es la parte izquierda de la `/` en esa misma línea, buscar por grupo
-sale gratis.
-
-El clon vive en PENSIEVE_CACHE y se crea la primera vez; las siguientes sólo se
-actualiza. Es caché, no backup: backups/pensieve-data.git es de `amq pensieve
-backup` y este comando no lo toca.
-
-Config (env):
-  PENSIEVE_DATA_REPO   repo de notas (el mismo que lee amq pensieve backup)
-  PENSIEVE_CACHE       dónde clonarlo (default /tmp/pensieve-data)
-
-El id es lo que enlaza con la web:
-  https://github.com/amatiasq/pensieve-data/blob/main/note/<id>
-
-Examples:
-  amq pensieve search docker
-  amq pensieve search recetas/
-EOF
-}
+# amq pensieve search <término> — busca notas por su nombre y escribe una línea
+# por cada una: el título tal cual, y detrás su id (lo que enlaza con la web:
+# https://github.com/amatiasq/pensieve-data/blob/main/note/<id>). Sin
+# distinguir mayúsculas.
+#
+# Una nota es un fichero de pensieve-data cuya primera línea es su nombre, así
+# que buscar es mirar primeras líneas — con el repo clonado no hace falta la
+# web. Como el grupo es la parte izquierda de la `/` en esa misma línea, buscar
+# por grupo (`amq pensieve search recetas/`) sale gratis.
+#
+# El clon vive en PENSIEVE_CACHE y se crea la primera vez; las siguientes sólo
+# se actualiza. Es caché, no backup: backups/pensieve-data.git es de `amq
+# pensieve backup` y este comando no lo toca. Leer una nota entera es `amq
+# pensieve view <id>`; editarla, `amq pensieve edit <id>`.
+#
+# Config (env):
+#   PENSIEVE_DATA_REPO   repo de notas (el mismo que lee amq pensieve backup)
+#   PENSIEVE_CACHE       dónde clonarlo (default /tmp/pensieve-data)
 
 case "$1" in
-  -h|--help|help) print-help; exit 0;;
-  '') print-help; exit 1;;
+  -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
+  '') awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0" >&2; exit 1;;
 esac
 
-term="$1"
+source "$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)/lib/pensieve-data.sh"
 
-DATA_REPO="${PENSIEVE_DATA_REPO:-git@github.com:amatiasq/pensieve-data.git}"
+term="$1"
 CACHE="${PENSIEVE_CACHE:-/tmp/pensieve-data}"
 
-# Un clon normal, no `--mirror`: hacen falta los ficheros en disco, no sólo el
-# historial. Y `--ff-only` porque este clon no se edita: si divergió, algo pasa
-# que un merge silencioso taparía.
-if [[ -d "$CACHE/.git" ]]; then
-  echo "==> updating $CACHE" >&2
-  git -C "$CACHE" pull --ff-only --quiet
-else
-  echo "==> cloning $DATA_REPO into $CACHE" >&2
-  git clone "$DATA_REPO" "$CACHE"
-fi
-
-# Un almacén de notas es un repo con `note/` dentro. Sin esa carpeta lo apuntado
-# por PENSIEVE_DATA_REPO es otra cosa —el fork viejo de la app, por ejemplo— y
-# `find` sólo diría "no such file or directory".
-if [[ ! -d "$CACHE/note" ]]; then
-  echo "amq pensieve search: $CACHE no tiene note/, no es un almacén de notas." >&2
-  echo "                     PENSIEVE_DATA_REPO=$DATA_REPO" >&2
-  exit 1
-fi
+pensieve_data_clone "$CACHE"
 
 if [ -t 1 ] && [ -z "$NO_COLOR" ]; then
   DIM=$'\033[2m'; OFF=$'\033[0m'
@@ -68,7 +39,9 @@ fi
 # Una pasada de awk por lote en vez de un `head` por nota: con miles, minutos.
 # El título se limpia al imprimir (la primera línea puede venir comentada);
 # sólo la parte visible de `getMetadataFromContent`, con los marcadores de
-# COMMENTS_BY_LANG en Note.ts.
+# COMMENTS_BY_LANG en src/2-entities/getMetadataFromContent.ts. Escribir
+# metadata no se duplica así: eso es `amq pensieve edit`, que llama a la de
+# verdad.
 find "$CACHE/note" -type f -print0 \
   | xargs -0 awk -v term="$term" -v dim="$DIM" -v off="$OFF" '
       FNR != 1 { nextfile }
