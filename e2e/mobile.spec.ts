@@ -44,13 +44,20 @@ test.describe('Mobile layout', () => {
     await expect(app.locator('h5').first()).toBeVisible();
   });
 
-  test('can create a note from mobile sidebar', async ({ app }) => {
+  test('can create a note from mobile sidebar', async ({ app, mockRepo }) => {
     const noteCountBefore = await app.locator('h5').count();
+    const commitsBefore = mockRepo.commits.length;
 
     await clickCreateNote(app);
 
     // Should navigate to the new note
     await expect(app).toHaveURL(/\/note\//, { timeout: 5_000 });
+
+    // La recarga lee la lista del repo, y lo remoto gana: sin esperar al commit
+    // la nota nueva todavía no está allí y la lista vuelve con las de antes.
+    await expect(async () => {
+      expect(mockRepo.commits.length).toBeGreaterThan(commitsBefore);
+    }).toPass({ timeout: 5_000 });
 
     // Navigate back to home to see the sidebar
     await app.goto('/');

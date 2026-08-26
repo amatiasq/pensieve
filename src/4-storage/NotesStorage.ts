@@ -3,12 +3,13 @@ import { getMetadataFromContent } from '../2-entities/getMetadataFromContent.ts'
 import { Note, NoteContent, NoteId } from '../2-entities/Note.ts';
 import { DEFAULT_SETTINGS, Settings } from '../2-entities/Settings.ts';
 import { DEFAULT_SHORTCUTS, Shortcuts } from '../2-entities/Shortcuts.ts';
-import { datestr } from '../util/datestr.ts';
+import { datestr, parseDate } from '../util/datestr.ts';
 import { deserialize, serialize } from '../util/serialization.ts';
 import { fetchAndUpdate } from './helpers/fetchAndUpdate.ts';
 import { RemoteJson } from './helpers/RemoteJson.ts';
 import { RemoteValue } from './helpers/RemoteValue.ts';
 import { MixedStore } from './middleware/MixedStore.ts';
+import { Preloader } from './Preloader.ts';
 import { RemoteNote } from './RemoteNote.ts';
 
 const getNotesPath = () => 'meta/*';
@@ -18,6 +19,7 @@ const cleanJson = (json: string) => json.trim().replace(/,$/, '');
 
 export class NotesStorage {
   private readonly notes = new Map<NoteId, RemoteNote>();
+  private readonly preloader = new Preloader(this.store);
   private readonly emitNotesCreate: (data: Note[]) => void;
   readonly onNotesCreated: (listener: (data: Note[]) => void) => () => void;
 
@@ -57,15 +59,29 @@ export class NotesStorage {
       x => Boolean(Object.keys(x).length),
     );
 
-    return Object.values(values).map(raw => {
+    const notes = Object.values(values).map(raw => {
       const note = deserialize<Note>(cleanJson(raw));
       this.updateRemote(note.id, note);
       return note;
     });
+
+    this.preloadContent(notes);
+    return notes;
+  }
+
+  // Lo que nunca se abrió no está en local, así que sin red no se lee. La cola
+  // va de la nota más reciente a la más vieja: lo de hace dos años se precarga
+  // al final, o no se precarga.
+  private preloadContent(notes: Note[]) {
+    const newest = (note: Note) => Number(parseDate(note.modified));
+    const newestFirst = [...notes].sort((a, b) => newest(b) - newest(a));
+
+    this.preloader.preload(newestFirst.map(x => getContentPath(x.id)));
   }
 
   private synchronize(notes: Record<NoteId, string>) {
     const toBeAdded = [];
+    const all: Note[] = [];
     // Sin el spread: `new Set(...keys)` le pasa cada clave como un argumento
     // distinto, y `Set` sólo mira el primero, así que salía un conjunto con las
     // *letras* de la primera nota. Nada coincidía, y cada sincronización
@@ -74,6 +90,8 @@ export class NotesStorage {
 
     for (const [, json] of Object.entries(notes)) {
       const note = deserialize<Note>(cleanJson(json));
+      all.push(note);
+
       const exists = existing.delete(note.id);
       const remote = this.note(note.id);
 
@@ -92,6 +110,8 @@ export class NotesStorage {
       this.store.deleteLocal(getNotePath(id));
       this.store.deleteLocal(getContentPath(id));
     }
+
+    this.preloadContent(all);
   }
 
   note(id: NoteId): RemoteNote {

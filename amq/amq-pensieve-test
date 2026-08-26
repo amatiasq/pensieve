@@ -1,12 +1,15 @@
 #!/bin/bash -e
-# amq pensieve test [args de playwright] — the Playwright e2e suite (10 specs,
-# desktop + mobile). Extra args go straight to `playwright test`.
+# amq pensieve test [args de playwright] — the Playwright e2e suite (12 specs,
+# 71 tests, desktop + mobile). Extra args go straight to `playwright test`.
+#
+# Runs against `vite preview`, not the dev server: the build is what ships, and
+# it is where the dead emotion CSS hid for four months. Playwright builds and
+# starts the servers itself, so `dist/` cannot go stale under the suite.
 #
 # No OAuth needed: `e2e/fixtures.ts` intercepts `/auth` and serves a repo mock
-# from memory, so the suite runs offline against a plain `vite` dev server that
-# Playwright starts itself.
+# from memory, so the suite runs offline.
 #
-# NOT in CI yet, though it is green: `.agents/plans/e2e-de-pensieve-en-ci.md`.
+# Same command in CI: .github/workflows/ci-pensieve.yml, job `e2e`.
 
 case "$1" in
   -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;

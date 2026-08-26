@@ -1,8 +1,8 @@
 # 2026-08-20 — Fuera los seis selectores de componente de emotion
 
 Cierra la mitad de `selectores-de-componente-de-emotion.md`. La otra mitad —los
-e2e en CI— sigue con el blocker que declaraba aquel plan y sale como
-[`e2e-de-pensieve-en-ci.md`](../plans/e2e-de-pensieve-en-ci.md).
+e2e en CI— salió como plan aparte y ya cayó:
+[`2026-08-26 e2e-de-pensieve-en-ci.md`](2026-08-26%20e2e-de-pensieve-en-ci.md).
 
 ## Qué se perdía
 

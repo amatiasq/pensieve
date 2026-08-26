@@ -5,21 +5,21 @@ import { AsyncStore } from '../AsyncStore.ts';
 import { patternToRegex } from '../helpers/patternToRegex.ts';
 
 export class ForageStore implements AsyncStore {
-  private cachedKeys: string[] | null = null;
+  private cachedKeys: Set<string> | null = null;
 
   constructor(private readonly store: UseStore) {
     debugMethods(this, ['readAll', 'read', 'write', 'delete']);
   }
 
+  // Un conjunto, no una lista: la precarga pregunta por cada nota del repo, y
+  // con miles de claves eso son miles de búsquedas lineales seguidas.
   async has(key: string): Promise<boolean> {
-    const allKeys = this.cachedKeys || (await keys(this.store)) as string[];
-
     if (!this.cachedKeys) {
-      this.cachedKeys = allKeys;
+      this.cachedKeys = new Set((await keys(this.store)) as string[]);
       setTimeout(() => (this.cachedKeys = null), 3000);
     }
 
-    return allKeys.includes(key);
+    return this.cachedKeys.has(key);
   }
 
   readAll(pattern: string) {

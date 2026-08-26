@@ -1,5 +1,5 @@
 import { ClientStorage } from '@amatiasq/client-storage';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   areSettingsIdentical,
   DEFAULT_SETTINGS,
@@ -22,6 +22,13 @@ function useSettings() {
     localCache.cache || DEFAULT_SETTINGS,
   );
 
+  // El listener se suscribe una vez, así que no puede comparar contra el `value`
+  // de aquel render: congelado en el primero, la vuelta de un cambio ida-y-vuelta
+  // coincide con él y se descarta por «idéntica». Ctrl+B dos veces dejaba la
+  // sidebar escondida para siempre.
+  const latest = useRef(value);
+  latest.current = value;
+
   useEffect(() => {
     store.settings.get().then(initialize);
     return store.settings.onChange(initialize);
@@ -30,14 +37,13 @@ function useSettings() {
   return [value, set, loading] as const;
 
   function initialize(newValue: Settings) {
-    if (!areSettingsIdentical(newValue, value)) {
+    if (!areSettingsIdentical(newValue, latest.current)) {
+      latest.current = newValue;
       localCache.set(newValue);
       setValue(newValue);
     }
 
-    if (loading) {
-      setLoading(false);
-    }
+    setLoading(false);
   }
 
   async function set(newValue: Settings) {

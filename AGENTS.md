@@ -56,6 +56,11 @@ Notas en un repo privado de GitHub. Reglas del mono:
   tarball en vez de seguir: rendirse deja la app leyendo lo local, que es mucho
   mejor que gastar la hora en una carga que no va a terminar.
 
+- **Precargar es lo contrario del tarball, y por eso lleva freno.** Leer sin red
+  una nota que nunca se abrió exige bajarla, o sea justo la petición por fichero
+  que agota el rate limit. `Preloader` la hace de una en una, sólo en la pestaña
+  líder y con un presupuesto por sesión; lo que no entra lo coge la siguiente.
+
 - **Un object store que falta se crea; no se da por hecho que esté.** El
   `createStore` de idb-keyval abre la base sin versión, así que su upgrade sólo
   salta cuando la base no existe: si existe y le falta su store, cada lectura y

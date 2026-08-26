@@ -70,11 +70,11 @@ lleva.** Es el modelo estándar de una SPA, y sacarlo de ahí exige que el token
 toque el JS del cliente —cookie httpOnly gestionada por el servidor—, lo que cambia
 el flujo entero. Queda escrito como decisión consciente, no como pendiente.
 
-## Lo que falta, en dos planes
+## Lo que salió de aquí en dos planes, y ya cayó
 
 - El punto 5, los selectores de emotion, ya cayó:
   [`2026-08-20 selectores-de-componente-de-emotion.md`](2026-08-20%20selectores-de-componente-de-emotion.md).
-  Lo que sigue fuera de CI son los e2e:
-  [`e2e-de-pensieve-en-ci.md`](../plans/e2e-de-pensieve-en-ci.md).
+  Los e2e ya entraron en CI:
+  [`2026-08-26 e2e-de-pensieve-en-ci.md`](2026-08-26%20e2e-de-pensieve-en-ci.md).
 - El punto 6, que era una decisión antes que un trabajo, ya cayó:
   [`2026-08-24 monaco-del-cdn-o-del-bundle.md`](2026-08-24%20monaco-del-cdn-o-del-bundle.md).

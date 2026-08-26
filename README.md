@@ -13,7 +13,8 @@ highlighting. Every save is a commit, so the history is git's.
   browser otherwise.
 - Settings and shortcuts are JSON, edited in-app at
   [`/settings`](https://pensieve.amatiasq.com/settings) (`CMD+,`).
-- Notes opened at least once stay readable and editable offline.
+- Notes download in the background, newest first, so they stay readable and
+  editable offline.
 
 ## Caveats
 

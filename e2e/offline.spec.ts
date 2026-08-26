@@ -1,8 +1,9 @@
 import { test, expect, clickNote, clickCreateNote, focusEditor, waitForEditor } from './fixtures';
 
 test.describe('Offline behavior', () => {
-  // Note: the app doesn't have a service worker yet, so it can't load from scratch
-  // when offline. These tests verify behavior when going offline AFTER initial load.
+  // The suite blocks the service worker (`playwright.config.ts`), so nothing here
+  // loads from scratch without network. These tests verify behavior when going
+  // offline AFTER initial load.
 
   test('editing offline does not crash the app', async ({ app }) => {
     await clickNote(app, 'hello-world.js');
