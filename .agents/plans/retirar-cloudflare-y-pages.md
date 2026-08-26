@@ -20,7 +20,7 @@ verdad.
    registrado, y ése es justo el caso que puede fallar.
 2. **Sólo entonces**, borrar los dos Workers de Cloudflare, por nombre:
    `pensieve-api` (la API) y `pensieve` (unos assets que no usa nadie). El
-   `account_id` está en [`cloudflare.md`](../../../infra/machines/cloudflare.md).
+   `account_id` está en [`cloudflare.md`](../../../infra/cloudflare.md).
 3. Retirar Pages en `amatiasq/pensieve`: es la rama `gh-pages`, que el mirror no
    toca. Basta con desactivar Pages y borrar la rama; el workflow de mono se
    queda como está.

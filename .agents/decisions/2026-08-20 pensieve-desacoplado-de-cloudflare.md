@@ -69,7 +69,7 @@ mismo compose, en la red `internal` y sin `VIRTUAL_HOST`.
 No queda `wrangler.jsonc`, ni `wrangler.toml`, ni `wrangler` en
 `devDependencies`, ni el `package-lock.json` que lo arrastraba. El `account_id` de
 la cuenta, que sólo vivía en ese `wrangler.toml`, está ahora en
-[`cloudflare.md`](../../../infra/machines/cloudflare.md).
+[`cloudflare.md`](../../../infra/cloudflare.md).
 
 **Consecuencia: ya no hay vuelta atrás por comando.** Los dos Workers siguen en pie
 pero no se pueden redesplegar desde aquí. Un arreglo urgente antes del corte es
