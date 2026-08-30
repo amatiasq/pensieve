@@ -6,11 +6,7 @@ import { parseTarball } from './parseTarball.ts';
 import { GithubToken } from './GithubAuth.ts';
 import { githubGraphql } from './GithubGraphQlApi.ts';
 import { GithubRestApi, MediaType } from './GithubRestApi.ts';
-import {
-  GHApiRepositoryNode,
-  GHNodeSha,
-  GHRepoNodeType,
-} from './models/GHApiRepositoryNode.ts';
+import { GHApiRepositoryNode } from './models/GHApiRepositoryNode.ts';
 
 const CREATE_REPO_CONFIG = {
   has_issues: false,
@@ -40,22 +36,9 @@ class TooManyIndividualReads extends Error {}
 // any is necessary here because of https://github.com/microsoft/TypeScript/issues/14174#issuecomment-856812565
 export type StagedFiles = Record<string, any>;
 
-export interface GHRepoNode {
-  type: GHRepoNodeType;
-  sha: GHNodeSha;
-  name: string;
-  path: string;
-  size: number;
-}
-
-export interface GHRepoFile extends GHRepoNode {
-  type: 'file';
-  content: string;
-}
-
 // Lo que contesta `/commit`. `committed: false` es «no había nada que guardar»:
 // el árbol coincidía con el del padre y no se creó commit.
-export interface CommitResult {
+interface CommitResult {
   sha: string;
   committed: boolean;
 }

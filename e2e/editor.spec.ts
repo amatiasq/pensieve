@@ -1,4 +1,11 @@
-import { test, expect, clickNote, focusEditor, waitForEditor } from './fixtures';
+import {
+  test,
+  expect,
+  clickNote,
+  focusEditor,
+  NOTE_IDS,
+  waitForEditor,
+} from './fixtures';
 
 test.describe('Editor', () => {
   test('opens note content in Monaco editor', async ({ app }) => {
@@ -102,5 +109,41 @@ test.describe('Editor', () => {
     // Navigate to second note
     await clickNote(app, 'ideas.md');
     await expect(app.locator('.monaco-editor .view-lines')).toContainText('Learn Rust', { timeout: 10_000 });
+  });
+
+  // Editar una nota y cambiar a otra antes de que salte el autosave: el guardado
+  // pendiente tiene que aterrizar en la nota que se editó, no en la que quedó
+  // abierta.
+  test('a pending save lands on its own note', async ({ app, mockRepo }) => {
+    test.slow();
+
+    await clickNote(app, 'ideas.md');
+    await waitForEditor(app);
+    await expect(app.locator('.monaco-editor .view-lines')).toContainText(
+      'Learn Rust',
+    );
+
+    await focusEditor(app);
+    await app.keyboard.press('ControlOrMeta+a');
+    await app.keyboard.type('# superpotato.md\n\nmoved content');
+
+    await clickNote(app, 'hello-world.js');
+    await expect(app.locator('.monaco-editor .view-lines')).toContainText(
+      'Hello World',
+      { timeout: 10_000 },
+    );
+
+    await expect
+      .poll(() => mockRepo.getFile(`note/${NOTE_IDS.ideas}`), {
+        timeout: 15_000,
+      })
+      .toContain('superpotato.md');
+
+    expect(mockRepo.getFile(`note/${NOTE_IDS.helloWorld}`)).toContain(
+      'Hello World',
+    );
+    expect(mockRepo.getFile(`meta/${NOTE_IDS.helloWorld}.json`)).toContain(
+      'hello-world.js',
+    );
   });
 });

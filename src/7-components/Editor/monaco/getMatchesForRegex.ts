@@ -1,6 +1,6 @@
 import type { editor, IRange } from 'monaco-editor';
 
-export interface MatchDescription {
+interface MatchDescription {
   text: string;
   capture: string[];
   row: number;

@@ -1,3 +1,4 @@
+// Monaco recibe este módulo entero con un spread; sólo `theme` se pide aparte.
 export const automaticLayout = true;
 export const contextmenu = false;
 export const renderLineHighlight = 'none';

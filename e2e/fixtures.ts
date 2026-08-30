@@ -10,6 +10,7 @@ export const NOTE_IDS = {
   apiClient: 'ccc33333-3333-4333-8333-333333333333',
   ideas: 'ddd44444-4444-4444-8444-444444444444',
   cake: 'eee55555-5555-4555-8555-555555555555',
+  japan: 'fff66666-6666-4666-8666-666666666666',
 } as const;
 
 interface TestNote {
@@ -69,6 +70,17 @@ const TEST_NOTES: TestNote[] = [
     created: '2024-05-01 11:00:00',
     modified: '2024-05-01 11:00:00',
     content: '# recipes/cake.md\n\n## Chocolate Cake\n\n- 200g flour\n- 100g sugar\n- 50g cocoa\n',
+  },
+  // `folder - name` is how a note leaves its folder to stay visible with the
+  // folder closed: it has no group, the prefix is part of the title.
+  {
+    id: NOTE_IDS.japan,
+    title: 'travel - japan.md',
+    group: null,
+    favorite: false,
+    created: '2024-01-05 09:00:00',
+    modified: '2024-01-05 09:00:00',
+    content: '# travel - japan.md\n\n- Kyoto\n- Osaka\n',
   },
 ];
 

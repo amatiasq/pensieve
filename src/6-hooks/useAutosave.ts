@@ -1,29 +1,22 @@
 import { useEffect, useRef } from 'react';
 import { onPageActive } from '../0-dom/page-lifecycle.ts';
-import { useNavigator } from './useNavigator.ts';
 import { useScheduler } from './useScheduler.ts';
 import { useSetting } from './useSetting.ts';
 import { useShortcut } from './useShortcut.ts';
 
 interface AutosaveOptions {
   hasUnsavedChanges: boolean;
-  saveOnNavigation?: boolean;
   save(options: { urgent: boolean }): void;
 }
 
 // El guardado entero del editor: el debounce, el autosave programado, el
 // urgente al ocultarse la pestaña, el atajo de teclado y el volcado al
-// navegar. El editor sólo pone `save` y avisa de cada edición.
-export function useAutosave({
-  hasUnsavedChanges,
-  saveOnNavigation,
-  save,
-}: AutosaveOptions) {
+// desmontarse. El editor sólo pone `save` y avisa de cada edición.
+export function useAutosave({ hasUnsavedChanges, save }: AutosaveOptions) {
   const autosave = useSetting('autosave')[0] || 0;
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
-  const navigator = useNavigator();
 
   const doSave = ({ urgent = false } = {}) => {
     scheduler.stop();
@@ -45,23 +38,22 @@ export function useAutosave({
     }
   });
 
-  useShortcut('save', () => doSave());
+  // Lo pendiente se vuelca al desmontarse, con el cierre del último render, que
+  // es el único que sabe qué se estaba editando. Un temporizador que sobrevive
+  // al editor guarda con el `save` del editor siguiente, o sea en otra nota.
+  const pending = useRef(saveIfUnsaved);
+  pending.current = saveIfUnsaved;
 
-  useEffect(() =>
-    navigator.onNavigate(() => {
-      // Stop the scheduler when unmounting
-      if (scheduler.isRunning) {
-        scheduler.stop();
-        saveIfUnsaved();
-      }
-    }),
+  useEffect(
+    () => () => {
+      clearTimeout(debounceTimer.current);
+      scheduler.stop();
+      pending.current();
+    },
+    [],
   );
 
-  useEffect(() => {
-    if (saveOnNavigation) {
-      return navigator.onNavigate(() => requestSave());
-    }
-  });
+  useShortcut('save', () => doSave());
 
   useEffect(() => {
     if (!hasUnsavedChanges) return;

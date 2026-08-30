@@ -20,6 +20,7 @@ const NEWEST_FIRST = [
   NOTE_IDS.ideas,
   NOTE_IDS.apiClient,
   NOTE_IDS.helpers,
+  NOTE_IDS.japan,
 ];
 
 /** El log de contenidos pedidos a GitHub, en orden. */

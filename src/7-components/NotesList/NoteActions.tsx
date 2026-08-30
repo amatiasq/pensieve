@@ -7,9 +7,11 @@ import { NoteId } from '../../2-entities/Note.ts';
 import { ghPublicPage } from '../../3-github/gh-utils.ts';
 import { useNavigator } from '../../6-hooks/useNavigator.ts';
 import { useNote } from '../../6-hooks/useNote.ts';
+import { useSnapshotNote } from '../../6-hooks/useSnapshotNote.ts';
 import { useUsername } from '../../6-hooks/useUsername.ts';
 import { IconButton } from '../atoms/IconButton.tsx';
 import { ArrowIcon } from '../icons/ArrowIcon.tsx';
+import { CameraIcon } from '../icons/CameraIcon.tsx';
 import { ClipboardIcon } from '../icons/ClipboardIcon.tsx';
 import { GithubIcon } from '../icons/GithubIcon.tsx';
 import { IconContainer } from '../icons/IconContainer.tsx';
@@ -75,6 +77,7 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
 
   const navigator = useNavigator();
   const username = useUsername();
+  const snapshot = useSnapshotNote(id);
 
   const handleMoveUp = useCallback(bump, [bump]);
 
@@ -113,6 +116,12 @@ export function NoteActions({ id, ...divProps }: NoteActionsProps) {
           <ArrowIcon title="Move up" />
         </ArrowUp>
         Move to top
+      </StyledMenuItem>
+      <StyledMenuItem onClick={snapshot} css={realMenuItem}>
+        <StyledIcon>
+          <CameraIcon title="Snapshot" />
+        </StyledIcon>
+        Snapshot
       </StyledMenuItem>
       <StyledMenuItem>
         <a href={githubUrl} css={realMenuItem} target="_blank">

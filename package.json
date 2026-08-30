@@ -39,7 +39,6 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.3",
-    "dotenv": "^10.0.0",
     "eslint": "^10",
     "monaco-editor": "^0.56.0",
     "rollup-plugin-visualizer": "^5.7.1",
@@ -47,5 +46,14 @@
     "typescript-eslint": "^8.0.0",
     "vite": "^8.1.4",
     "vite-plugin-pwa": "^1.3.0"
+  },
+  "knip": {
+    "ignore": [
+      "amq/**",
+      "api/**",
+      "public/**",
+      "src/7-components/Editor/monacoConfiguration.ts"
+    ],
+    "ignoreUnresolved": ["/src/1-core/idb.ts"]
   }
 }

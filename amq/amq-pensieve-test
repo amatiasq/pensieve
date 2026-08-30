@@ -1,6 +1,6 @@
 #!/bin/bash -e
-# amq pensieve test [args de playwright] — the Playwright e2e suite (12 specs,
-# 71 tests, desktop + mobile). Extra args go straight to `playwright test`.
+# amq pensieve test [args de playwright] — the Playwright e2e suite (14 specs,
+# 79 tests, desktop + mobile). Extra args go straight to `playwright test`.
 #
 # Runs against `vite preview`, not the dev server: the build is what ships, and
 # it is where the dead emotion CSS hid for four months. Playwright builds and

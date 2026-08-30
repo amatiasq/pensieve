@@ -6,7 +6,6 @@ import { GithubToken } from './GithubAuth.ts';
 export enum MediaType {
   Json = 'application/vnd.github.v3+json',
   Raw = 'application/vnd.github.v3.raw',
-  Html = 'application/vnd.github.v3.html',
 }
 
 interface GHRequestOptions {

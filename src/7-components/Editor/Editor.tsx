@@ -17,7 +17,6 @@ interface BaseEditorProps {
 
 type ReadonlyEditorProps = BaseEditorProps & { readonly: true };
 type EditableEditorProps = BaseEditorProps & {
-  saveOnNavigation?: boolean;
   onChange?(unsaved: string): void;
   onSave(newValue: string, options: { urgent: boolean }): void;
 };
@@ -37,11 +36,7 @@ export function Editor(props: EditorProps) {
   const [hasUnsavedChanges, setHasUnsavedChanged] = useState(false);
   const [value, setValue] = useState<string>(content);
 
-  const { onUserEdit } = useAutosave({
-    hasUnsavedChanges,
-    saveOnNavigation: isEditable(props) && props.saveOnNavigation,
-    save: forceSave,
-  });
+  const { onUserEdit } = useAutosave({ hasUnsavedChanges, save: forceSave });
 
   useEffect(() => {
     updateTitle(title);

@@ -4,7 +4,7 @@ import { debugMethods } from '../../util/debugMethods.ts';
 import { AsyncStore } from '../AsyncStore.ts';
 import { patternToRegex } from '../helpers/patternToRegex.ts';
 
-export class ForageStore implements AsyncStore {
+class ForageStore implements AsyncStore {
   private cachedKeys: Set<string> | null = null;
 
   constructor(private readonly store: UseStore) {

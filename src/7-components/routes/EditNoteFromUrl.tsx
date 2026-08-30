@@ -17,19 +17,27 @@ const ReadError = styled.div`
   }
 `;
 
+// El editor y sus hooks guardan estado por nota, así que la nota es su `key`:
+// sin ella el render que sigue a la navegación pinta el texto de la anterior con
+// el `onSave` de la nueva, y lo que estuviera por guardar cae en la nota que no
+// es.
 export function EditNoteFromUrl() {
   const { noteId } = useParams() as { noteId: NoteId };
+  return <NoteEditor key={noteId} id={noteId} />;
+}
+
+function NoteEditor({ id }: { id: NoteId }) {
   const navigator = useNavigator();
-  const [note, { loading, draft }] = useNote(noteId);
+  const [note, { loading, draft }] = useNote(id);
   const [content, setContent, contentLoading, contentError] =
-    useNoteContent(noteId);
+    useNoteContent(id);
 
   if (loading) {
     return <Loader />;
   }
 
   if (!note) {
-    console.error(`Note ${noteId} not found`);
+    console.error(`Note ${id} not found`);
     navigator.goRoot();
     return null;
   }
@@ -53,10 +61,9 @@ export function EditNoteFromUrl() {
 
   return (
     <Editor
-      key={note.id}
+      key={id}
       title={note.title}
       content={content}
-      saveOnNavigation
       onChange={draft}
       onSave={setContent}
     />

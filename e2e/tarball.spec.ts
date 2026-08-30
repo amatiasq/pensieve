@@ -182,7 +182,7 @@ test.describe('Cold start via tarball', () => {
     await page.goto('/');
 
     await expect(page.locator('h5').first()).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator('h5')).toHaveCount(5);
+    await expect(page.locator('h5')).toHaveCount(6);
   });
 
   test('clicking a second note loads its content', async ({

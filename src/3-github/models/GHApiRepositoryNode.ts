@@ -1,6 +1,6 @@
-export type GHNodeSha = '[string GHNodeSha]';
+type GHNodeSha = '[string GHNodeSha]';
 
-export type GHRepoNodeType = 'blob' | 'file' | 'dir' | 'symlink' | 'submodule';
+type GHRepoNodeType = 'blob' | 'file' | 'dir' | 'symlink' | 'submodule';
 
 export interface GHApiRepositoryNode {
   type: GHRepoNodeType;

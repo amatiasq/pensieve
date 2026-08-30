@@ -11,6 +11,11 @@ export function datestr(date = new Date()) {
   return str as SerializedDate;
 }
 
+export function daystr(date = new Date()) {
+  const [day] = datestr(date).split(' ');
+  return day;
+}
+
 export function parseDate(str: SerializedDate) {
   return new Date(str);
 }

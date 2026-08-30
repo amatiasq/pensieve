@@ -11,6 +11,9 @@ Notas en un repo privado de GitHub. Reglas del mono:
 - **Grupo** — la carpeta de una nota, la parte a la izquierda de la `/` en la
   primera línea. No existe como entidad: es un derivado del texto, así que
   renombrar la primera línea mueve la nota de carpeta.
+- **Snapshot** — una copia de una nota cuya primera línea pasa a ser
+  `# <grupo de la original> / <fecha de hoy>`. Archiva un estado, así que se
+  crea sin navegar a ella: el foco se queda en la original.
 - **Repo-como-almacén** — no hay base de datos. Cada nota son dos ficheros del
   repo (`meta/{id}.json` y `note/{id}`), y cada guardado es un commit: el
   historial de la app *es* el historial de git.
@@ -112,6 +115,13 @@ Notas en un repo privado de GitHub. Reglas del mono:
   la página anterior hasta el siguiente refresh —header de la sidebar sobre la
   nota, pantalla en blanco al volver atrás—. En escritorio no se ve porque home
   y note comparten el mismo grid.
+
+- **El editor es de una nota, y la nota es su `key`.** Sus hooks guardan estado
+  —el texto sin guardar, si hay cambios pendientes—, así que sin `key` React
+  reusa la instancia y el render que sigue a la navegación junta el texto de la
+  nota anterior con el `onSave` de la nueva. Lo pendiente se vuelca al
+  desmontarse el editor, no en `onNavigate`: ese evento sale de un efecto y
+  llega cuando el editor ya se ha desuscrito, igual que el layout de arriba.
 
 - **El camino crítico se usa a diario.** Cualquier cambio en auth, guardado o
   service worker se prueba con la cuenta real y con una pestaña que ya tenga
