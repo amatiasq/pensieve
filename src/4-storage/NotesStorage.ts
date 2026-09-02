@@ -17,6 +17,10 @@ const getNotePath = (id: NoteId) => `meta/${id}.json`;
 const getContentPath = (id: NoteId) => `note/${id}`;
 const cleanJson = (json: string) => json.trim().replace(/,$/, '');
 
+export interface CreateNoteOptions {
+  favorite?: boolean;
+}
+
 export class NotesStorage {
   private readonly notes = new Map<NoteId, RemoteNote>();
   private readonly preloader = new Preloader(this.store);
@@ -123,8 +127,13 @@ export class NotesStorage {
     return this.createRemote(id, { ...createNote(''), id });
   }
 
-  create(content: NoteContent): RemoteNote {
-    const note = createNote(content);
+  // Una nota nace en favoritos porque se acaba de escribir; una copia de
+  // archivo no, que arriba estorba a la nota de la que se copió.
+  create(
+    content: NoteContent,
+    { favorite = true }: CreateNoteOptions = {},
+  ): RemoteNote {
+    const note = { ...createNote(content), favorite };
     const { id } = note;
     const remote = this.createRemote(id, note);
     const reason = `Create note "${note.title}"`;

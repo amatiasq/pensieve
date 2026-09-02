@@ -94,13 +94,12 @@ export class ResilientOnlineStore implements AsyncStore {
     return this.rejectIfOffline() || this.remote.readAll(pattern);
   }
 
+  // Sin red esto no se rinde, al revés que `readAll`: el tarball dejó el
+  // contenido de todas las notas en disco y quien sabe leerlo es la capa de
+  // abajo. Rechazar aquí escondía una nota que ya estaba guardada.
   read(key: string) {
     if (this.reading.has(key)) {
       return this.reading.get(key)!;
-    }
-
-    if (this.isOffline) {
-      return Promise.reject(new StoreOfflineError());
     }
 
     const promise = this.remote.read(key);

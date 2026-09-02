@@ -313,6 +313,14 @@ export class GHRepository {
   // token caducado— el contenido ya está en disco. Sin esto la app tiene la nota
   // guardada y aun así abre el editor vacío, que es lo mismo que perderla.
   async readFile(path: string): Promise<string> {
+    // Sin red la petición no sale del aparato, así que lanzarla sólo suma
+    // fallos al circuit breaker y éste deja la app sin GitHub otros 30 s
+    // cuando la red vuelve.
+    if (!navigator.onLine) {
+      const cached = await this.readFileFromDirCache(path);
+      if (cached != null) return cached;
+    }
+
     try {
       return await this.requestFile(path);
     } catch (error) {

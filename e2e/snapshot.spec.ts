@@ -36,6 +36,16 @@ test.describe('Snapshot', () => {
     await expect(group.locator('h5').filter({ hasText: today() })).toBeVisible({ timeout: 5_000 });
   });
 
+  test('the original stays above the copy', async ({ app, mockRepo }) => {
+    await openGroup(app, 'recipes');
+    await snapshotNote(app, 'cake.md');
+    await waitForSnapshot(mockRepo, `# recipes / ${today()}`);
+
+    const group = app.locator('details').filter({ hasText: 'recipes' });
+    // `h5 > a` es el título: el menú de la nota mete más enlaces dentro del h5.
+    await expect(group.locator('h5 > a')).toHaveText(['cake.md', today()], { timeout: 10_000 });
+  });
+
   test('the original is left alone and the view stays on it', async ({ app, mockRepo }) => {
     await openGroup(app, 'recipes');
     await clickNote(app, 'cake.md');

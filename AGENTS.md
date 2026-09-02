@@ -13,7 +13,8 @@ Notas en un repo privado de GitHub. Reglas del mono:
   renombrar la primera línea mueve la nota de carpeta.
 - **Snapshot** — una copia de una nota cuya primera línea pasa a ser
   `# <grupo de la original> / <fecha de hoy>`. Archiva un estado, así que se
-  crea sin navegar a ella: el foco se queda en la original.
+  crea sin navegar a ella y sin estrella, y la original sube por encima: ni el
+  foco ni el primer sitio de la lista se van de la original.
 - **Repo-como-almacén** — no hay base de datos. Cada nota son dos ficheros del
   repo (`meta/{id}.json` y `note/{id}`), y cada guardado es un commit: el
   historial de la app *es* el historial de git.
@@ -84,6 +85,10 @@ Notas en un repo privado de GitHub. Reglas del mono:
   caché de directorios cuando la petición falla. `readDirViaTree` **no** pasa por
   ahí, usa `requestFile`: lo que guarda queda apuntado con el SHA nuevo, y con
   contenido viejo bajo un SHA nuevo la nota se queda desactualizada para siempre.
+  **Y «sin red» tiene que llegar hasta ahí**: `ResilientOnlineStore` rechaza
+  `readAll` cuando `navigator.onLine` es falso, pero **no `read`** — cortar
+  arriba deja la nota en disco y la app diciendo que no se puede leer, que es
+  como se veía en el móvil.
 
 - **Un editor vacío nunca sustituye a una lectura que falló.** No estar en caché
   no es «la nota está vacía»: si lo local gana la carrera con un valor por

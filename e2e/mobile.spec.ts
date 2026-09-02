@@ -1,4 +1,5 @@
 import { test, expect, clickNote, clickCreateNote } from './fixtures';
+import { bulkRepo, setupTarballMocks } from './tarball-mock';
 
 test.describe('Mobile layout', () => {
   test('shows sidebar on home page', async ({ app }) => {
@@ -62,6 +63,39 @@ test.describe('Mobile layout', () => {
     // Navigate back to home to see the sidebar
     await app.goto('/');
     await expect(app.locator('h5')).toHaveCount(noteCountBefore + 1, { timeout: 5_000 });
+  });
+
+  // El bug que se veía en el móvil: sin red, una nota que nunca se abrió tiene
+  // su contenido donde lo dejó el tarball, pero la capa de offline rechazaba la
+  // lectura antes de llegar a ese disco. La nota estaba guardada y la app no la
+  // pintaba. La causa es estar sin red, no el móvil — en escritorio no se ve
+  // porque allí nunca se está sin red.
+  test('sin red se abre una nota que sólo bajó el tarball', async ({ page }) => {
+    const repo = bulkRepo();
+    await setupTarballMocks(page, repo);
+    await page.goto('/');
+    await expect(page.locator('h5').first()).toBeVisible({ timeout: 15_000 });
+
+    // En escritorio el editor es Monaco y se baja del CDN: sin abrirlo antes,
+    // sin red no habría editor que enseñara nada. En móvil es un `<pre>`.
+    const editor = page.locator('.monaco-editor .view-lines, pre code');
+    await clickNote(page, 'note-0258.md');
+    await expect(editor).toContainText('contenido de la nota 0258', {
+      timeout: 15_000,
+    });
+    await page.goBack();
+    await expect(page.locator('h5').first()).toBeVisible({ timeout: 10_000 });
+
+    await page.context().setOffline(true);
+
+    // La precarga va de la más vieja a la más nueva y ésta es la última, así
+    // que a local no ha llegado: sólo la tiene la caché del tarball.
+    await clickNote(page, 'note-0259.md');
+    await expect(editor).toContainText('contenido de la nota 0259', {
+      timeout: 10_000,
+    });
+
+    await page.context().setOffline(false);
   });
 
   test('filter works on mobile', async ({ app }) => {
