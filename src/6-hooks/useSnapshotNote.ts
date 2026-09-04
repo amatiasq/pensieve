@@ -19,7 +19,7 @@ export function useSnapshotNote(id: NoteId) {
 
     // La copia es el archivo y la original es con la que se sigue trabajando:
     // nace sin estrella y la original sube por delante de ella.
-    store.create(snapshotContent(content), { favorite: false });
+    store.create(snapshotContent(content), { favorite: true });
     await note.bump();
   };
 }
