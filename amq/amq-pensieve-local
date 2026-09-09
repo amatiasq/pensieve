@@ -11,6 +11,8 @@ case "$1" in
   -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
+amq need bun deno
+
 if [ ! -f .env ]; then
   echo "Falta pensieve/.env con CLIENT_SECRET_DEV y CLIENT_SECRET_PROD." >&2
   echo "Son los de las OAuth Apps de GitHub: /auth no puede canjear el code sin ellos." >&2

@@ -16,6 +16,8 @@ case "$1" in
   -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
+amq need bun deno
+
 if [ ! -d node_modules ]; then
   echo "==> bun install"
   bun install

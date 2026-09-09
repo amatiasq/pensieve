@@ -19,6 +19,8 @@ case "$1" in
   '') awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0" >&2; exit 1;;
 esac
 
+amq need bun
+
 LIB="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)/lib"
 source "$LIB/pensieve-data.sh"
 

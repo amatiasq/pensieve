@@ -17,6 +17,8 @@ case "$1" in
   -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
+amq need bun docker
+
 IMAGE="docker.amatiasq.com/pensieve-api"
 SERVICE="pensieve"
 STAMP="$(date +%Y-%m-%dT%H-%M-%S)"
