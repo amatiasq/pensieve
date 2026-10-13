@@ -4,14 +4,14 @@
 #
 #   --skip-build   sube el dist/ que ya está construido
 #
-# El stack del VPS son dos contenedores: el nginx que sirve el build desde
-# ./www, y la API (Deno) en la red interna, a la que sólo llega ese nginx. Este
-# comando hace las dos mitades: la imagen de la API y el `dist/` de la app.
+# Son dos mitades en dos stacks: la imagen de la API, que corre sola en la red
+# `pensieve_internal`, y el `dist/` de la app, que sirve el nginx común de
+# `services/nginx-static` — el mismo que se une a esa red para llevarle /auth,
+# /commit y /tarball a la API. El `dist/` va al docroot del nginx que esté
+# sirviendo, que es el común salvo en la vuelta atrás.
 #
 # El build se hace aquí y no en el VPS: es Bun + Vite y la CPU del VPS no tiene
 # AVX2. Al servidor sólo llega `dist/`.
-#
-# Config (env): VPS_REMOTE_DIR (default vps)
 
 case "$1" in
   -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
@@ -22,8 +22,7 @@ amq need bun docker
 IMAGE="docker.amatiasq.com/pensieve-api"
 SERVICE="pensieve"
 STAMP="$(date +%Y-%m-%dT%H-%M-%S)"
-VPS_REMOTE_DIR="${VPS_REMOTE_DIR:-vps}"
-SITE_DIR="$VPS_REMOTE_DIR/docker/$SERVICE/www"
+VPS_REMOTE_DIR=vps
 
 cd "$(dirname "$0")/.."
 
@@ -72,19 +71,33 @@ echo "==> subir la imagen"
 docker push "$IMAGE:latest"
 docker push "$IMAGE:$STAMP"
 
-# Con --delete, al revés que `amq vps deploy`: aquí todo es generado, y una ruta
-# que dejó de construirse debe dejar de servirse.
+# El docroot lo decide qué nginx está arriba, no el repo: desde el 2026-09-18
+# sirve el común de `services/nginx-static` y la rama de abajo es la vuelta
+# atrás, que arranca otra vez el nginx por sitio.
+if amq vps ssh 'docker ps --format "{{.Names}}"' | grep -qx nginx-static; then
+  SITE_DIR="$VPS_REMOTE_DIR/docker/nginx-static/www/pensieve"
+  shared_nginx=1
+else
+  SITE_DIR="$VPS_REMOTE_DIR/docker/pensieve/www"
+  shared_nginx=0
+fi
+echo "==> docroot: $SITE_DIR"
+
+# Con --delete: aquí todo es generado, y una ruta que dejó de construirse debe
+# dejar de servirse. Apunta a `www/pensieve/`, nunca a `www/`, que es de once
+# sitios.
 echo "==> rsync dist/ -> $SITE_DIR/ en el VPS"
 amq vps ssh "mkdir -p '$SITE_DIR'"
 amq vps rsync --delete dist/ ":$SITE_DIR/"
 
-echo "==> subir infra (compose + nginx.conf)"
-amq vps deploy "$SERVICE"
+# La API primero: es quien crea la red `pensieve_internal` a la que el nginx
+# común se une.
+amq services deploy "$SERVICE" --from infra
 
-# Recrear y no `nginx -s reload`: el despliegue trae imagen nueva de la API, y
-# un reload de nginx no la recogería. Es una PWA con escrituras offline, así que
-# el corte de un recreate no se nota.
-echo "==> pull-and-restart en el VPS"
-amq vps pull-and-restart "$SERVICE"
+# El nginx por sitio lee su nginx.conf del servidor y no necesita nada; el
+# común sí, que su routing —y el proxy a la API— viaja aquí.
+if [ "$shared_nginx" = 1 ]; then
+  amq nginx-static deploy
+fi
 
 echo "==> desplegado: https://pensieve.amatiasq.com/ ($commit)"

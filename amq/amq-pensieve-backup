@@ -16,6 +16,8 @@ case "$1" in
   -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
+cd "$(dirname "$0")/.."
+
 DATA_REPO="${PENSIEVE_DATA_REPO:-git@github.com:amatiasq/pensieve-data.git}"
 MIRROR="backups/pensieve-data.git"
 
@@ -34,3 +36,9 @@ fi
 bundle="backups/pensieve-data-$(date +%Y-%m-%d).bundle"
 echo "==> writing $bundle"
 git -C "$MIRROR" bundle create "../../$bundle" --all
+
+# Se afirma el fichero, no el exit de git: un backup que sale 0 no ha copiado nada.
+if [[ ! -s "$bundle" ]]; then
+  echo "$bundle no está o está vacío: hoy no hay copia." >&2
+  exit 1
+fi

@@ -17,6 +17,8 @@ esac
 
 amq need bun
 
+cd "$(dirname "$0")/.."
+
 if [ ! -d node_modules ]; then
   echo "==> bun install"
   bun install

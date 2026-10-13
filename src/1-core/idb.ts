@@ -1,13 +1,9 @@
 import type { UseStore } from 'idb-keyval';
 
 /**
- * `createStore` de idb-keyval abre la base sin versión y su `onupgradeneeded`
- * sólo salta si la base no existe: sobre la base que dejó localforage
- * (`pensieve-data`/`keyvaluepairs`) el store `keyval` no se creaba nunca,
- * todo tiraba `NotFoundError` y la app tapaba el agujero yendo a GitHub por
- * todo. Un object store sólo se crea dentro de un `onupgradeneeded`, y eso
- * sólo pasa al subir de versión: esto sube la versión. Lo del store viejo no
- * se migra — es una caché y el repo la rellena en una petición.
+ * `createStore` de idb-keyval abre la base sin versión, así que sobre una base
+ * que ya existe sin el store no lo crea nunca y todo tira `NotFoundError`. Un
+ * object store sólo se crea al subir de versión: esto la sube.
  */
 export function createStore(dbName: string, storeName: string): UseStore {
   let connection: Promise<IDBDatabase> | null = null;

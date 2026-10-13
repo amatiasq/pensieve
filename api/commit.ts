@@ -1,4 +1,5 @@
 import type { Context } from 'hono';
+import { HTTPException } from 'hono/http-exception';
 import config from '../src/config.json' with { type: 'json' };
 
 type StagedFiles = Record<string, string | Record<string, unknown> | null>;
@@ -52,11 +53,13 @@ export async function commitToGithub(
 
     const body = await response.text();
 
-    // El worker de Cloudflare se comía los fallos de GitHub y contestaba 200,
-    // así que un guardado que no se guardaba parecía guardado. Ahora falla, y
-    // el outbox lo reintenta.
+    // Un fallo de GitHub es un error, o el outbox no reintenta.
     if (!response.ok) {
-      throw new Error(`GitHub ${method} ${path}: ${response.status} ${body}`);
+      const message = `GitHub ${method} ${path}: ${response.status} ${body}`;
+      if (isAuthFailure(response.status)) {
+        throw new HTTPException(response.status, { message });
+      }
+      throw new Error(message);
     }
 
     return JSON.parse(body) as T;
@@ -88,6 +91,11 @@ export async function commitToGithub(
   });
 
   return { sha: created.sha, committed: true };
+}
+
+// Un token que GitHub rechaza es un 401/403 para el cliente, no un 500.
+export function isAuthFailure(status: number): status is 401 | 403 {
+  return status === 401 || status === 403;
 }
 
 function toTreeItems(files: StagedFiles) {

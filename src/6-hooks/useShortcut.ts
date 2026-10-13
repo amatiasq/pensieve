@@ -54,10 +54,6 @@ function init(store: NotesStorage) {
       });
 
       if (typeof command === 'function') {
-        // if (getSetting('displayShortcutsAsTooltip')) {
-        //   tooltip(keys.replace('META', 'CMD'));
-        // }
-
         event.preventDefault();
         command();
       }

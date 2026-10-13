@@ -1,31 +1,14 @@
-# pensieve: la SPA la sirve nginx desde ./www, y la API vive a su lado en la red
-# `internal`, sin VIRTUAL_HOST — sólo la alcanza el nginx de este stack.
+# pensieve: la API, sola en la red privada `pensieve_internal`. La SPA la sirve
+# el nginx común de [`services/nginx-static`](../../services/nginx-static/), que
+# se une a esa red para sus tres rutas de API — por eso la red lleva `name:`
+# explícito: es la cadena que comparten los dos compose, sin depender del
+# prefijo que cada proyecto le pone a sus redes.
 #
 # La carpeta del stack se llama `pensieve` y no puede cambiar, o el servidor se
 # queda con el stack anterior huérfano.
 
 services:
-  nginx:
-    container_name: amq-pensieve
-    image: nginx:1.31
-    restart: unless-stopped
-    expose:
-      - 80
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./logs:/var/log/nginx
-      # El build, que `amq pensieve deploy` rsyncea aquí. Todo es generado: ese
-      # rsync sí lleva --delete.
-      - ./www:/www:ro
-    environment:
-      - VIRTUAL_HOST=pensieve.amatiasq.com,pensieve.amq.im
-      - LETSENCRYPT_HOST=pensieve.amatiasq.com,pensieve.amq.im
-      - LETSENCRYPT_EMAIL=amatiasq@gmail.com
-    networks:
-      - exposed
-      - internal
-
-  # El nombre del servicio es el host al que proxea el nginx de arriba.
+  # El nombre del servicio es el host al que proxea el nginx común.
   pensieve-api:
     image: docker.amatiasq.com/pensieve-api:latest
     container_name: amq-pensieve-api
@@ -42,6 +25,4 @@ services:
 
 networks:
   internal:
-    driver: bridge
-  exposed:
-    external: true
+    name: pensieve_internal

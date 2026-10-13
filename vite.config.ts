@@ -1,6 +1,5 @@
 import react from '@vitejs/plugin-react';
 import { readFileSync } from 'fs';
-import { visualizer } from 'rollup-plugin-visualizer';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -64,9 +63,6 @@ export default defineConfig({
     }),
     react({
       jsxImportSource: '@emotion/react',
-    }),
-    visualizer({
-      filename: 'dist/stats.html',
     }),
   ],
   server: {

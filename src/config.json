@@ -1,5 +1,5 @@
 {
-  "GH_SCOPE": "repo gist",
+  "GH_SCOPE": "repo",
   "GH_API": "https://api.github.com",
   "AUTH_ENDPOINT": "/auth",
   "COMMIT_ENDPOINT": "/commit",

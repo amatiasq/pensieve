@@ -13,6 +13,8 @@ esac
 
 amq need bun deno
 
+cd "$(dirname "$0")/.."
+
 if [ ! -f .env ]; then
   echo "Falta pensieve/.env con CLIENT_SECRET_DEV y CLIENT_SECRET_PROD." >&2
   echo "Son los de las OAuth Apps de GitHub: /auth no puede canjear el code sin ellos." >&2

@@ -1,5 +1,6 @@
 import type { Context } from 'hono';
 import config from '../src/config.json' with { type: 'json' };
+import { isAuthFailure } from './commit.ts';
 
 interface TarballRequest {
   token: string;
@@ -28,7 +29,7 @@ export async function tarball(c: Context) {
       {
         error: `GitHub tarball ${owner}/${repo}@${branch}: ${response.status}`,
       },
-      502,
+      isAuthFailure(response.status) ? response.status : 502,
     );
   }
 

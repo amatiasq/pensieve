@@ -6,7 +6,6 @@ import { extendMonacoLanguage } from './extendMonacoLanguage.ts';
 import { provideCustomLinks } from './extendMonacoLinks.ts';
 import { extendMonacoTheme } from './extendMonacoTheme.ts';
 
-// type IMonarchLanguage = languages.IMonarchLanguage;
 type IMonarchLanguageRule = languages.IMonarchLanguageRule;
 type ITokenThemeRule = editor.ITokenThemeRule;
 type ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
@@ -72,12 +71,4 @@ export function extendMonaco(
     `Error from extending monaco's theme`,
     theme,
   );
-
-  // const extensions: Record<string, IMonarchLanguage> = {
-  //   markdown: { tokenizer: { root: [] } },
-  // };
-
-  // for (const [key, value] of Object.entries(extensions)) {
-  //   extendMonacoLanguage(monaco, key, value);
-  // }
 }

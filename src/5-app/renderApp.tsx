@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ghRepository } from '../3-github/gh-utils.ts';
-import { AppStorage } from '../4-storage/AppStorage.ts';
+import { NotesStorage } from '../4-storage/NotesStorage.ts';
 import { createStore } from '../4-storage/index.ts';
 import { Loader } from '../7-components/atoms/Loader.tsx';
 import { App } from './App.tsx';
@@ -16,7 +16,7 @@ export function renderApp(container: HTMLElement): void {
 }
 
 function Scaffold() {
-  const [store, setStore] = useState<AppStorage>(null!);
+  const [store, setStore] = useState<NotesStorage>(null!);
   const { token, username } = useGithubAuth();
 
   useEffect(() => {

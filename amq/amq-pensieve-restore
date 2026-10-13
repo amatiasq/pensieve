@@ -20,6 +20,8 @@ case "$1" in
   -h|--help|help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/, ""); print}' "$0"; exit 0;;
 esac
 
+cd "$(dirname "$0")/.."
+
 bundle="${1:-$(ls -t backups/pensieve-data-*.bundle 2>/dev/null | head -1)}"
 
 if [[ -z "$bundle" ]]; then

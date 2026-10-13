@@ -1,144 +1,116 @@
 # pensieve — AGENTS.md
 
-Notas en un repo privado de GitHub. Reglas del mono:
-[`../AGENTS.md`](../AGENTS.md).
+Notes in a private GitHub repo.
 
-## Glosario
+## Glossary
 
-- **Nota** — un fichero de texto con id UUID v4. **Su primera línea es su
-  nombre**: de ahí salen extensión, carpeta y título, y no hay ningún otro sitio
-  donde se guarden. `getMetadataFromContent` es la única autoridad.
-- **Grupo** — la carpeta de una nota, la parte a la izquierda de la `/` en la
-  primera línea. No existe como entidad: es un derivado del texto, así que
-  renombrar la primera línea mueve la nota de carpeta.
-- **Snapshot** — una copia de una nota cuya primera línea pasa a ser
-  `# <grupo de la original> / <fecha de hoy>`. Archiva un estado, así que se
-  crea sin navegar a ella y sin estrella, y la original sube por encima: ni el
-  foco ni el primer sitio de la lista se van de la original.
-- **Repo-como-almacén** — no hay base de datos. Cada nota son dos ficheros del
-  repo (`meta/{id}.json` y `note/{id}`), y cada guardado es un commit: el
-  historial de la app *es* el historial de git.
-- **Store** — la interfaz `AsyncStore` (`readAll`/`read`/`write`/`delete`) sobre
-  claves de fichero. Todo lo demás son middlewares que la envuelven:
-  `CachedStore` (TTL en memoria), `ForageStore` (IndexedDB),
-  `ResilientOnlineStore` (outbox), `GHRepoStore` (GitHub), `MixedStore` (une
-  local y remoto).
-- **Stale-while-revalidate** — se pinta lo local al instante y se reconcilia con
-  lo remoto cuando llega. `MixedStore.readAll` devuelve remoto y escribe la
-  diferencia en local; `read` **prefiere remoto** y sólo cae a local si falla.
-- **Outbox** — la cola de escrituras que no salieron, en IndexedDB
-  (`pensieve-outbox`). Sobrevive al cierre de la pestaña; se vacía al volver la
-  red, al volver el foco, o por Background Sync.
-- **Leader tab** — de todas las pestañas abiertas, sólo una vacía el outbox y
-  hace el polling remoto (`isLeader()`); las demás reciben el resultado por
-  `BroadcastChannel`. Sin esto, N pestañas hacen N commits del mismo cambio.
-- **Circuit breaker** — tras 3 fallos de servidor seguidos, las llamadas a
-  GitHub fallan al instante durante 30 s (o hasta `X-RateLimit-Reset`). Degrada
-  la app a modo local en vez de colgarla contra una API caída.
-- **`/halt`** — ruta que carga la app **sin lanzar el redirect de OAuth**. Es la
-  única forma de llegar a la página con un token roto para arreglarlo.
+- **Note** — a text file with a UUID v4 id. **Its first line is its name**:
+  extension, folder and title come from it, and they're stored nowhere else.
+  `getMetadataFromContent` is the only authority.
+- **Group** — a note's folder, the part left of the `/` in the first line. It
+  isn't an entity: it's derived from the text, so renaming the first line moves
+  the note to another folder.
+- **Snapshot** — a copy of a note whose first line becomes
+  `# <original's group> / <today's date>`. It archives a state, so it's created
+  without navigating to it and without a star, and the original is bumped above
+  it: neither focus nor the top of the list leave the original.
+- **Repo-as-store** — there's no database. Each note is two files in the repo
+  (`meta/{id}.json` and `note/{id}`), and each save is a commit: the app's
+  history *is* the git history.
+- **Store** — the `AsyncStore` interface (`readAll`/`read`/`write`/`delete`)
+  over file keys. Everything else is middleware wrapping it: `CachedStore`
+  (in-memory TTL), `IdbStore` (IndexedDB), `ResilientOnlineStore` (outbox),
+  `GHRepoStore` (GitHub), `MixedStore` (joins local and remote).
+- **Stale-while-revalidate** — local is painted at once and reconciled with
+  remote when it arrives. `MixedStore.readAll` returns remote and writes the
+  difference locally; `read` **prefers remote** and only falls back to local
+  if it fails.
+- **Outbox** — the queue of writes that didn't go out, in IndexedDB
+  (`pensieve-outbox`). It survives closing the tab; it drains when the network
+  comes back, when focus comes back, or through Background Sync.
+- **Leader tab** — of all open tabs, only one drains the outbox and polls
+  remote (`isLeader()`); the rest get the result over `BroadcastChannel`.
+  Without it, N tabs make N commits of the same change.
+- **Circuit breaker** — after 3 server failures in a row, GitHub calls fail
+  instantly for 30 s (or until `X-RateLimit-Reset`). It degrades the app to
+  local mode instead of hanging it on a dead API.
+- **`/halt`** — a route that loads the app **without firing the OAuth
+  redirect**. It's the only way to reach the page with a broken token to fix
+  it.
 
-## Invariantes
+## Invariants
 
-- **El `client_secret` de la OAuth App no puede tocar el bundle del cliente.**
-  Por eso `/auth` existe como endpoint de servidor: es el único
-  sitio donde el intercambio del `code` por token puede ocurrir. Los secretos
-  llegan a `api/auth.ts` como variables de entorno, desde un `.env` gitignorado
-  —el del servidor lo escribe `amq pensieve secrets`, el de local lo lee `amq
-  pensieve local`—, nunca desde `config.json`.
-- **La API es del mismo origen que la app, y por eso no hay CORS.** `api/` es un
-  servicio Deno en la red `internal` del stack, al que sólo llega el nginx de al
-  lado; el cliente pide `/auth`, `/commit` y `/tarball` en rutas relativas.
-  Volver a separarlos trae de vuelta un CORS que hay que acertar.
-
-- **El arranque en frío se lee de un tarball, no fichero a fichero.** Las notas
-  son miles de ficheros y la cuenta tiene 5000 llamadas por hora: pedir una por
-  nota agota el rate limit de la hora entera antes de acabar de cargar, y la app
-  se queda sin lista. Por eso existe `/tarball` —el navegador no puede pedirlo
-  él, porque `api.github.com` redirige a `codeload.github.com`, que no permite
-  el origen de la app— y por eso `readDirViaTree` se rinde y se lo pide al
-  tarball en vez de seguir: rendirse deja la app leyendo lo local, que es mucho
-  mejor que gastar la hora en una carga que no va a terminar.
-
-- **Precargar es lo contrario del tarball, y por eso lleva freno.** Leer sin red
-  una nota que nunca se abrió exige bajarla, o sea justo la petición por fichero
-  que agota el rate limit. `Preloader` la hace de una en una, sólo en la pestaña
-  líder y con un presupuesto por sesión; lo que no entra lo coge la siguiente.
-
-- **Un object store que falta se crea; no se da por hecho que esté.** El
-  `createStore` de idb-keyval abre la base sin versión, así que su upgrade sólo
-  salta cuando la base no existe: si existe y le falta su store, cada lectura y
-  cada escritura tiran `NotFoundError` para siempre. Le pasó a lo local —
-  localforage había creado `pensieve-data` con el store `keyvaluepairs`, y a
-  idb-keyval se le pedía `keyval` sobre esa misma base—, y la caché quedó muerta
-  sin que nada lo dijera: la app tapó el agujero yendo a GitHub por todo, que es
-  lo que agotaba el rate limit. Las bases se abren por
-  [`1-core/idb.ts`](src/1-core/idb.ts), que sube la versión para crear el store
-  que falte. Lo que hubiera en el store viejo no se migra: es una caché, y el
-  repo la rellena entera en una petición.
-
-- **Lo que el tarball baja se lee del disco cuando GitHub no contesta.** El
-  tarball trae el contenido de **todas** las notas, no sólo la lista, y lo deja
-  en `pensieve-dir-cache`. Si al abrir una nota se pidiera otra vez a la API y la
-  API dijera que no —rate limit agotado, token caducado, sin red—, la app tendría
-  la nota en disco y aun así abriría el editor vacío. Por eso `readFile` cae a la
-  caché de directorios cuando la petición falla. `readDirViaTree` **no** pasa por
-  ahí, usa `requestFile`: lo que guarda queda apuntado con el SHA nuevo, y con
-  contenido viejo bajo un SHA nuevo la nota se queda desactualizada para siempre.
-  **Y «sin red» tiene que llegar hasta ahí**: `ResilientOnlineStore` rechaza
-  `readAll` cuando `navigator.onLine` es falso, pero **no `read`** — cortar
-  arriba deja la nota en disco y la app diciendo que no se puede leer, que es
-  como se veía en el móvil.
-
-- **Un editor vacío nunca sustituye a una lectura que falló.** No estar en caché
-  no es «la nota está vacía»: si lo local gana la carrera con un valor por
-  defecto, el fallo del remoto no aparece en ninguna parte y guardar encima se
-  lleva la nota por delante. `fetchAndUpdate` sólo contesta con lo local si
-  `isValid` lo acepta, y si no puede ni lo local ni el remoto **falla**;
-  `EditNoteFromUrl` enseña el error en vez del editor.
-
-- **Lo que la caché guarda de cada fichero es su SHA de git**, o sea
-  `sha1("blob " + tamaño + "\0" + contenido)`, que es el mismo que trae
-  `git/trees`. Es lo único que hace comparable el tarball con la sincronización
-  siguiente: con un hash cualquiera nada coincide y el repo se vuelve a pedir
-  entero, nota a nota.
-- **Las capas `src/0-dom` … `src/7-components` sólo importan de capas de número
-  igual o inferior.** Es lo que mantiene el storage y GitHub fuera de la UI, y
-  lo comprueba `layers/no-upward-import`, en `eslint.config.js`.
-- **Las notas son la copia off-site de todo lo demás.** Son lo que hace falta
-  para arreglar el VPS cuando el VPS se rompe, así que pensieve no puede
-  acabar dependiendo de aquello que sus notas sirven para reparar: los datos
-  viven en un repo de GitHub (`amatiasq/pensieve-data`) y la app es una PWA
-  con escrituras offline, así que con el VPS caído las notas se leen y se
-  editan.
-- **El layout de la página se deriva del render, no del evento
-  `onNavigate`.** En móvil cada página tiene su propio `grid-template-areas`, y
-  quien lo elige es la clase `page-*` de `App`. Si esa clase saliera de un
-  `useState` alimentado por `navigator.onNavigate`, nunca cambiaría: los efectos
-  de los hijos corren antes que los del padre, así que `Router` emite la
-  navegación antes de que `App` haya vuelto a suscribirse, y el grid se queda en
-  la página anterior hasta el siguiente refresh —header de la sidebar sobre la
-  nota, pantalla en blanco al volver atrás—. En escritorio no se ve porque home
-  y note comparten el mismo grid.
-
-- **El editor es de una nota, y la nota es su `key`.** Sus hooks guardan estado
-  —el texto sin guardar, si hay cambios pendientes—, así que sin `key` React
-  reusa la instancia y el render que sigue a la navegación junta el texto de la
-  nota anterior con el `onSave` de la nueva. Lo pendiente se vuelca al
-  desmontarse el editor, no en `onNavigate`: ese evento sale de un efecto y
-  llega cuando el editor ya se ha desuscrito, igual que el layout de arriba.
-
-- **El camino crítico se usa a diario.** Cualquier cambio en auth, guardado o
-  service worker se prueba con la cuenta real y con una pestaña que ya tenga
-  pensieve abierto — un service worker viejo esconde el despliegue nuevo.
-
-- **Respaldar un repo es clonarlo, y por eso `restore` se para en el clon.**
-  `amq pensieve backup` deja un espejo y un bundle; `amq pensieve restore` lo
-  abre y cuenta commits y ficheros. Devolverlo a GitHub es `git push --mirror`,
-  que reescribe el repo remoto entero: el comando lo imprime y no lo ejecuta,
-  porque un restore que publica solo no se puede ensayar.
-- **La copia de fuera no la hace este comando: la baja Cereza**, con una llave de
-  despliegue de sólo lectura, y su ensayo diario clona ese espejo. Aquí sólo queda
-  la copia de Lorelei — dos caminos copiando los mismos 97 M ocupan el doble.
-
-Planes en [`.agents/plans/`](.agents/plans/).
+- **The OAuth App's `client_secret` can't touch the client bundle.** That's
+  why `/auth` exists as a server endpoint: it's the only place the `code` can
+  be swapped for a token. Secrets reach `api/auth.ts` as environment
+  variables from a gitignored `.env` —the server's is written by `amq pensieve
+  secrets`, the local one is read by `amq pensieve local`—, never from
+  `config.json`.
+- **The API shares the app's origin, so there's no CORS.** `api/` is a Deno
+  service only on the `pensieve_internal` network, reached only by the shared
+  nginx, which joins that network; the client calls `/auth`, `/commit` and
+  `/tarball` on relative paths. Splitting them again brings back a CORS setup
+  that has to be right.
+- **A cold start reads a tarball, not file by file.** Notes are thousands of
+  files and the account has 5000 calls per hour: one per note burns the whole
+  hour's rate limit before loading finishes, and the app is left without a
+  list. That's why `/tarball` exists —the browser can't ask for it, because
+  `api.github.com` redirects to `codeload.github.com`, which doesn't allow the
+  app's origin— and why `readDirViaTree` gives up and asks the tarball instead
+  of going on: giving up leaves the app reading local, much better than
+  spending the hour on a load that won't finish.
+- **Preloading is the opposite of the tarball, so it has a brake.** Reading
+  offline a note that was never opened means downloading it, exactly the
+  per-file request that burns the rate limit. `createPreloader` does it one at a
+  time, only in the leader tab and with a per-session budget; whatever doesn't
+  fit, the next session takes.
+- **A missing object store gets created; it's never assumed to be there.**
+  idb-keyval's `createStore` opens the database without a version, so if the
+  database exists without its store every read and write throws
+  `NotFoundError` forever, silently. Databases are opened through
+  [`1-core/idb.ts`](src/1-core/idb.ts), which bumps the version to create the
+  missing store.
+- **What the tarball downloaded is read from disk when GitHub doesn't
+  answer.** The tarball brings the content of **every** note, not just the
+  list, and leaves it in `pensieve-dir-cache`. If opening a note asked the API
+  again and the API said no —rate limit, expired token, no network—, the app
+  would have the note on disk and still open an empty editor. That's why
+  `readFile` falls back to the directory cache when the request fails.
+  `readDirViaTree` does **not** go there, it uses `requestFile`: what it stores
+  is tagged with the new SHA, and old content under a new SHA leaves the note
+  stale forever. **And "offline" has to reach that far**:
+  `ResilientOnlineStore` rejects `readAll` when `navigator.onLine` is false,
+  but **not `read`** — cutting it higher up leaves the note on disk and the app
+  saying it can't be read.
+- **An empty editor never replaces a failed read.** Not being cached isn't
+  "the note is empty": if local wins the race with a default value, the remote
+  failure shows up nowhere and saving over it wipes the note. `fetchAndUpdate`
+  only answers with local if `isValid` accepts it, and if neither local nor
+  remote can, it **fails**; `EditNoteFromUrl` shows the error instead of the
+  editor.
+- **What the cache stores for each file is its git SHA**, that is
+  `sha1("blob " + size + "\0" + content)`, the same one `git/trees` returns.
+  It's the only thing that makes the tarball comparable with the next sync:
+  with any other hash nothing matches and the whole repo is fetched again, note
+  by note.
+- **Layers `src/0-dom` … `src/7-components` only import from layers with an
+  equal or lower number.** It keeps storage and GitHub out of the UI, and
+  `layers/no-upward-import` in `eslint.config.js` checks it.
+- **The notes are the off-site copy of everything else.** They're what's
+  needed to fix the VPS when the VPS breaks, so pensieve can't end up
+  depending on what its notes are for repairing: data lives in a GitHub repo
+  (`amatiasq/pensieve-data`) and the app is a PWA with offline writes, so with
+  the VPS down notes are read and edited.
+- **The critical path is used daily.** Any change to auth, saving or the
+  service worker is tested with the real account and with a tab that already
+  has pensieve open — an old service worker hides the new deploy.
+- **Backing up a repo is cloning it, so `restore` stops at the clone.**
+  `amq pensieve backup` leaves a mirror and a bundle; `amq pensieve restore`
+  opens it and counts commits and files. Putting it back on GitHub is
+  `git push --mirror`, which rewrites the whole remote repo: the command prints
+  it and doesn't run it, because a restore that publishes by itself can't be
+  rehearsed.
+- **The off-site copy isn't made by this command: the NAS pulls it**, with a
+  read-only deploy key, and its daily rehearsal clones that mirror. Here only
+  the laptop copy is left — two paths copying the same data take twice the
+  space.

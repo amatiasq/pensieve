@@ -12,53 +12,53 @@ const SESSION_BUDGET = 600;
  * Baja a local, una por segundo, las claves que no estén ya ahí. Sin esto sólo
  * se lee sin red lo que se abrió alguna vez, así que un portátil recién abierto
  * en un avión no tiene las notas viejas.
+ *
+ * Devuelve `preload`, que reemplaza la cola, de la clave más prioritaria a la
+ * menos.
  */
-export class Preloader {
-  private queue: string[] = [];
-  private budget = SESSION_BUDGET;
-  private timer: ReturnType<typeof setInterval> | null = null;
-  private downloading = false;
+export function createPreloader(store: MixedStore): (keys: string[]) => void {
+  let queue: string[] = [];
+  let budget = SESSION_BUDGET;
+  let timer: ReturnType<typeof setInterval> | null = null;
+  let downloading = false;
 
-  constructor(private readonly store: MixedStore) {}
+  return function preload(keys: string[]) {
+    if (!budget) return;
 
-  /** Reemplaza la cola, de la clave más prioritaria a la menos. */
-  preload(keys: string[]) {
-    if (!this.budget) return;
+    queue = keys;
+    timer ??= setInterval(tick, TICK_MS);
+  };
 
-    this.queue = keys;
-    this.timer ??= setInterval(() => this.tick(), TICK_MS);
-  }
-
-  private tick() {
+  function tick() {
     // Sólo la pestaña líder baja: N pestañas serían N veces el rate limit.
-    if (this.downloading || !navigator.onLine || !isLeader()) return;
+    if (downloading || !navigator.onLine || !isLeader()) return;
 
-    this.downloading = true;
-    this.downloadNext().finally(() => (this.downloading = false));
+    downloading = true;
+    downloadNext().finally(() => (downloading = false));
   }
 
-  private async downloadNext() {
-    while (this.queue.length && this.budget) {
-      const key = this.queue.shift()!;
+  async function downloadNext() {
+    while (queue.length && budget) {
+      const key = queue.shift()!;
 
       // Abrir una nota la deja en local, así que sale de la cola sola.
-      if (await this.store.localHas(key)) continue;
+      if (await store.localHas(key)) continue;
 
-      this.budget--;
+      budget--;
 
       // Un fallo no se reintenta aquí: la sincronización periódica vuelve a
       // encolar lo que siga faltando.
-      await this.store.readRemote(key).catch(() => {});
+      await store.readRemote(key).catch(() => {});
       return;
     }
 
-    this.stop();
+    stop();
   }
 
-  private stop() {
-    if (!this.timer) return;
+  function stop() {
+    if (!timer) return;
 
-    clearInterval(this.timer);
-    this.timer = null;
+    clearInterval(timer);
+    timer = null;
   }
 }

@@ -9,7 +9,5 @@ export function errorFor<T>(action: () => T, message: string, ...other: any[]) {
     if (other.length) {
       console.debug('Reported debug values:', ...other);
     }
-
-    // throw new Error(message);
   }
 }

@@ -8,8 +8,9 @@ import { deserialize, serialize } from '../util/serialization.ts';
 import { fetchAndUpdate } from './helpers/fetchAndUpdate.ts';
 import { RemoteJson } from './helpers/RemoteJson.ts';
 import { RemoteValue } from './helpers/RemoteValue.ts';
+import { GithubUsername } from '../3-github/models/GHApiUser.ts';
 import { MixedStore } from './middleware/MixedStore.ts';
-import { Preloader } from './Preloader.ts';
+import { createPreloader } from './Preloader.ts';
 import { RemoteNote } from './RemoteNote.ts';
 
 const getNotesPath = () => 'meta/*';
@@ -23,7 +24,7 @@ export interface CreateNoteOptions {
 
 export class NotesStorage {
   private readonly notes = new Map<NoteId, RemoteNote>();
-  private readonly preloader = new Preloader(this.store);
+  private readonly preload = createPreloader(this.store);
   private readonly emitNotesCreate: (data: Note[]) => void;
   readonly onNotesCreated: (listener: (data: Note[]) => void) => () => void;
 
@@ -39,7 +40,10 @@ export class NotesStorage {
     DEFAULT_SHORTCUTS,
   );
 
-  constructor(private readonly store: MixedStore) {
+  constructor(
+    private readonly store: MixedStore,
+    readonly username: GithubUsername,
+  ) {
     const [emitNotesCreate, onNotesCreated] =
       messageBus<Note[]>('notes-created');
 
@@ -80,7 +84,7 @@ export class NotesStorage {
     const newest = (note: Note) => Number(parseDate(note.modified));
     const newestFirst = [...notes].sort((a, b) => newest(b) - newest(a));
 
-    this.preloader.preload(newestFirst.map(x => getContentPath(x.id)));
+    this.preload(newestFirst.map(x => getContentPath(x.id)));
   }
 
   private synchronize(notes: Record<NoteId, string>) {

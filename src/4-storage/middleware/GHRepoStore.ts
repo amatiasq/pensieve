@@ -67,8 +67,6 @@ export class GHRepoStore implements AsyncStore {
   }
 
   private push(isUrgent = false) {
-    // console.log('push');
-
     if (this.repo.isCommiting) {
       this.scheduler.restart();
       return;

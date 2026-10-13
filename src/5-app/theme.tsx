@@ -15,8 +15,6 @@ const sidebar = color('#252526');
 const border = color('#343637');
 const primary = color('#669bd1');
 const secondary = color('#f2f230');
-// const secondary = color('#d16014');
-// const secondary = color('#c9866e');
 
 export const globalStyles = css`
   #app-container {

@@ -1,10 +1,10 @@
 import { del, get, keys, set, type UseStore } from 'idb-keyval';
-import { createStore as createIdbStore } from '../../1-core/idb.ts';
+import { createStore as openIdbStore } from '../../1-core/idb.ts';
 import { debugMethods } from '../../util/debugMethods.ts';
 import { AsyncStore } from '../AsyncStore.ts';
 import { patternToRegex } from '../helpers/patternToRegex.ts';
 
-class ForageStore implements AsyncStore {
+class IdbStore implements AsyncStore {
   private cachedKeys: Set<string> | null = null;
 
   constructor(private readonly store: UseStore) {
@@ -57,8 +57,8 @@ class ForageStore implements AsyncStore {
   }
 }
 
-export function createForageStore(name: string) {
-  return new ForageStore(createIdbStore(name, 'keyval'));
+export function createIdbStore(name: string) {
+  return new IdbStore(openIdbStore(name, 'keyval'));
 }
 
 // Un patrón `prefijo*` es un rango de claves: el cursor se salta las que no

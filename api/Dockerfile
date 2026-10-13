@@ -1,4 +1,4 @@
-# La API de pensieve: /auth y /commit, sin estado.
+# La API de pensieve: /auth, /commit y /tarball, sin estado.
 #
 # El contexto de build es `pensieve/`, no `pensieve/api/`, porque los CLIENT_ID
 # salen de `src/config.json` — el mismo fichero que lee el cliente, para que no

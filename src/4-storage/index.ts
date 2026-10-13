@@ -1,12 +1,12 @@
 import { GHRepository } from '../3-github/GHRepository.ts';
 import { GithubToken } from '../3-github/GithubAuth.ts';
 import { GithubUsername } from '../3-github/models/GHApiUser.ts';
-import { AppStorage } from './AppStorage.ts';
 import { CachedStore } from './middleware/CachedStore.ts';
-import { createForageStore } from './middleware/ForageStore.ts';
+import { createIdbStore } from './middleware/IdbStore.ts';
 import { GHRepoStore } from './middleware/GHRepoStore.ts';
 import { MixedStore } from './middleware/MixedStore.ts';
 import { ResilientOnlineStore } from './middleware/ResilientOnlineStore.ts';
+import { NotesStorage } from './NotesStorage.ts';
 
 export async function createStore(
   token: GithubToken,
@@ -26,7 +26,7 @@ export async function createStore(
     }
   }
 
-  const local = createForageStore(repoName);
+  const local = createIdbStore(repoName);
   const repoStore = new GHRepoStore(repo);
 
   // Handles offline
@@ -41,5 +41,5 @@ export async function createStore(
     new CachedStore(resilient, 30, 'remote'),
   );
 
-  return new AppStorage(username, mixed);
+  return new NotesStorage(mixed, username);
 }
